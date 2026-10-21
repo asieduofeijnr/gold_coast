@@ -1,0 +1,186 @@
+This video will be different because in
+this one, I'm going to show you how I
+built this.
+It was made in Godot.
+And yes, it's not one prompt. And I want
+to show you the whole process how I
+usually work with AI models. And I'm
+using four: Fable 5, Opus 5, GPT 56,
+Soul, [music] and Kimik 83. And each of
+those models has different
+responsibility. Fable 5 takes the hard
+calls, [music]
+what we build and why. Opus 5 writes the
+mechanics and build models, [music] too.
+GPT 56 is my Blender guy, sometimes
+mechanics, too. And Kimik 83 is Blender
+only. It has a really good feel of
+aesthetics, [music] I noticed. So, how
+do you start? And that's the hard part.
+I had a few of these and I finished
+[music] none. They all looked right, but
+none of them had a gameplay loop. This
+one started the same way. I was looking
+at Pinterest and [music] that one scene
+stopped me. And I just wanted to make it
+a game so badly. So, I made it a
+reference, not to copy it, to catch the
+same [music] feeling. And we started
+with a color Bible, but the picture is
+daylight. And I wanted the same place
+after dark. So, every color gets
+translated first. From [music] now on,
+nothing goes in the game without it.
+Okay, let's make a game.
+>> [music]
+>> Do not ask for the whole game in one
+prompt. Let the best model write the
+plan. Every job then gets its own clean
+session. And every job ends the same
+way, a test. [music]
+If it fails, one job goes back, not the
+game. So, one job, one fresh chat. The
+model is not carrying nine other jobs,
+so it reads less
+>> [music]
+>> and make fewer mistakes. It also uses
+fewer tokens. So, first job on the list,
+the ground.
+>> [music]
+>> I told Fable what I wanted. Snow deep in
+one place and thin in another. Fable
+made a plan and Opus wrote it. It starts
+flat, completely [music] flat. Every
+corner gets asked one question, "How
+high are you?"
+>> [music]
+>> A hundred and ten thousand of them, 60
+times a second. You may ask why I do not
+[music] save the answers once, because
+the height keeps changing. A boot
+pressed the snow down, the wind builds a
+drift up, and I never ask about the
+whole [music] map, only a hundred and
+twenty meters of it, and it slides along
+with the character. Next, a house, some
+trees, and a car. These are just
+placeholders. The real [music] Blender
+models come later. Then, we put snow on
+the ground. And remember, the ground has
+a height, so the snow can be deep here
+and thin [music] there. And now the snow
+slows you down. Deep snow, you walk.
+Thin snow, you can run. [music] And
+finally, footprints. You can see where
+you walked. It is a small thing, but it
+makes the world feel alive. Behind the
+scenes, it works like this. Every step
+paints into one picture, [music] not a
+list of footprints. One image, fixed
+size. The snow reads it, the wind erase
+it, the enemy [music] writes into the
+same one. A thousand tracks cost the
+same as one.
+Okay, now let's replace those
+placeholders with real Blender models.
+Nobody modeled this house by hand, and
+AI model wrote a script. Blender run it.
+Every line adds one piece. So, when the
+roof is wrong, I do not touch the mesh.
+[music] I fix one line and run it again.
+Now, let's add it to the scene. And yes,
+it is much better. Let's do the same
+with trees and a car. Okay, it is
+starting to looks like a game.
+If you like this video, click subscribe
+button.
+Quick tip, don't ask AI for realistic
+meshes. It will not deliver. Simple
+shapes, it does well. This house is just
+a boxes and a roof. The light does the
+[music] rest, and we will work on it in
+a second. But first, let's replace a
+character placeholder with the real
+character. And first I wanted to create
+[music] a concept with GPT. So, this is
+the prompt for GPT. And those are the
+results. And those images goes to Mesh
+AI. I like to use this tool for
+generating a character meshes. We have
+8,000 polygons, which is perfectly fine
+for a main character. Okay, let's
+texture it. And that's [music] fine. We
+will map the colors to our color Bible
+later. And this time I also decided to
+use the animations from Meshy directly.
+And the [music] rigged character looks
+much more simple and has like less
+details and a bit different colors. But
+as I said, we will fix it and it will
+look perfectly fine in our game.
+And there it is. Our new character is in
+the game and it looks really really cool
+now. Let's just walk around.
+I love those footprints and the fact
+that each footprints can have like a
+different depth and also the snow that
+you feel where it's deep. Okay, so we
+have the character and we have all of
+the meshes on the map. We will play with
+the light a bit.
+About the lightning, it is really
+helpful to ask your AI model to expose
+you this kind of lightning control panel
+with those sliders so you can play
+around. Of course, you can do that
+directly in the game engine, for
+example, Godot. So, here I have few
+presets. Each of them reflects a
+different daytime. So, let's play along.
+This one is like a flat, then nightfall.
+And you can see how much the scene
+changes. Deep night, which is a bit bit
+[music] lighter.
+And the whiteout, blizzard, a lot more
+density of the fog. And the sunrise. I
+love this one. It is really warm here.
+And then pale day, um midday. So, you
+can see how much the same scene differs
+[music]
+based on the lightning settings. And I
+love this that you can affect the game
+[music] a lot this way. And now the
+enemies. I want a very few of them, but
+every meeting should be able to kill
+you. Right now there are two, a starving
+man and bears. I found the bear on
+Sketchfab with CC attribution and a lot
+of animations. So, I downloaded it, but
+the bear is realistic here and we need
+more low poly models. So, I asked AI to
+decimate it in Blender. And here you can
+see a free stages of decimation. And
+decimation simply reducing a polygon
+counts. The man sees you. The bear
+smells you on the wind.
+This part is still a prototype. You
+press F [music] and the gun finds the
+target. The bear you cannot outrun ever.
+[music] So, it warns you first and then
+it charges.
+It knocks you down and for now you just
+lie there. Last thing I want to show
+you, the house interior. It's not a
+different location, it's the same one.
+So, player sees the danger outside the
+house. How does it work? Simple. The
+moment I step inside, the roof and the
+front wall come off. That's it. But
+there is also another system. When our
+character goes behind some object, for
+example, a tree, then the whole shape
+fades out. How? The camera shoots a ray
+at me all the time. [music]
+And that's it, guys. If you want more
+deep dive videos, let me know in the
+comments.

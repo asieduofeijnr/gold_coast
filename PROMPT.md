@@ -1,6 +1,6 @@
 # Lagos Life Simulator: AI game dev prompt
 
-> **Current job: Job 1, "Walk around"** (details in section 8)
+> **Current job: Job 2, "Neighborhood"** (details in section 8)
 
 **How to use this file:** start a fresh Codex session for each job and tell it
 to read this file and do the current job. The AI does only that job. When the
@@ -69,19 +69,33 @@ values. Until we build the real color bible (Job 10), use this provisional palet
 | `palm_green` | `#3F7A3A` | plants |
 | `player_blue` | `#2B59C3` | placeholder player |
 
-## 4. Current state (inspected 2026-10-21)
-`gold-coast/` is a brand-new, empty Godot project:
-- It contains only the files Godot creates for a new project: `project.godot`,
-  `icon.svg`, `.gitignore`, `.gitattributes`, `.editorconfig`
-- There are no scenes, scripts, or assets, and no main scene is set (pressing
-  Play asks you to pick one)
-- The display name is "Gold Coast"
-- The renderer is **GL Compatibility**, which runs on old hardware and the web
-  but leaves out much of Godot's better lighting. Job 1 switches it to **Forward+**.
-- The physics engine is Jolt and the UI stretch mode is `canvas_items`. Both
-  are good; keep them.
-- It's not a git repository yet. The Godot command-line tool isn't on PATH, so
-  use the full path below.
+## 4. Current state (updated after Job 1, 2026-10-21)
+- **Job 1 is done.** Pressing Play opens `scenes/main/main.tscn`: a sunlit
+  80 × 80 m patch of laterite with one road, and a capsule player you walk with
+  WASD or the arrow keys, seen from a fixed isometric camera.
+- **Settings:** the display name is "Lagos Life Simulator". The renderer is
+  Forward+ (Metal on Apple Silicon) and the physics engine is Jolt. Physics
+  interpolation is on (smooth movement on 120 Hz screens), and 4× MSAA smooths
+  edges. The UI stretch mode is `canvas_items`. The Input Map actions are
+  `move_forward`, `move_back`, `move_left`, and `move_right`.
+- **Colors:** `art/palette/palette.gd` (`Palette`) holds every color,
+  including the sun and sky colors added in Job 1. `art/palette/palette_mesh.gd`
+  (`PaletteMesh`) is a mesh whose color you pick from a dropdown of palette names.
+- **Scenes:**
+  - `scenes/world/` holds `lighting.tscn` (the sun and sky), `ground.tscn`
+    (ground with invisible walls at the edge), and `road.tscn` (built in code
+    from its settings; runs along X)
+  - `scenes/player/` holds `player.tscn`, with its swappable
+    `player_placeholder_model.tscn`
+  - `scenes/camera/` holds `iso_camera.tscn`
+- **Editor scripts:** the palette mesh, ground, road, lighting, and camera
+  scripts are `@tool` scripts, so they also run in the editor and the scene
+  looks right before you press Play.
+- **Tests:** `tests/test_runner.tscn` runs every `tests/test_*.gd` file.
+  `tests/test_case.gd` (`TestCase`) is the base class, with `check()` and
+  `wait_physics_frames()`. There are 14 checks so far, all passing.
+- **Git:** the repo is at `kayayo/` on branch `main`, with one commit per job.
+- The Godot command-line tool isn't on PATH, so use the full path below.
 
 Before starting any job, re-check the project. If something was added since this
 was written, keep it working and build on it.
@@ -117,9 +131,11 @@ $GODOT --headless --path . --quit-after 300              # smoke test: run the m
 $GODOT --headless --path . res://tests/test_runner.tscn  # automated tests (exit code 0 = all passed)
 $GODOT --path .                                          # play the game in a window
 $GODOT --path . --editor                                 # open the editor
+$GODOT --path . --write-movie /tmp/shots/frame.png --quit-after 60  # save 60 frames as images to check the look
 ```
 Any `ERROR` or `SCRIPT ERROR` line in the output counts as a failure, even if
-the tests pass.
+the tests pass. After adding a new `class_name` script from outside the editor,
+run `--import` before anything else, or other scripts can't find the class.
 
 Blender scripts (later jobs) run inside Blender's own Python, not any other
 Python environment:
@@ -175,7 +191,7 @@ and folder names.
 Each job takes one session and ends with a test. Mark a job `[x]` when it's done.
 
 **Phase 1: Prototype**
-- [ ] **Job 1: Walk around.** Ground, a road, a capsule player with
+- [x] **Job 1: Walk around.** Ground, a road, a capsule player with
   camera-relative WASD, a fixed isometric camera that follows the player, and
   sun and environment lighting. *Test:* holding W moves the player up the screen.
 - [ ] **Job 2: Neighborhood.** A main road with a cross street, and five
@@ -224,7 +240,7 @@ cuts); a phone UI (map, bank app).
 
 ## 8. Job details
 
-### Job 1: Walk around (current)
+### Job 1: Walk around (done)
 **Goal:** the smallest playable thing. You press Play and walk a character along
 a sunlit Lagos road, seen from a fixed isometric camera.
 
@@ -282,7 +298,7 @@ a sunlit Lagos road, seen from a fixed isometric camera.
 - The player casts a shadow, and the scene is lit by the sun and sky
 - All tests pass, and the smoke test shows no errors
 
-### Job 2: Neighborhood
+### Job 2: Neighborhood (current)
 **Goal:** a small neighborhood you can walk around, where buildings block you.
 1. **Reusable building:** create `scenes/buildings/placeholder_building.tscn`
    and `placeholder_building.gd`. The root is a StaticBody3D with a box mesh, a
@@ -291,8 +307,11 @@ a sunlit Lagos road, seen from a fixed isometric camera.
    so changes show up in the editor right away, and keep the mesh and collision
    the same size automatically.
 2. **Roads:** extend the Job 1 road into a main road with one cross street (a T
-   or + junction). Keep it flat and visual only. Make the road its own reusable
-   scene if that keeps `main.tscn` tidy.
+   or + junction). Keep it flat and visual only. `road.tscn` is already a
+   reusable scene. Watch the junction: two crossing Road instances overlap at
+   the same heights (the surfaces flicker), and their sidewalks and dashes would
+   run straight across the junction. Handle it, for example by letting a road
+   leave a gap where another road crosses.
 3. **Five buildings:** place them along the roads, each with its own name, size,
    and color. For example: a two-storey face-me-I-face-you house, a provisions
    shop, a buka, a three-storey apartment block, and a bank. Give each one a

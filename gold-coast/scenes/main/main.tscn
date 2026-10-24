@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/road.tscn" id="3_road"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="4_player"]
 [ext_resource type="PackedScene" path="res://scenes/camera/iso_camera.tscn" id="5_camera"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/placeholder_building.tscn" id="6_building"]
+[ext_resource type="PackedScene" path="res://scenes/props/billboard.tscn" id="7_billboard"]
 
 [node name="Main" type="Node3D"]
 
@@ -13,6 +15,43 @@
 [node name="Ground" parent="." instance=ExtResource("2_ground")]
 
 [node name="Road" parent="." instance=ExtResource("3_road")]
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="CompoundHouse" parent="Buildings" instance=ExtResource("6_building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -12.5)
+building_name = "Compound House"
+size = Vector3(12, 3.2, 10)
+wall_color = 5
+roof_style = 1
+
+[node name="ProvisionsStore" parent="Buildings" instance=ExtResource("6_building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, -10)
+building_name = "Provisions Store"
+size = Vector3(5, 3, 5)
+wall_color = 6
+
+[node name="ChopBar" parent="Buildings" instance=ExtResource("6_building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -10.5)
+building_name = "Chop Bar"
+size = Vector3(7, 3.2, 6)
+wall_color = 8
+roof_style = 1
+
+[node name="ApartmentBlock" parent="Buildings" instance=ExtResource("6_building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, -11.5)
+building_name = "Apartment Block"
+size = Vector3(9, 9.6, 8)
+wall_color = 7
+
+[node name="MobileMoneyKiosk" parent="Buildings" instance=ExtResource("6_building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8, 0, -8.7)
+building_name = "Mobile Money"
+size = Vector3(2.6, 2.6, 2.4)
+wall_color = 0
+
+[node name="Billboard" parent="." instance=ExtResource("7_billboard")]
+transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, 24, 0, -9)
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 5)

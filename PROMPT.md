@@ -1,6 +1,6 @@
-# Lagos Life Simulator: AI game dev prompt
+# Gold Coast: AI game dev prompt
 
-> **Current job: Job 2, "Neighborhood"** (details in section 8)
+> **Current job: Job 3, "Money"** (details in section 8)
 
 **How to use this file:** start a fresh Codex session for each job and tell it
 to read this file and do the current job. The AI does only that job. When the
@@ -20,9 +20,10 @@ we're building.
   or service), ask me instead of guessing.
 
 ## 2. Project overview
-- **Game:** Lagos Life Simulator, an African city exploration and life-simulation
-  game set in Lagos, Nigeria
-- **Inspiration:** Naija Life Lagos Simulator, and the city look of Cities: Skylines
+- **Game:** Gold Coast, an exploration and life-simulation game about everyday
+  life in Ghana
+- **Inspiration:** Naija Life Lagos Simulator (for gameplay only; the setting is
+  Ghana), and the city look of Cities: Skylines
 - **Engine:** Godot 4.7.2 (`/Applications/Godot.app`)
 - **Language:** GDScript with static typing (`var speed: float = 4.5`)
 - **3D modeling:** Blender 5.2.2 LTS (`/Applications/Blender.app`)
@@ -31,24 +32,31 @@ we're building.
 - **Machine:** Mac with Apple Silicon (M4 Pro)
 - **Locations:**
   - Repo root: `/Users/nanaasiedu-ofeijnr/Documents/Projects/kayayo` (this file)
-  - Godot project: `kayayo/gold-coast/`, which is `res://` (the folder name stays as is)
+  - Godot project: `kayayo/gold-coast/`, which is `res://`
   - Blender sources and scripts: `kayayo/blender/` (outside the Godot project)
 
 ## 3. Game vision
 **Core loop (proposed, not final): the daily hustle.**
-Wake up in a rented room → choose how to make money today → get there (walk for
-free, or pay for a danfo or keke to save time) → work → spend ₦ on food,
-transport, and rent → get home and sleep. In the long run: save up, find better
-hustles, and move from a mainland room to a better home. You start with ₦10,000.
+Wake up in a rented room in a compound house → choose how to make money today
+(for example carrying loads at the market, selling in traffic, or running a
+chop bar) → get there (walk for free, or pay for a trotro or taxi to save
+time) → work → spend cedis on food, transport, and rent → get home and sleep.
+In the long run: save up the rent advance landlords ask for, find better
+hustles, and move from a single room to a chamber and hall, then to a place of
+your own. You start with GH₵100.
 
-**The look:** a fully 3D Lagos neighborhood seen from a fixed isometric angle.
-Clean, readable, and slightly stylized, like Cities: Skylines rather than
-photorealism. Use simple shapes and let the lighting do most of the work. Lagos
-details to add over time: painted compound walls with gates, rusted corrugated
-roofs, rooftop water tanks, generators, kiosks and container shops, umbrellas,
-hand-painted signboards, "This house is not for sale" painted on walls, power
-poles with tangled wires, open gutters along the roads, yellow danfos, kekes,
-okadas, palm trees, harmattan haze, and orange streetlights at night.
+**The look:** a fully 3D Ghanaian neighborhood seen from a fixed isometric
+angle. Clean, readable, and slightly stylized, like Cities: Skylines rather
+than photorealism. Use simple shapes and let the lighting do most of the work.
+Ghanaian details to add over time: compound houses around shared courtyards,
+painted walls and gates, rusted "zinc" roofs, black polytanks on the roofs,
+kiosks and container shops painted in bright telecom colors, roadside
+umbrellas, hand-painted signboards with names like "God Is Great Enterprise",
+"REMOVE BY ORDER" painted on walls, power poles with tangled wires, open
+gutters along the roads, trotros with slogans painted on the back, taxis with
+painted corners, okadas, aboboyaas, kayayei carrying loads on their heads, palm
+and neem trees, red laterite earth, harmattan haze, and orange streetlights at
+night.
 
 **Color rule:** every color in code comes from one palette file,
 `res://art/palette/palette.gd`. Colors picked in the editor also use palette
@@ -56,7 +64,7 @@ values. Until we build the real color bible (Job 10), use this provisional palet
 
 | Name | Hex | Use |
 |---|---|---|
-| `danfo_yellow` | `#F2B705` | buses, accents |
+| `kente_gold` | `#F2B705` | accents, taxi corners, signboards |
 | `laterite` | `#A9532D` | bare ground, road edges |
 | `asphalt` | `#4A4A48` | roads |
 | `road_marking` | `#E8E4D8` | lane lines |
@@ -68,33 +76,79 @@ values. Until we build the real color bible (Job 10), use this provisional palet
 | `rust_roof` | `#8B4A2B` | roofs |
 | `palm_green` | `#3F7A3A` | plants |
 | `player_blue` | `#2B59C3` | placeholder player |
+| `skin_deep` | `#7A4433` | the player's skin |
+| `cloth_maroon` | `#6A1C15` | her slit (wrap skirt) |
+| `cloth_red` | `#A3362A` | her duku (headwrap) |
+| `cloth_cream` | `#EAD3B4` | her kaba (top) |
+| `cloth_ochre` | `#E0A878` | trim bands on her skirt |
+| `gold_jewelry` | `#D9A55B` | earrings, necklace, bangles |
+| `dark_brown` | `#3D1A14` | sandals, eyes |
 
-## 4. Current state (updated after Job 1, 2026-10-21)
+`palette.gd` also holds the sun and sky colors. The character colors were picked
+from the reference picture in `blender/characters/reference/`.
+
+## 4. Current state (updated 2026-10-24, after Jobs 1 and 2 and the first character)
 - **Job 1 is done.** Pressing Play opens `scenes/main/main.tscn`: a sunlit
-  80 × 80 m patch of laterite with one road, and a capsule player you walk with
-  WASD or the arrow keys, seen from a fixed isometric camera.
-- **Settings:** the display name is "Lagos Life Simulator". The renderer is
+  80 × 80 m patch of laterite with one road, and the player character you walk
+  with WASD or the arrow keys, seen from a fixed isometric camera.
+- **Job 2 is done.** Five solid placeholder buildings stand on the far side of
+  the road (−Z, the upper right on screen), all built from one reusable scene:
+  - Compound House, Provisions Store, Chop Bar, Apartment Block, and Mobile
+    Money kiosk
+  - Their fronts sit at z = −7.5, doors facing the road
+  - At the end of the row stands an "AKWAABA!" billboard in Ghana's flag colors
+  - The cross street from the original plan is postponed: there's still one road
+- **First character is done (Job 13, done early).** A young woman in a kaba and
+  slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
+  - She's built by `blender/scripts/build_player_character.py`, which exports
+    `gold-coast/art/models/characters/player_character.glb` (about 3,000
+    triangles, 19 bones with Godot humanoid names, and looping `idle` and `walk`
+    animations). The script reads her colors from `palette.gd`.
+  - `blender/characters/player_character_preview.png` shows her from every side.
+  - `scenes/player/player_model.tscn` (`PlayerModel`) plays idle or walk and
+    scales the walk to match her speed. She walks at 1.8 m/s; the walk
+    animation was made for 1.7 m/s.
+- **Settings:** the display name is "Gold Coast". The renderer is
   Forward+ (Metal on Apple Silicon) and the physics engine is Jolt. Physics
   interpolation is on (smooth movement on 120 Hz screens), and 4× MSAA smooths
   edges. The UI stretch mode is `canvas_items`. The Input Map actions are
   `move_forward`, `move_back`, `move_left`, and `move_right`.
 - **Colors:** `art/palette/palette.gd` (`Palette`) holds every color,
-  including the sun and sky colors added in Job 1. `art/palette/palette_mesh.gd`
+  including the sun, sky, and character colors. `art/palette/palette_mesh.gd`
   (`PaletteMesh`) is a mesh whose color you pick from a dropdown of palette names.
 - **Scenes:**
   - `scenes/world/` holds `lighting.tscn` (the sun and sky), `ground.tscn`
     (ground with invisible walls at the edge), and `road.tscn` (built in code
     from its settings; runs along X)
-  - `scenes/player/` holds `player.tscn`, with its swappable
-    `player_placeholder_model.tscn`
+  - `scenes/buildings/` holds `placeholder_building.tscn` (`PlaceholderBuilding`):
+    - It has `@export` settings for name, size, wall color, and roof style
+      (flat concrete, or a gable zinc roof)
+    - Its script builds the walls, a matching collision box, a door (or a
+      serving hatch if it's narrower than 4 m), windows, the roof (with a
+      polytank on flat roofs at least 6 m wide), and a floating name label
+    - The front faces +Z
+  - `scenes/props/` holds `billboard.tscn` (`Billboard`): a headline and tagline,
+    a red/gold/green board with black stars and two spotlights. The posts are
+    solid, and you can walk under the board.
+  - `scenes/player/` holds `player.tscn`, whose `Model` is `player_model.tscn`.
+    The old capsule, `player_placeholder_model.tscn`, is kept as a fallback.
   - `scenes/camera/` holds `iso_camera.tscn`
-- **Editor scripts:** the palette mesh, ground, road, lighting, and camera
-  scripts are `@tool` scripts, so they also run in the editor and the scene
-  looks right before you press Play.
+- **Shared helpers:** `scripts/shapes.gd` (`Shapes`) makes palette-colored boxes
+  and solid boxes.
+- **Editor scripts:** the palette mesh, ground, road, lighting, camera,
+  building, and billboard scripts are `@tool` scripts, so they also run in the
+  editor and the scene looks right before you press Play. The pieces they make
+  are "internal" children: hidden in the scene tree and never saved.
 - **Tests:** `tests/test_runner.tscn` runs every `tests/test_*.gd` file.
   `tests/test_case.gd` (`TestCase`) is the base class, with `check()` and
-  `wait_physics_frames()`. There are 14 checks so far, all passing.
+  `wait_physics_frames()`. There are 38 checks so far, all passing.
 - **Git:** the repo is at `kayayo/` on branch `main`, with one commit per job.
+  The reference picture is ignored by git: it's a Vecteezy download with its own
+  license, used only for inspiration.
+- The Godot command-line tool isn't on PATH, so use the full path below.
+- **Git:** the repo is at `kayayo/` on branch `main`, with one commit per job.
+  The reference picture is ignored by git: it's a Vecteezy download with its own
+  license, used only for inspiration.
 - The Godot command-line tool isn't on PATH, so use the full path below.
 
 Before starting any job, re-check the project. If something was added since this
@@ -137,9 +191,20 @@ Any `ERROR` or `SCRIPT ERROR` line in the output counts as a failure, even if
 the tests pass. After adding a new `class_name` script from outside the editor,
 run `--import` before anything else, or other scripts can't find the class.
 
-Blender scripts (later jobs) run inside Blender's own Python, not any other
-Python environment:
-`/Applications/Blender.app/Contents/MacOS/Blender --background --python blender/scripts/<name>.py`
+Blender scripts run inside Blender's own Python, not any other Python
+environment. Run them from the repo root (`kayayo/`). To rebuild the player
+character after changing her script or her palette colors:
+```bash
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup \
+  --python blender/scripts/build_player_character.py -- \
+  --palette gold-coast/art/palette/palette.gd \
+  --glb gold-coast/art/models/characters/player_character.glb \
+  --blend blender/characters/player_character.blend \
+  --renders /tmp/player_character_renders
+```
+Then run Godot's `--import` and the tests. If you change her walk, re-measure its
+speed and update `walk_animation_speed` in `player_model.gd`, or her feet will
+slide.
 
 ### Known Godot pitfalls
 - **Open scenes:** if a scene is open in the editor while you change its file on
@@ -155,8 +220,9 @@ Python environment:
 - **Orthographic camera:** place it far enough back along its view direction
   (about 40 m) that nothing gets clipped. If shadows disappear, increase the
   sun's shadow max distance.
-- **₦ symbol:** check that it actually renders. If it shows up as a box, bundle a
-  font that includes ₦ (e.g. Noto Sans, OFL license) and credit it.
+- **₵ symbol (the cedi sign in GH₵):** check that it actually renders. If it
+  shows up as a box, bundle a font that includes ₵ (e.g. Noto Sans, OFL
+  license) and credit it.
 
 ## 6. Project structure
 This is the target layout. Create folders as jobs need them.
@@ -166,7 +232,9 @@ kayayo/                       repo root
   CREDITS.md                  third-party assets and licenses (create when first needed)
   docs/
     learning-notes.md         plain-language notes on new concepts, added after every job
-  blender/                    Blender sources: generator scripts (*.py) and .blend files
+  blender/                    Blender files (outside the Godot project)
+    scripts/                  scripts that build models, e.g. build_player_character.py
+    characters/               .blend files and preview pictures; reference/ (not in git)
   gold-coast/                 the Godot project (res://)
     project.godot
     autoload/                 global singletons, e.g. game_state.gd (money)
@@ -176,11 +244,12 @@ kayayo/                       repo root
       camera/                 iso_camera.tscn + iso_camera.gd
       world/                  ground, roads, environment and lighting
       buildings/              placeholder_building.tscn (later: real buildings)
+      props/                  billboard.tscn, later streetlights, kiosks, trees
       ui/                     hud.tscn, later menus and panels
-    scripts/                  shared helpers not tied to one scene, e.g. format.gd
+    scripts/                  shared helpers not tied to one scene, e.g. shapes.gd, format.gd
     art/
       palette/                palette.gd, the single source of colors
-      models/                 .glb files exported from Blender
+      models/                 .glb files exported from Blender, e.g. characters/player_character.glb
       materials/
     tests/                    test_runner.tscn + test_*.gd
 ```
@@ -194,11 +263,12 @@ Each job takes one session and ends with a test. Mark a job `[x]` when it's done
 - [x] **Job 1: Walk around.** Ground, a road, a capsule player with
   camera-relative WASD, a fixed isometric camera that follows the player, and
   sun and environment lighting. *Test:* holding W moves the player up the screen.
-- [ ] **Job 2: Neighborhood.** A main road with a cross street, and five
-  placeholder buildings with collision, all made from one reusable building
-  scene. *Test:* walking into any building stops the player.
+- [x] **Job 2: Neighborhood.** Five placeholder buildings with collision on the
+  far side of the road, all made from one reusable building scene, plus an
+  "AKWAABA!" billboard at the end of the row. (The cross street is postponed.)
+  *Test:* walking into any building stops the player.
 - [ ] **Job 3: Money.** A `GameState` autoload that owns money (starting at
-  10,000) and a HUD that shows `₦10,000`. *Test:* the formatting and
+  GH₵100) and a HUD that shows `GH₵100.00`. *Test:* the formatting and
   earn/spend tests pass, and the HUD updates when money changes.
 
 **Phase 2: First gameplay loop**
@@ -209,40 +279,42 @@ Each job takes one session and ends with a test. Mark a job `[x]` when it's done
 - [ ] **Job 6: Needs.** Hunger and energy drain over time and show on the HUD.
   *Test:* the drain rates match their settings.
 - [ ] **Job 7: Interactions.** A "Press E" interaction system. Buy food at a
-  buka (costs ₦, restores hunger) and sleep at home (skips to morning, restores
+  chop bar (costs cedis, restores hunger) and sleep at home (skips to morning, restores
   energy). *Test:* buying food with too little money fails cleanly.
-- [ ] **Job 8: First hustle.** One simple job that earns ₦, e.g. carrying
-  deliveries between shops within a time limit. *Test:* I can play one full day:
+- [ ] **Job 8: First hustle.** One simple job that earns cedis, e.g.
+  carrying a shopper's load across the market on your head like a kayayo,
+  within a time limit. *Test:* I can play one full day:
   earn, eat, sleep.
 - [ ] **Job 9: Rent and saving.** Weekly rent, plus save and load (saving when
   you sleep). *Test:* saving and loading restores money, time, and needs.
 
-**Phase 3: Make it look like Lagos**
+**Phase 3: Make it look like Ghana**
 - [ ] **Job 10: Color bible.** Built from one reference image I choose, with a
   day version and a night version of every color. It replaces the provisional
   palette, and nothing goes into the game without it.
 - [ ] **Job 11: Lighting lab.** An in-game debug panel with sliders (sun angle,
   sun color, ambient light, fog, exposure) and presets: harmattan morning,
-  midday, golden hour, night, blackout night ("NEPA took light"), and rainy season.
+  midday, golden hour, night, dumsor night (a power cut), and rainy season.
 - [ ] **Job 12: Blender pipeline.** Python scripts that build low-poly buildings
   and props in Blender and export `.glb` files. To fix a model, change a line of
   the script and run it again; never hand-edit the mesh. Keep shapes simple
   rather than aiming for realism.
-- [ ] **Job 13: Real character.** Concept art → a rigged, animated mesh (e.g.
-  from Meshy or Mixamo), recolored to the color bible.
+- [x] **Job 13: Real character** (done early). Built with a Blender script
+  instead of AI tools: `blender/scripts/build_player_character.py`. Later
+  characters can follow the same pattern, or use concept art → Meshy or Mixamo.
 - [ ] **Job 14: Enterable home.** When you step inside, the roof and front wall
   hide. It's the same scene, with no loading screen.
 
 **Phase 4: Living city (to be planned later)**
-Pedestrians; danfos and kekes driving routes; go-slow traffic; more
-neighborhoods; weather and events (harmattan, rainy-season flooding, power
-cuts); a phone UI (map, bank app).
+Pedestrians; trotros and taxis driving routes, with a mate calling out the
+stops; traffic jams; cross streets and more neighborhoods; weather and events (harmattan,
+rainy-season flooding, dumsor); a phone UI (map, mobile money).
 
 ## 8. Job details
 
 ### Job 1: Walk around (done)
 **Goal:** the smallest playable thing. You press Play and walk a character along
-a sunlit Lagos road, seen from a fixed isometric camera.
+a sunlit Ghanaian road, seen from a fixed isometric camera.
 
 **Steps** (run something after each one):
 1. **Inspect** the project and confirm the current state in section 4. Report
@@ -251,7 +323,7 @@ a sunlit Lagos road, seen from a fixed isometric camera.
    `.gitignore` containing `.DS_Store`, then commit the existing files *before*
    changing anything. Explain git to me in a sentence or two.
 3. **Project settings:**
-   - Display name: `Lagos Life Simulator`
+   - Display name: `Gold Coast`
    - Renderer: Forward+ (tell me to restart the editor if it's open)
    - Input Map actions: `move_forward` (W, Up), `move_back` (S, Down),
      `move_left` (A, Left), `move_right` (D, Right)
@@ -298,53 +370,54 @@ a sunlit Lagos road, seen from a fixed isometric camera.
 - The player casts a shadow, and the scene is lit by the sun and sky
 - All tests pass, and the smoke test shows no errors
 
-### Job 2: Neighborhood (current)
+### Job 2: Neighborhood (done)
 **Goal:** a small neighborhood you can walk around, where buildings block you.
-1. **Reusable building:** create `scenes/buildings/placeholder_building.tscn`
-   and `placeholder_building.gd`. The root is a StaticBody3D with a box mesh, a
-   matching box collision, and a simple `rust_roof` roof. Expose `@export` values
-   for size (Vector3) and wall color (a palette name). Make it a `@tool` script
-   so changes show up in the editor right away, and keep the mesh and collision
-   the same size automatically.
-2. **Roads:** extend the Job 1 road into a main road with one cross street (a T
-   or + junction). Keep it flat and visual only. `road.tscn` is already a
-   reusable scene. Watch the junction: two crossing Road instances overlap at
-   the same heights (the surfaces flicker), and their sidewalks and dashes would
-   run straight across the junction. Handle it, for example by letting a road
-   leave a gap where another road crosses.
-3. **Five buildings:** place them along the roads, each with its own name, size,
-   and color. For example: a two-storey face-me-I-face-you house, a provisions
-   shop, a buka, a three-storey apartment block, and a bank. Give each one a
-   floating Label3D sign with its name.
-4. **Tests:** for each building, start the player 3 m in front of it, push toward
-   it for 2 seconds, and check the player never ends up inside its footprint.
-   Also check that each building's collision size matches its mesh.
+What was built (changed from the original plan at my request: one road,
+buildings on one side only, and a billboard):
+1. **Reusable building:** `scenes/buildings/placeholder_building.tscn` and
+   `placeholder_building.gd`, a `@tool` StaticBody3D. Its walls and collision
+   box are always the same size. It also has a door or hatch, windows, a flat
+   concrete or gable zinc roof, an optional polytank, and a floating name label.
+2. **Five buildings** on the far side of the road, each with its own name, size,
+   color, and roof: a compound house, a provisions store, a chop bar, a
+   three-storey apartment block, and a mobile money kiosk.
+3. **Billboard:** `scenes/props/billboard.tscn` at the end of the row, turned
+   25° toward the camera. It's styled like Red Alert 2's roadside billboards
+   (small, bright, on posts, with spotlights) and The Sims' cheerful ads.
+4. **Tests:** `tests/test_buildings.gd`, 17 checks:
+   - each building's collision matches its mesh
+   - walking into each building's front stops the player 0.35 m from the wall
+     (her capsule's radius)
+   - the billboard is at the end of the row and faces the camera
+   - its posts are solid, and she can walk under the board
 
 **Done when:** you can't walk through any building, you can still walk around
 all of them, and the tests pass.
 
-### Job 3: Money
-**Goal:** show the player's money on screen, starting at ₦10,000, with one place
+### Job 3: Money (current)
+**Goal:** show the player's money on screen, starting at GH₵100, with one place
 in the code that owns it.
 1. **GameState:** create `autoload/game_state.gd` and register it as the
-   `GameState` autoload. It has `money: int = 10000`, a
-   `money_changed(new_amount: int)` signal, `add_money(amount: int)`, and
-   `spend_money(amount: int) -> bool`. If there isn't enough money,
-   `spend_money` returns false and changes nothing.
-2. **Formatting:** create `scripts/format.gd` with `format_naira(amount: int) -> String`.
-   It should give 10000 → `₦10,000`, 1234567 → `₦1,234,567`, 0 → `₦0`, and
-   -500 → `-₦500`.
+   `GameState` autoload. Count money in whole pesewas (100 pesewas = GH₵1) so
+   prices like GH₵6.50 work without rounding errors. It has
+   `money: int = 10000` (GH₵100.00), a `money_changed(new_amount: int)` signal,
+   `add_money(amount: int)`, and `spend_money(amount: int) -> bool`. If there
+   isn't enough money, `spend_money` returns false and changes nothing.
+2. **Formatting:** create `scripts/format.gd` with
+   `format_cedis(pesewas: int) -> String`. It should give 10000 → `GH₵100.00`,
+   650 → `GH₵6.50`, 123456789 → `GH₵1,234,567.89`, 0 → `GH₵0.00`, and
+   -50000 → `-GH₵500.00`.
 3. **HUD:** create `scenes/ui/hud.tscn`, a CanvasLayer with a large, readable
    money label in the top-left corner on a subtle background panel. It updates
    from the `money_changed` signal, never by checking every frame.
-4. **Debug key:** in debug builds only, F2 adds ₦1,000 so I can watch the HUD update.
+4. **Debug key:** in debug builds only, F2 adds GH₵10 so I can watch the HUD update.
 5. **Tidy-up:** make sure everything matches the structure in section 6.
 6. **Tests:** cover the formatting cases above, spending with enough money,
    spending with too little (returns false and money is unchanged), and the
    signal firing with the new amount.
 
-**Done when:** the HUD shows ₦10,000 at the start (the ₦ renders properly, not
-as a box), F2 updates it immediately, and the tests pass.
+**Done when:** the HUD shows GH₵100.00 at the start (the ₵ renders properly,
+not as a box), F2 updates it immediately, and the tests pass.
 
 ## 9. Report format (end of every job)
 1. **What I built:** 2–3 sentences

@@ -40,7 +40,7 @@ func _check_direction(action: StringName, expected: Vector2, description: String
 
 	var distance := Vector2(moved.x, moved.z).length()
 	var on_screen := _to_screen(moved).normalized()
-	check(distance > 3.0 and on_screen.dot(expected) > 0.98,
+	check(distance > _player.walk_speed * 0.6 and on_screen.dot(expected) > 0.98,
 			"%s (walked %.1f m)" % [description, distance])
 	check(_is_standing(), "  ...and is still standing on the ground")
 	check(Vector2(_player.velocity.x, _player.velocity.z).length() < 0.01,

@@ -3,14 +3,18 @@ extends CharacterBody3D
 ## The character you control. WASD (or the arrow keys) moves you relative
 ## to the camera: W always walks up the screen, whatever the camera angle.
 
-## Top walking speed, in metres per second.
-@export var walk_speed := 4.5
+## Top walking speed, in metres per second (a brisk walk, matching her
+## walk animation).
+@export var walk_speed := 1.8
 ## How quickly you speed up to walking speed (metres per second, per second).
 @export var acceleration := 30.0
 ## How quickly you slow down after letting go of the keys.
 @export var deceleration := 40.0
 ## How quickly you turn to face the way you're walking. Higher = snappier.
 @export var turn_speed := 12.0
+
+# The 3D character, if the Model is one (the old capsule placeholder isn't).
+@onready var _model := get_node_or_null("Model") as PlayerModel
 
 
 func _physics_process(delta: float) -> void:
@@ -31,6 +35,9 @@ func _physics_process(delta: float) -> void:
 	velocity.z = horizontal.z
 
 	move_and_slide()
+
+	if _model != null:
+		_model.move_speed = Vector2(velocity.x, velocity.z).length()
 
 
 ## Turns the key input into a direction on the ground, based on which way

@@ -8,7 +8,7 @@ class_name Palette
 ## The color names. Scripts can show these as a dropdown in the Inspector
 ## (see PaletteMesh).
 enum ColorName {
-	DANFO_YELLOW,
+	KENTE_GOLD,
 	LATERITE,
 	ASPHALT,
 	ROAD_MARKING,
@@ -25,10 +25,17 @@ enum ColorName {
 	SKY_HORIZON,
 	GROUND_HORIZON,
 	GROUND_BOTTOM,
+	SKIN_DEEP,
+	CLOTH_MAROON,
+	CLOTH_RED,
+	CLOTH_CREAM,
+	CLOTH_OCHRE,
+	GOLD_JEWELRY,
+	DARK_BROWN,
 }
 
 const COLORS: Dictionary[ColorName, Color] = {
-	ColorName.DANFO_YELLOW: Color("#F2B705"), # buses, accents
+	ColorName.KENTE_GOLD: Color("#F2B705"), # accents, taxi corners, signboards
 	ColorName.LATERITE: Color("#A9532D"), # bare ground, road edges
 	ColorName.ASPHALT: Color("#4A4A48"), # roads
 	ColorName.ROAD_MARKING: Color("#E8E4D8"), # lane lines
@@ -45,6 +52,13 @@ const COLORS: Dictionary[ColorName, Color] = {
 	ColorName.SKY_HORIZON: Color("#D9D0BE"), # hazy sky near the horizon
 	ColorName.GROUND_HORIZON: Color("#9A5A3A"), # what you see past the edge of the map
 	ColorName.GROUND_BOTTOM: Color("#8A4E30"), # what you see past the edge of the map
+	ColorName.SKIN_DEEP: Color("#7A4433"), # the player's skin
+	ColorName.CLOTH_MAROON: Color("#6A1C15"), # her slit (wrap skirt)
+	ColorName.CLOTH_RED: Color("#A3362A"), # her duku (headwrap)
+	ColorName.CLOTH_CREAM: Color("#EAD3B4"), # her kaba (top)
+	ColorName.CLOTH_OCHRE: Color("#E0A878"), # trim bands on her skirt
+	ColorName.GOLD_JEWELRY: Color("#D9A55B"), # earrings, necklace, bangles
+	ColorName.DARK_BROWN: Color("#3D1A14"), # sandals, eyes
 }
 
 # One shared material per color, made the first time it's asked for.

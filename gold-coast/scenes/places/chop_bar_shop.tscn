@@ -1,0 +1,116 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/places/chop_bar_shop.gd" id="1_shop"]
+[ext_resource type="Script" path="res://scripts/food.gd" id="2_food"]
+[ext_resource type="Script" path="res://scenes/interactions/interactable.gd" id="3_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/people/vendor.tscn" id="4_vendor"]
+[ext_resource type="Script" path="res://scenes/props/food_counter.gd" id="5_food_counter"]
+[ext_resource type="Script" path="res://scenes/props/chop_table.gd" id="6_chop_table"]
+[ext_resource type="Script" path="res://scenes/props/wash_basin.gd" id="7_wash_basin"]
+[ext_resource type="Script" path="res://scenes/ui/menu_board.gd" id="8_menu_board"]
+
+[sub_resource type="Resource" id="Resource_waakye"]
+script = ExtResource("2_food")
+title = "Waakye"
+description = "Rice and beans, shito, egg and gari"
+price = 2500
+hunger = 45.0
+minutes = 30.0
+color = 60
+topping = 61
+
+[sub_resource type="Resource" id="Resource_banku"]
+script = ExtResource("2_food")
+title = "Banku & tilapia"
+description = "Grilled tilapia with hot pepper"
+price = 6000
+hunger = 70.0
+minutes = 40.0
+color = 62
+topping = 63
+
+[sub_resource type="Resource" id="Resource_fufu"]
+script = ExtResource("2_food")
+title = "Fufu & light soup"
+description = "Pounded fufu in goat light soup"
+price = 4500
+hunger = 60.0
+minutes = 40.0
+color = 64
+topping = 62
+
+[sub_resource type="Resource" id="Resource_kenkey"]
+script = ExtResource("2_food")
+title = "Kenkey & fish"
+description = "Ga kenkey, fried fish and pepper"
+price = 3000
+hunger = 50.0
+minutes = 30.0
+color = 65
+topping = 66
+
+[sub_resource type="Resource" id="Resource_kelewele"]
+script = ExtResource("2_food")
+title = "Kelewele"
+description = "Spicy fried plantain with groundnuts"
+price = 1000
+hunger = 20.0
+minutes = 15.0
+color = 67
+topping = 65
+
+[sub_resource type="Resource" id="Resource_water"]
+script = ExtResource("2_food")
+title = "Pure water"
+description = "An ice-cold sachet"
+price = 100
+hunger = 5.0
+minutes = 5.0
+in_bowl = false
+color = 68
+topping = 68
+
+[node name="ChopBarShop" type="Node3D" groups=["navigation_source"]]
+script = ExtResource("1_shop")
+menu = Array[ExtResource("2_food")]([SubResource("Resource_waakye"), SubResource("Resource_banku"), SubResource("Resource_fufu"), SubResource("Resource_kenkey"), SubResource("Resource_kelewele"), SubResource("Resource_water")])
+
+[node name="Counter" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 7.35)
+script = ExtResource("3_interactable")
+prompt = "Buy food"
+sign_height = 1.95
+
+[node name="FoodCounter" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, 6.5)
+script = ExtResource("5_food_counter")
+
+[node name="Vendor" parent="." instance=ExtResource("4_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -1.6, 0, 5.98)
+
+[node name="Table" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 0, 7.75)
+script = ExtResource("6_chop_table")
+
+[node name="Basin" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 0, 6.5)
+script = ExtResource("7_wash_basin")
+
+[node name="BasinSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 0, 7.25)
+script = ExtResource("3_interactable")
+prompt = "Wash bowls"
+sign_height = 1.9
+
+[node name="MenuLayer" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 3
+
+[node name="MenuBoard" type="Control" parent="MenuLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_menu_board")

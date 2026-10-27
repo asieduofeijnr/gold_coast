@@ -130,14 +130,7 @@ func _build_roof() -> float:
 
 ## A name label floating above the roof that always turns to face the camera.
 func _build_sign(roof_top: float) -> void:
-	var label := Label3D.new()
-	label.text = building_name
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.pixel_size = 0.01
-	label.font_size = 64
-	label.outline_size = 16
-	label.modulate = Palette.color(Palette.ColorName.ROAD_MARKING)
-	label.outline_modulate = Palette.color(Palette.ColorName.DARK_BROWN)
+	var label := Shapes.name_label(building_name)
 	label.position.y = roof_top + SIGN_GAP
 	_add(label)
 

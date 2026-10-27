@@ -1,0 +1,61 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/places/momo_kiosk.gd" id="1_kiosk"]
+[ext_resource type="PackedScene" path="res://scenes/people/vendor.tscn" id="2_vendor"]
+[ext_resource type="Script" path="res://scenes/interactions/skilled_job.gd" id="3_skilled_job"]
+[ext_resource type="Script" path="res://art/palette/palette_mesh.gd" id="4_palette_mesh"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_stool"]
+size = Vector3(0.38, 0.42, 0.34)
+
+[node name="MomoKiosk" type="Node3D" groups=["navigation_source"]]
+script = ExtResource("1_kiosk")
+
+[node name="Stool" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.21, 1.75)
+mesh = SubResource("BoxMesh_stool")
+script = ExtResource("4_palette_mesh")
+color_name = 37
+
+[node name="AuntieDede" parent="." instance=ExtResource("2_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -2.4, 0, 1.75)
+person_name = "Auntie Dede"
+top_color = 0
+skirt_color = 6
+trim_color = 23
+headwrap_color = 0
+greetings = Array[String](["Momo! Cash in, cash out!", "My sister, you want to send money?", "Credit for your phone, come!"])
+greet_distance = 4.0
+pose = &"sit"
+
+[node name="Shift" type="Marker3D" parent="." node_paths=PackedStringArray("boss")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -2.4, 0, 1.75)
+script = ExtResource("3_skilled_job")
+prompt = "Run the kiosk"
+sign_height = 2.0
+skill = "momo_agent"
+needs = "needs MoMo agent training"
+work = "Run the kiosk"
+doing = "Running the MoMo kiosk"
+pay = 4500
+payer = "DEDE"
+game_minutes = 120.0
+real_seconds = 8.0
+pose = &"sit"
+per_day = 2
+opens = 420.0
+closes = 1080.0
+hours = "Kiosk shifts 7am - 8pm"
+boss = NodePath("../AuntieDede")
+needs_line = "You need MoMo agent training first, my dear. Sankofa Training College teaches it!"
+hours_line = "It's too late to start a shift. Come back in the morning!"
+done_line = "That's enough for today, my dear. Come again tomorrow!"
+
+[node name="CustomerSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, 2.85)
+
+[node name="Street" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 3.6)
+
+[node name="StationSide" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 3.6)

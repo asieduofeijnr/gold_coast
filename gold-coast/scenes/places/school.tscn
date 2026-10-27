@@ -1,0 +1,82 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/places/school.gd" id="1_school"]
+[ext_resource type="PackedScene" path="res://scenes/people/vendor.tscn" id="2_vendor"]
+[ext_resource type="Script" path="res://scenes/props/blackboard.gd" id="3_blackboard"]
+[ext_resource type="Script" path="res://scenes/interactions/skilled_job.gd" id="4_skilled_job"]
+[ext_resource type="Script" path="res://scenes/props/school_bench.gd" id="5_bench"]
+[ext_resource type="Script" path="res://scenes/props/flagpole.gd" id="6_flagpole"]
+[ext_resource type="Script" path="res://scenes/props/shade_tree.gd" id="7_shade_tree"]
+[ext_resource type="Script" path="res://scenes/props/signboard.gd" id="8_signboard"]
+
+[node name="School" type="Node3D" groups=["navigation_source"]]
+script = ExtResource("1_school")
+
+[node name="Headmistress" parent="." instance=ExtResource("2_vendor")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 6, 0, 0.1)
+person_name = "Mrs. Ofori"
+top_color = 6
+skirt_color = 72
+trim_color = 70
+headwrap_color = 6
+greetings = Array[String](["Good morning! Welcome to Nkabom Basic School.", "Our children need good teachers!", "Education is the key, my dear!"])
+greet_distance = 5.0
+
+[node name="Blackboard" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.9, 0, 3.9)
+script = ExtResource("3_blackboard")
+
+[node name="Lesson" type="Marker3D" parent="." node_paths=PackedStringArray("boss")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 6.6, 0, 2.5)
+script = ExtResource("4_skilled_job")
+prompt = "Teach a lesson"
+sign_height = 2.2
+skill = "teaching"
+needs = "needs a certificate"
+work = "Teach a lesson"
+doing = "Teaching a lesson"
+pay = 5000
+payer = "SCHOOL"
+game_minutes = 60.0
+real_seconds = 5.0
+pose = &"teach"
+per_day = 3
+opens = 480.0
+closes = 780.0
+days = Array[int]([1, 2, 3, 4, 5])
+hours = "Lessons 8am - 2pm, Mon - Fri"
+boss = NodePath("../Headmistress")
+needs_line = "We need teachers, my dear! Get a teaching certificate at Sankofa Training College."
+hours_line = "There are no lessons now. Come on a school day, from eight o'clock."
+done_line = "That's all the classes for today. Thank you, Madam!"
+start_line = "Class, stand up and greet your teacher!"
+thanks_line = "Ayekoo, Madam! The children love your class."
+
+[node name="Bench" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 8.3, 0, 2.6)
+script = ExtResource("5_bench")
+
+[node name="Bench2" type="StaticBody3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 9.6, 0, 2.6)
+script = ExtResource("5_bench")
+
+[node name="Flagpole" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0, -4.9)
+script = ExtResource("6_flagpole")
+
+[node name="MangoTree" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4, 0, -3.7)
+script = ExtResource("7_shade_tree")
+
+[node name="SchoolSign" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7, 0, -6.9)
+script = ExtResource("8_signboard")
+text = "NKABOM M/A BASIC SCHOOL"
+subtitle = "LESSONS MON - FRI · 8AM - 2PM"
+board_size = Vector2(5.2, 0.95)
+board_color = 72
+text_color = 70
+post_height = 1.6
+
+[node name="Playground" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, -2)

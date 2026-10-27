@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/phone.tscn" id="2_phone"]
+
+[node name="HUD" type="CanvasLayer"]
+process_mode = 3
+layer = 2
+script = ExtResource("1_hud")
+
+[node name="SleepShade" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="Phone" parent="." instance=ExtResource("2_phone")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -334.0
+offset_right = 176.0
+offset_bottom = -16.0
+grow_vertical = 0
+scale = Vector2(0.9, 0.9)
+pivot_offset = Vector2(0, 318)

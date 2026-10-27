@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/phone.gd" id="1_phone"]
+
+[node name="Phone" type="Control"]
+custom_minimum_size = Vector2(160, 318)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 160.0
+offset_bottom = 318.0
+mouse_filter = 0
+script = ExtResource("1_phone")

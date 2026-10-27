@@ -1,12 +1,14 @@
 @tool
 extends Node3D
-## A straight road with a dashed center line and a sidewalk on each side.
-## It runs along the X axis, centered on this node. It's visual only: you
+## A straight road with a dashed center line, a sidewalk on each side, and an
+## open gutter (drain) along the outside of each sidewalk, as on most Ghanaian
+## roads. It runs along the X axis, centered on this node. It's visual only: you
 ## walk on the ground underneath, so it stays perfectly flat.
 
 # Each layer sits a few millimetres above the one below so they don't flicker.
 const ROAD_HEIGHT := 0.01
 const TOP_LAYER_HEIGHT := 0.02
+const GUTTER_WIDTH := 0.35
 
 @export var length := 80.0:
 	set(value):
@@ -55,6 +57,11 @@ func _rebuild() -> void:
 	var sidewalk_z := (road_width + sidewalk_width) / 2.0
 	_add_strip(0.0, -sidewalk_z, length, sidewalk_width, TOP_LAYER_HEIGHT, Palette.ColorName.CONCRETE)
 	_add_strip(0.0, sidewalk_z, length, sidewalk_width, TOP_LAYER_HEIGHT, Palette.ColorName.CONCRETE)
+	var gutter_z := road_width / 2.0 + sidewalk_width + GUTTER_WIDTH / 2.0
+	for side in [-1.0, 1.0]:
+		_add_strip(0.0, side * gutter_z, length, GUTTER_WIDTH, TOP_LAYER_HEIGHT, Palette.ColorName.GUTTER)
+		_add_strip(0.0, side * (gutter_z + GUTTER_WIDTH / 2.0 + 0.04), length, 0.08, TOP_LAYER_HEIGHT,
+				Palette.ColorName.CONCRETE) # the gutter's concrete lip
 
 	# Center the row of dashes along the road.
 	var step := dash_length + dash_gap

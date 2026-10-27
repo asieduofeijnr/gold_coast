@@ -1,0 +1,269 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/places/market.gd" id="1_market"]
+[ext_resource type="Script" path="res://scenes/props/market_stall.gd" id="2_stall"]
+[ext_resource type="PackedScene" path="res://scenes/people/vendor.tscn" id="3_vendor"]
+[ext_resource type="Script" path="res://scenes/props/head_pan.gd" id="4_head_pan"]
+[ext_resource type="Script" path="res://scenes/interactions/interactable.gd" id="5_interactable"]
+[ext_resource type="Script" path="res://art/palette/palette_mesh.gd" id="6_palette_mesh"]
+[ext_resource type="Script" path="res://scenes/props/signboard.gd" id="7_signboard"]
+[ext_resource type="Script" path="res://scenes/props/sewing_machine.gd" id="8_sewing_machine"]
+[ext_resource type="Script" path="res://scenes/interactions/skilled_job.gd" id="9_skilled_job"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(21, 0.01, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_stool"]
+size = Vector3(0.38, 0.42, 0.34)
+
+[node name="Market" type="Node3D" groups=["navigation_source"]]
+script = ExtResource("1_market")
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.004, 2.6)
+mesh = SubResource("BoxMesh_floor")
+script = ExtResource("6_palette_mesh")
+color_name = 29
+
+[node name="MarketSign" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0, -2.9)
+script = ExtResource("7_signboard")
+text = "NKABOM MARKET"
+board_size = Vector2(5.2, 0.8)
+board_color = 39
+text_color = 72
+post_height = 2.7
+
+[node name="FishStall" type="StaticBody3D" parent="." node_paths=PackedStringArray("seller")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2, 0, 0)
+script = ExtResource("2_stall")
+produce = 66
+produce_middle = 63
+umbrella = 10
+umbrella_band = 72
+seller = NodePath("../FishSeller")
+
+[node name="FishSeller" parent="." instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -7.2, 0, -0.62)
+person_name = "Auntie Efua"
+top_color = 70
+skirt_color = 23
+trim_color = 0
+headwrap_color = 32
+greetings = Array[String](["Fresh fish, come and buy!", "Smoked fish from Tema!"])
+greet_distance = 3.5
+
+[node name="TomatoStall" type="StaticBody3D" parent="." node_paths=PackedStringArray("seller")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6, 0, 0)
+script = ExtResource("2_stall")
+produce = 64
+produce_middle = 67
+umbrella = 32
+umbrella_band = 72
+seller = NodePath("../TomatoSeller")
+
+[node name="TomatoSeller" parent="." instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -3.6, 0, -0.62)
+person_name = "Auntie Ama"
+top_color = 32
+skirt_color = 23
+trim_color = 0
+headwrap_color = 70
+greetings = Array[String](["Fresh tomatoes, cheap cheap!", "Sweet tomatoes, come and see!"])
+greet_distance = 3.5
+
+[node name="YamStall" type="StaticBody3D" parent="." node_paths=PackedStringArray("seller")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("2_stall")
+produce = 38
+produce_middle = 60
+umbrella = 0
+umbrella_band = 10
+seller = NodePath("../YamSeller")
+
+[node name="YamSeller" parent="." instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, -0.62)
+person_name = "Auntie Akos"
+top_color = 7
+skirt_color = 60
+trim_color = 72
+headwrap_color = 67
+greetings = Array[String](["Yams! Onions! Come and buy!", "Good yams from the north!"])
+greet_distance = 3.5
+
+[node name="TraderStall" type="StaticBody3D" parent="." node_paths=PackedStringArray("seller")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 0, 0)
+script = ExtResource("2_stall")
+produce = 10
+produce_middle = 67
+umbrella = 70
+umbrella_band = 72
+seller = NodePath("../Trader")
+
+[node name="Trader" parent="." node_paths=PackedStringArray("belongings") instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 3.6, 0, -0.62)
+person_name = "Madam Serwaa"
+top_color = 70
+skirt_color = 0
+trim_color = 32
+headwrap_color = 10
+greetings = Array[String](["Kayayo! I have a load for you!", "Who wants work? Come, come!", "Kayayo, come and carry!"])
+belongings = [NodePath("../LoadPile")]
+
+[node name="ClothStall" type="StaticBody3D" parent="." node_paths=PackedStringArray("seller")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 0, 0)
+script = ExtResource("2_stall")
+produce = 0
+produce_middle = 0
+umbrella = 25
+umbrella_band = 72
+cloth = true
+seller = NodePath("../ClothSeller")
+
+[node name="ClothSeller" parent="." node_paths=PackedStringArray("belongings") instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 7.6, 0, -0.62)
+person_name = "Sister Abena"
+top_color = 0
+skirt_color = 70
+trim_color = 32
+headwrap_color = 25
+greetings = Array[String](["Kente! Wax print! Come and see!", "Fine cloth for your kaba!"])
+greet_distance = 3.5
+belongings = [NodePath("../SewingMachine")]
+
+[node name="SewingMachine" type="StaticBody3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 9.45, 0, -0.55)
+script = ExtResource("8_sewing_machine")
+
+[node name="SewJob" type="Marker3D" parent="." node_paths=PackedStringArray("boss")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 9.45, 0, -0.55)
+script = ExtResource("9_skilled_job")
+prompt = "Sew a kaba and slit"
+sign_height = 1.9
+skill = "dressmaking"
+needs = "needs dressmaking"
+work = "Sew a kaba and slit"
+doing = "Sewing a kaba and slit"
+pay = 8000
+payer = "ABENA"
+game_minutes = 120.0
+real_seconds = 6.0
+pose = &"sew"
+per_day = 2
+opens = 360.0
+closes = 960.0
+hours = "Sewing orders 6am - 4pm"
+boss = NodePath("../ClothSeller")
+needs_line = "You can't sew yet, my dear. Learn dressmaking at Sankofa Training College!"
+hours_line = "No more sewing today. Come back in the morning!"
+done_line = "No more orders today. Come back tomorrow!"
+start_line = "This kaba is for a wedding on Saturday. Sew it fine o!"
+thanks_line = "Ayekoo! Fine work. Here's your money."
+
+[node name="PepperStall" type="StaticBody3D" parent="." node_paths=PackedStringArray("seller")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6, 0, 5.4)
+script = ExtResource("2_stall")
+produce = 32
+produce_middle = 62
+umbrella = 0
+umbrella_band = 32
+seller = NodePath("../PepperSeller")
+
+[node name="PepperSeller" parent="." instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -3.6, 0, 4.78)
+person_name = "Mama Akua"
+top_color = 25
+skirt_color = 37
+trim_color = 0
+headwrap_color = 10
+greetings = Array[String](["Pepper! Garden eggs!", "Fresh pepper, very hot o!"])
+greet_distance = 3.5
+
+[node name="PlantainStall" type="StaticBody3D" parent="." node_paths=PackedStringArray("seller")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0, 5.4)
+script = ExtResource("2_stall")
+produce = 10
+produce_middle = 67
+umbrella = 10
+umbrella_band = 0
+seller = NodePath("../PlantainSeller")
+
+[node name="PlantainSeller" parent="." instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1.8, 0, 4.78)
+person_name = "Auntie Yaa"
+top_color = 67
+skirt_color = 10
+trim_color = 72
+headwrap_color = 70
+greetings = Array[String](["Ripe plantain, cheap!", "Plantain for your kelewele!"])
+greet_distance = 3.5
+
+[node name="OrangeStool" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.8, 0.21, 3.2)
+mesh = SubResource("BoxMesh_stool")
+script = ExtResource("6_palette_mesh")
+color_name = 37
+
+[node name="OrangeSeller" parent="." node_paths=PackedStringArray("belongings") instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -9.8, 0, 3.2)
+person_name = "Grandma Afua"
+top_color = 21
+skirt_color = 37
+trim_color = 0
+headwrap_color = 32
+greetings = Array[String](["Sweet oranges, peeled for you!", "Oranges, one cedi!"])
+greet_distance = 3.5
+pose = &"sit"
+belongings = [NodePath("../OrangeStool"), NodePath("../OrangeBasin")]
+
+[node name="OrangeBasin" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.8, 0, 3.85)
+script = ExtResource("4_head_pan")
+goods_color = 67
+cloth_ring = false
+
+[node name="GroundnutStool" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.21, 3)
+mesh = SubResource("BoxMesh_stool")
+script = ExtResource("6_palette_mesh")
+color_name = 37
+
+[node name="GroundnutSeller" parent="." node_paths=PackedStringArray("belongings") instance=ExtResource("3_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 10, 0, 3)
+person_name = "Auntie Mansa"
+top_color = 6
+skirt_color = 60
+trim_color = 0
+headwrap_color = 0
+greetings = Array[String](["Roasted groundnuts!", "Groundnut and banana, come!"])
+greet_distance = 3.5
+pose = &"sit"
+belongings = [NodePath("../GroundnutStool"), NodePath("../GroundnutBasin")]
+
+[node name="GroundnutBasin" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 3.65)
+script = ExtResource("4_head_pan")
+goods_color = 65
+cloth_ring = false
+
+[node name="LoadPile" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0, -0.2)
+
+[node name="HeadPan" type="Node3D" parent="LoadPile"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.35)
+script = ExtResource("4_head_pan")
+goods_color = 64
+cloth_ring = false
+
+[node name="HeadPan2" type="Node3D" parent="LoadPile"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0, 0.35)
+script = ExtResource("4_head_pan")
+goods_color = 38
+cloth_ring = false
+
+[node name="HireSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 0, 0.95)
+script = ExtResource("5_interactable")
+prompt = "Carry a load"
+sign_height = 1.95
+works_while_carrying = true

@@ -5,56 +5,371 @@
 [ext_resource type="PackedScene" path="res://scenes/world/road.tscn" id="3_road"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="4_player"]
 [ext_resource type="PackedScene" path="res://scenes/camera/iso_camera.tscn" id="5_camera"]
-[ext_resource type="PackedScene" path="res://scenes/buildings/placeholder_building.tscn" id="6_building"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/building.tscn" id="6_building"]
 [ext_resource type="PackedScene" path="res://scenes/props/billboard.tscn" id="7_billboard"]
+[ext_resource type="PackedScene" path="res://art/models/buildings/compound_house.glb" id="8_compound_house"]
+[ext_resource type="PackedScene" path="res://art/models/buildings/provisions_store.glb" id="9_provisions_store"]
+[ext_resource type="PackedScene" path="res://art/models/buildings/chop_bar.glb" id="10_chop_bar"]
+[ext_resource type="PackedScene" path="res://art/models/buildings/apartment_block.glb" id="11_apartment_block"]
+[ext_resource type="PackedScene" path="res://art/models/buildings/mobile_money_kiosk.glb" id="12_kiosk"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="13_hud"]
+[ext_resource type="Script" path="res://scenes/world/walkable_area.gd" id="14_walkable_area"]
+[ext_resource type="Script" path="res://scenes/world/see_through.gd" id="15_see_through"]
+[ext_resource type="PackedScene" path="res://scenes/effects/move_marker.tscn" id="16_move_marker"]
+[ext_resource type="PackedScene" path="res://scenes/places/chop_bar_shop.tscn" id="17_chop_bar_shop"]
+[ext_resource type="PackedScene" path="res://scenes/places/home.tscn" id="18_home"]
+[ext_resource type="PackedScene" path="res://scenes/places/market.tscn" id="19_market"]
+[ext_resource type="Script" path="res://scenes/interactions/delivery_spot.gd" id="20_delivery_spot"]
+[ext_resource type="Script" path="res://scenes/main/main.gd" id="22_main"]
+[ext_resource type="Script" path="res://scenes/places/trotro_station.gd" id="23_trotro_station"]
+[ext_resource type="Script" path="res://scenes/vehicles/trotro.gd" id="24_trotro"]
+[ext_resource type="Script" path="res://scenes/people/town_life.gd" id="25_town_life"]
+[ext_resource type="Script" path="res://scenes/people/street_football.gd" id="26_street_football"]
+[ext_resource type="Script" path="res://scenes/people/goat.gd" id="27_goat"]
+[ext_resource type="Script" path="res://scenes/people/chicken.gd" id="28_chicken"]
+[ext_resource type="Script" path="res://scenes/props/power_line.gd" id="29_power_line"]
+[ext_resource type="Script" path="res://scenes/props/signboard.gd" id="30_signboard"]
+[ext_resource type="Script" path="res://scenes/ui/building_names.gd" id="31_building_names"]
+[ext_resource type="PackedScene" path="res://art/models/buildings/training_college.glb" id="32_college_model"]
+[ext_resource type="PackedScene" path="res://art/models/buildings/basic_school.glb" id="33_school_model"]
+[ext_resource type="PackedScene" path="res://scenes/places/training_college.tscn" id="34_college"]
+[ext_resource type="PackedScene" path="res://scenes/places/school.tscn" id="35_school"]
+[ext_resource type="PackedScene" path="res://scenes/places/momo_kiosk.tscn" id="36_momo_kiosk"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_town"]
+geometry_parsed_geometry_type = 1
+geometry_collision_mask = 1
+geometry_source_geometry_mode = 1
+geometry_source_group_name = &"navigation_source"
+cell_size = 0.25
+cell_height = 0.25
+agent_height = 2.0
+agent_radius = 0.5
+agent_max_climb = 0.25
+filter_baking_aabb = AABB(-41, -1, -41, 82, 3.5, 82)
 
 [node name="Main" type="Node3D"]
+script = ExtResource("22_main")
 
 [node name="Lighting" parent="." instance=ExtResource("1_lighting")]
 
-[node name="Ground" parent="." instance=ExtResource("2_ground")]
+[node name="Ground" parent="." groups=["navigation_source"] instance=ExtResource("2_ground")]
 
 [node name="Road" parent="." instance=ExtResource("3_road")]
 
-[node name="Buildings" type="Node3D" parent="."]
+[node name="Buildings" type="Node3D" parent="." groups=["navigation_source"]]
 
 [node name="CompoundHouse" parent="Buildings" instance=ExtResource("6_building")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 0, -12.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.45, 0, -11.65)
+model = ExtResource("8_compound_house")
 building_name = "Compound House"
-size = Vector3(12, 3.2, 10)
-wall_color = 5
-roof_style = 1
+subtitle = "Your home · Auntie Adwoa's"
 
 [node name="ProvisionsStore" parent="Buildings" instance=ExtResource("6_building")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.6, 0, -11.75)
+model = ExtResource("9_provisions_store")
 building_name = "Provisions Store"
-size = Vector3(5, 3, 5)
-wall_color = 6
+subtitle = "God Is Great Enterprise"
 
 [node name="ChopBar" parent="Buildings" instance=ExtResource("6_building")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -10.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -12.75)
+model = ExtResource("10_chop_bar")
 building_name = "Chop Bar"
-size = Vector3(7, 3.2, 6)
-wall_color = 8
-roof_style = 1
+subtitle = "Maame Esi's Chop Bar"
 
 [node name="ApartmentBlock" parent="Buildings" instance=ExtResource("6_building")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, -11.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6, 0, -11.4)
+model = ExtResource("11_apartment_block")
 building_name = "Apartment Block"
-size = Vector3(9, 9.6, 8)
-wall_color = 7
+subtitle = "Adom Court"
 
 [node name="MobileMoneyKiosk" parent="Buildings" instance=ExtResource("6_building")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8, 0, -8.7)
-building_name = "Mobile Money"
-size = Vector3(2.6, 2.6, 2.4)
-wall_color = 0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 0, -8.4)
+model = ExtResource("12_kiosk")
+building_name = "Mobile Money Vendor"
+subtitle = "MoMo Cash In, Cash Out"
 
-[node name="Billboard" parent="." instance=ExtResource("7_billboard")]
+[node name="TrainingCollege" parent="Buildings" instance=ExtResource("6_building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 0, 12.5)
+model = ExtResource("32_college_model")
+building_name = "Training College"
+subtitle = "Sankofa Training College"
+
+[node name="BasicSchool" parent="Buildings" instance=ExtResource("6_building")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -36, 0, 15.5)
+model = ExtResource("33_school_model")
+building_name = "Basic School"
+subtitle = "Nkabom M/A Basic School"
+
+[node name="ChopBarShop" parent="." node_paths=PackedStringArray("building") instance=ExtResource("17_chop_bar_shop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -12.75)
+building = NodePath("../Buildings/ChopBar")
+
+[node name="College" parent="." node_paths=PackedStringArray("building") instance=ExtResource("34_college")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 0, 12.5)
+building = NodePath("../Buildings/TrainingCollege")
+
+[node name="School" parent="." node_paths=PackedStringArray("building") instance=ExtResource("35_school")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, 15.5)
+building = NodePath("../Buildings/BasicSchool")
+
+[node name="MomoKiosk" parent="." node_paths=PackedStringArray("building") instance=ExtResource("36_momo_kiosk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 0, -8.4)
+building = NodePath("../Buildings/MobileMoneyKiosk")
+
+[node name="Home" parent="." node_paths=PackedStringArray("building") instance=ExtResource("18_home")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.45, 0, -11.65)
+building = NodePath("../Buildings/CompoundHouse")
+
+[node name="Market" parent="." instance=ExtResource("19_market")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 12)
+
+[node name="TrotroStationEast" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 0, -4.2)
+script = ExtResource("23_trotro_station")
+
+[node name="TrotroStationWest" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6, 0, -4.2)
+script = ExtResource("23_trotro_station")
+title = "TROTRO STOP"
+shelter = false
+
+[node name="Trotro" type="AnimatableBody3D" parent="." node_paths=PackedStringArray("stations")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 46, 0, -1.9)
+script = ExtResource("24_trotro")
+stations = [NodePath("../TrotroStationEast"), NodePath("../TrotroStationWest")]
+
+[node name="PowerLine" type="StaticBody3D" parent="." groups=["navigation_source"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 0, 6.7)
+script = ExtResource("29_power_line")
+
+[node name="StoreSign" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.6, 2.8, -7.84)
+script = ExtResource("30_signboard")
+board_size = Vector2(3.4, 0.5)
+
+[node name="KioskSign" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 2.3, -7.27)
+script = ExtResource("30_signboard")
+text = "MOMO · CASH IN · CASH OUT"
+board_size = Vector2(2.3, 0.4)
+board_color = 70
+text_color = 0
+
+[node name="ChopBarSign" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 2.6, -8.12)
+script = ExtResource("30_signboard")
+text = "MAAME ESI'S CHOP BAR"
+board_size = Vector2(3, 0.45)
+board_color = 32
+text_color = 72
+
+[node name="RemoveByOrder" type="Node3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 10.13, 1.05, -11.4)
+script = ExtResource("30_signboard")
+text = "REMOVE BY ORDER"
+board_size = Vector2(3.4, 0.6)
+text_color = 32
+on_wall = true
+
+[node name="StreetFootball" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0, 13)
+script = ExtResource("26_street_football")
+
+[node name="Animals" type="Node3D" parent="."]
+
+[node name="Goat" type="Node3D" parent="Animals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33, 0, 29)
+script = ExtResource("27_goat")
+area = Vector2(6, 8)
+
+[node name="Goat2" type="Node3D" parent="Animals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0, 28)
+script = ExtResource("27_goat")
+coat = 37
+patches = 72
+
+[node name="BabyGoat" type="Node3D" parent="Animals"]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, -31, 0, 31.5)
+script = ExtResource("27_goat")
+area = Vector2(5, 5)
+coat = 23
+patches = 72
+
+[node name="Chicken" type="Node3D" parent="Animals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.5, 0, -8.5)
+script = ExtResource("28_chicken")
+area = Vector2(4, 3)
+
+[node name="Chicken2" type="Node3D" parent="Animals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.2, 0, -7.8)
+script = ExtResource("28_chicken")
+area = Vector2(4, 3)
+feathers = 38
+
+[node name="Chicken3" type="Node3D" parent="Animals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.8, 0, -9)
+script = ExtResource("28_chicken")
+area = Vector2(4, 3)
+feathers = 67
+
+[node name="Chicken4" type="Node3D" parent="Animals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.8, 0, -9.4)
+script = ExtResource("28_chicken")
+area = Vector2(4, 3)
+
+[node name="DeliverySpots" type="Node3D" parent="."]
+
+[node name="ToChopBar" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.6, 0, -5.8)
+script = ExtResource("20_delivery_spot")
+place_name = "the Chop Bar"
+phone_name = "CHOP BAR"
+receiver = "Maame Esi"
+pay = 1000
+minutes = 22.0
+building = NodePath("../../Buildings/ChopBar")
+
+[node name="ToCompoundHouse" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.4, 0, -6.4)
+script = ExtResource("20_delivery_spot")
+place_name = "the Compound House"
+phone_name = "COMPOUND"
+receiver = "Auntie Adwoa"
+pay = 1800
+minutes = 34.0
+building = NodePath("../../Buildings/CompoundHouse")
+
+[node name="ToProvisionsStore" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.6, 0, -6.4)
+script = ExtResource("20_delivery_spot")
+place_name = "the Provisions Store"
+phone_name = "STORE"
+receiver = "Uncle Kofi"
+pay = 1400
+minutes = 28.0
+building = NodePath("../../Buildings/ProvisionsStore")
+
+[node name="ToApartmentBlock" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6, 0, -6.4)
+script = ExtResource("20_delivery_spot")
+place_name = "the Apartment Block"
+phone_name = "APARTMENTS"
+receiver = "Mrs Mensah"
+pay = 1000
+minutes = 22.0
+building = NodePath("../../Buildings/ApartmentBlock")
+
+[node name="ToMomoKiosk" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 0, -6.4)
+script = ExtResource("20_delivery_spot")
+place_name = "the MoMo kiosk"
+phone_name = "MOMO KIOSK"
+receiver = "Yaw"
+pay = 1200
+minutes = 25.0
+building = NodePath("../../Buildings/MobileMoneyKiosk")
+
+[node name="ToTrotroStation" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 16.6, 0, -5)
+script = ExtResource("20_delivery_spot")
+place_name = "the trotro station"
+phone_name = "STATION"
+receiver = "a passenger"
+pay = 1200
+minutes = 25.0
+building = NodePath("../../TrotroStationEast")
+
+[node name="ToSchool" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -29, 0, 14.2)
+script = ExtResource("20_delivery_spot")
+place_name = "the school"
+phone_name = "SCHOOL"
+receiver = "Auntie Mary"
+pay = 1600
+minutes = 32.0
+building = NodePath("../../Buildings/BasicSchool")
+
+[node name="ToCollege" type="Marker3D" parent="DeliverySpots" node_paths=PackedStringArray("building")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, 19.4)
+script = ExtResource("20_delivery_spot")
+place_name = "the college"
+phone_name = "COLLEGE"
+receiver = "Mr. Boateng"
+pay = 1600
+minutes = 30.0
+building = NodePath("../../Buildings/TrainingCollege")
+
+[node name="Billboard" parent="." groups=["navigation_source"] instance=ExtResource("7_billboard")]
 transform = Transform3D(0.906308, 0, 0.422618, 0, 1, 0, -0.422618, 0, 0.906308, 24, 0, -9)
+
+[node name="WalkableArea" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_town")
+script = ExtResource("14_walkable_area")
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 5)
 
-[node name="IsoCamera" parent="." node_paths=PackedStringArray("target") instance=ExtResource("5_camera")]
+[node name="MoveMarker" parent="." instance=ExtResource("16_move_marker")]
+
+[node name="IsoCamera" parent="." node_paths=PackedStringArray("target", "sun") instance=ExtResource("5_camera")]
 target = NodePath("../Player")
+sun = NodePath("../Lighting/Sun")
+
+[node name="SeeThrough" type="Node" parent="." node_paths=PackedStringArray("target", "buildings")]
+script = ExtResource("15_see_through")
+target = NodePath("../Player")
+buildings = NodePath("../Buildings")
+
+[node name="TownLife" type="Node3D" parent="." node_paths=PackedStringArray("stations", "chop_bar", "market")]
+script = ExtResource("25_town_life")
+stations = [NodePath("../TrotroStationEast"), NodePath("../TrotroStationWest")]
+chop_bar = NodePath("../ChopBarShop")
+market = NodePath("../Market")
+
+[node name="Doors" type="Node3D" parent="TownLife"]
+
+[node name="ApartmentDoor" type="Marker3D" parent="TownLife/Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0, -6.7)
+
+[node name="CompoundDoor" type="Marker3D" parent="TownLife/Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.3, 0, -6.7)
+
+[node name="StoreDoor" type="Marker3D" parent="TownLife/Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.4, 0, -6.7)
+
+[node name="SchoolGate" type="Marker3D" parent="TownLife/Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.6, 0, 9.8)
+
+[node name="CollegeDoor" type="Marker3D" parent="TownLife/Doors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 0, 19.4)
+
+[node name="Edges" type="Node3D" parent="TownLife"]
+
+[node name="WestRoad" type="Marker3D" parent="TownLife/Edges"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 0, -5)
+
+[node name="WestPath" type="Marker3D" parent="TownLife/Edges"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 0, 5.2)
+
+[node name="EastRoad" type="Marker3D" parent="TownLife/Edges"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, -5)
+
+[node name="EastPath" type="Marker3D" parent="TownLife/Edges"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, 5.2)
+
+[node name="South" type="Marker3D" parent="TownLife/Edges"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 30)
+
+[node name="SouthEast" type="Marker3D" parent="TownLife/Edges"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 28)
+
+[node name="AmpeSpot" type="Marker3D" parent="TownLife"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.4, 0, 14.9)
+
+[node name="BuildingNames" type="Node" parent="."]
+script = ExtResource("31_building_names")
+
+[node name="HUD" parent="." instance=ExtResource("13_hud")]
+
+[connection signal="destination_chosen" from="Player" to="MoveMarker" method="show_at"]

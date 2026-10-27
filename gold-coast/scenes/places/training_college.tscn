@@ -1,0 +1,94 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/places/training_college.gd" id="1_college"]
+[ext_resource type="Script" path="res://scripts/course.gd" id="2_course"]
+[ext_resource type="Script" path="res://scenes/props/desk.gd" id="3_desk"]
+[ext_resource type="PackedScene" path="res://scenes/people/vendor.tscn" id="4_vendor"]
+[ext_resource type="Script" path="res://scenes/interactions/interactable.gd" id="5_interactable"]
+[ext_resource type="Script" path="res://scenes/props/signboard.gd" id="6_signboard"]
+[ext_resource type="Script" path="res://scenes/ui/course_board.gd" id="7_course_board"]
+
+[sub_resource type="Resource" id="Resource_momo"]
+script = ExtResource("2_course")
+id = "momo_agent"
+title = "Mobile Money Agent"
+description = "Run Auntie Dede's MoMo kiosk"
+phone_title = "MOMO AGENT"
+fee = 8000
+classes = 1
+
+[sub_resource type="Resource" id="Resource_dressmaking"]
+script = ExtResource("2_course")
+id = "dressmaking"
+title = "Dressmaking"
+description = "Sew kaba and slit at the market"
+phone_title = "DRESSMAKING"
+fee = 20000
+classes = 2
+
+[sub_resource type="Resource" id="Resource_teaching"]
+script = ExtResource("2_course")
+id = "teaching"
+title = "Teaching Certificate"
+description = "Teach at Nkabom Basic School"
+phone_title = "TEACHING"
+fee = 35000
+classes = 3
+
+[node name="TrainingCollege" type="Node3D" groups=["navigation_source"]]
+script = ExtResource("1_college")
+courses = Array[ExtResource("2_course")]([SubResource("Resource_momo"), SubResource("Resource_dressmaking"), SubResource("Resource_teaching")])
+
+[node name="Desk" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 0, 7.5)
+script = ExtResource("3_desk")
+
+[node name="Registrar" parent="." instance=ExtResource("4_vendor")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -3.3, 0, 6.95)
+person_name = "Madam Afriyie"
+top_color = 72
+skirt_color = 70
+trim_color = 0
+headwrap_color = 70
+greetings = Array[String](["Akwaaba to Sankofa Training College!", "It is never too late to learn!", "Come and learn a skill, my dear!"])
+greet_distance = 5.0
+
+[node name="DeskSpot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 0, 8.25)
+script = ExtResource("5_interactable")
+prompt = "See the courses"
+sign_height = 1.9
+
+[node name="ClassDoor" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.65)
+
+[node name="CollegeSign" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0, 8.6)
+script = ExtResource("6_signboard")
+text = "SANKOFA TRAINING COLLEGE"
+subtitle = "MON - SAT · 8AM - 5PM"
+board_size = Vector2(5.6, 1.0)
+board_color = 70
+text_color = 72
+post_height = 1.9
+
+[node name="BoardLayer" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 3
+
+[node name="CourseBoard" type="Control" parent="BoardLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_course_board")
+owner_line = "SANKOFA"
+header_color = 70
+shop_name = "TRAINING COLLEGE"
+motto = "IT IS NEVER TOO LATE TO LEARN"
+speaker = "Madam Afriyie"
+speaker_headwrap = 70
+accept_hint = "go"

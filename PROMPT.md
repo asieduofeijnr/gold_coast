@@ -1,8 +1,8 @@
 # Gold Coast: AI game dev prompt
 
-> **Current job: Job 16, "Web build"**, in phase two: online (details in
-> section 8). Phase one (Jobs 1–9 and skills) and Job 15 are done. Job 16 is
-> built: only trying it in the browsers is left.
+> **Current job: Job 17, "On itch.io"**, in phase two: online (details in
+> section 8). Phase one (Jobs 1–9 and skills), Job 15, and Job 16 are done.
+> The itch.io account and the first upload are done too.
 
 **How to use this file:** start a fresh Codex session for each job and tell it
 to read this file and do the current job. The AI does only that job. When the
@@ -640,7 +640,8 @@ of peeling plaster. Flat colors, simple shapes.
     `GameState.start_with` ("new" or "load") skips the title screen then. F7
     skips it too. In tests, where the main scene isn't the game's own scene,
     `restart()` does it in place instead.
-- **Job 16 is built: the web version** (trying it in the browsers is left).
+- **Job 16 is done: the web version.** On 2026-10-30 I uploaded it to itch.io,
+  and it plays in the browser.
   - **Exporting:** `export_presets.cfg` has two presets.
     - "Web" builds the game into `build/web/`, without threads (so any web
       host works) and without the tests. Git ignores `build/`, and
@@ -1106,7 +1107,7 @@ that can follow them to any computer as a cloud save.
   Load, New game, How to play), and saving anywhere she's free, with her spot
   and her load. *Test:* saving on the street and loading puts her back on the
   spot, with her load, at the saved time.
-- [ ] **Job 16: Web build.** A Web export (without threads), the daylight colors
+- [x] **Job 16: Web build.** A Web export (without threads), the daylight colors
   fixed for the web renderer, and a speed pass to 60 fps on an ordinary laptop.
   *Test:* it builds and starts with no errors, and it plays, saves, and
   continues after a reload in Chrome, Safari, and Firefox.
@@ -1519,7 +1520,7 @@ checks (382 in all).
 **Done when:** you can save anywhere she's free, quit, start again, choose
 Continue, and carry on from the same spot.
 
-### Job 16: Web build (built; trying it in the browsers is left)
+### Job 16: Web build (done)
 **Goal:** the game runs well in Chrome, Safari, and Firefox on an ordinary laptop.
 Built as planned below. The templates were installed in the editor (the AI's
 sandbox blocks their download). The look: a linear tone map with a little less
@@ -1528,7 +1529,8 @@ the characters' parts merged, and only those on the screen animate (fewer
 shadows and less MSAA didn't help). With the web renderer on the Mac, the town
 went from 30–62 fps to 87–124. Tests: `tests/test_web_ready.gd`, 8 checks (391
 in all), and the web check (`tests/web_check.gd`), which runs in a browser.
-Left: trying it in Chrome and Safari (Firefox isn't installed on this Mac).
+On 2026-10-30 I uploaded it to itch.io, and it plays in the browser. Saving and
+continuing there, on another computer, is Job 17's test.
 1. **Templates:** download Godot 4.7.2's export templates, about 1 GB. You can
    do it in the editor (Editor > Manage Export Templates > Download and
    Install), or the AI can fetch them from GitHub if you're happy with that.
@@ -1571,8 +1573,14 @@ there.
    new checks in `test_school.gd` (the sign in view) and
    `test_player_model.gd` (sitting in her slit). 404 in all.
 
-### Job 17: On itch.io
+### Job 17: On itch.io (current)
 **Goal:** a link you can send to anyone.
+**Done so far (2026-10-30):** I made the account and the project, as a draft.
+The settings: kind of project HTML, the upload `gold-coast/build/gold-coast-web.zip`
+(the files of `build/web`, with `index.html` at the top) played in the browser,
+a 1152 × 648 viewport, a fullscreen button, and no SharedArrayBuffer (the game
+doesn't need it) or mobile option. The page's tagline and description are in
+`docs/itch-page.txt`.
 1. **The account:** I make a free itch.io account; the AI prepares everything
    to upload.
 2. **The page:** the title, a short description, screenshots, the controls, and

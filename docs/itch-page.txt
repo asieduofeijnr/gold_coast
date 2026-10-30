@@ -1,0 +1,35 @@
+Gold Coast's itch.io page. The tagline goes in "Short description or tagline",
+and the rest in "Description" (it's plain text, so it pastes cleanly).
+
+TAGLINE
+Hustle, learn, rise: life as a young kayayo in a busy Ghanaian town.
+
+DESCRIPTION
+Akwaaba! Welcome to Gold Coast.
+
+Gold Coast is a little life game set in a Ghanaian town. You play a young woman starting out with GH₵100 and an old-school phone. You earn your first cedis as a kayayo, carrying loads on your head from Nkabom Market. Then you learn a trade and work your way up.
+
+WHAT YOU CAN DO
+• Carry loads for the market women and deliver them across town before time runs out
+• Eat waakye, banku and tilapia, fufu and light soup, kenkey and fish, or kelewele at Maame Esi's chop bar
+• Keep her fed and rested, and pay Auntie Adwoa the GH₵140 rent every Monday (sleep on the street and the mosquitoes will find you!)
+• Study at Sankofa Training College to become a teacher, a dressmaker, or a mobile money agent
+• Teach at Nkabom M/A Basic School, sew kaba and slit at the market, or mind Auntie Dede's MoMo kiosk
+• Get paid by mobile money, with every receipt texted to your phone
+
+A TOWN THAT LIVES WITHOUT YOU
+Trotros pull in with the mate shouting "Circle! Circle!", an Uber drives through, children play football and ampe, goats and chickens wander, and the market women pack up and go home at night.
+
+CONTROLS
+• Walk: WASD or the arrow keys, or click the ground
+• E (or click): use, buy, talk, or work
+• Z: sleep (sleeping in her bed at home saves the game)
+• Mouse wheel: zoom
+• Space: back to her
+• M or Esc: the phone menu (save, load, how to play). In full screen, use M, because the browser uses Esc.
+
+GOOD TO KNOW
+• Gold Coast is early in development. More of the town, more jobs, and saves that follow you to any computer are on the way.
+• Your game is saved in your browser, on your own computer. Nothing is sent anywhere.
+• It plays in your web browser on a computer, with a keyboard and mouse.
+• Made with Godot and Blender.

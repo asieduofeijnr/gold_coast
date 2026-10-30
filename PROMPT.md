@@ -668,6 +668,42 @@ of peeling plaster. Flat colors, simple shapes.
     this computer. `tests/web_check.sh` runs the web check in Chrome with no
     window. The web check shows its results on the page, too.
   - The phone's font gained "+" (the bedtime GAME SAVED text showed "IN ?GH₵").
+- **After Job 16: a new trotro, an Uber, and fixes from playing it.**
+  - **Vehicles from Blender** (`blender/scripts/build_vehicles.py`, from the
+    drawings in `blender/vehicles/`):
+    - `art/models/vehicles/trotro.glb`: a classic cream minibus with a blue
+      stripe, a raised roof, four side windows with the seats showing, a
+      sliding door on its right, and square headlights. About 2,000 triangles.
+    - `art/models/vehicles/uber_car.glb`: a silver Toyota Yaris hatchback.
+    - Each body is its side outline pushed out to its width, cut into bands of
+      color, and rounded with a bevel. The wheels (`Wheel...`) and the
+      trotro's `Door` are separate, so they can turn and slide. Empty markers
+      (`SideSlogan`, `BackSlogan`, `DestinationCard`, `StickerFront`,
+      `StickerBack`) face outward where the game writes on them.
+    - The palette gained `TROTRO_CREAM`, `TROTRO_BLUE`, `CAR_GLASS`,
+      `CAR_SILVER`, `CAR_TRIM`, and `TYRE_BLACK` (at the end of the list,
+      because scenes store colors by number).
+  - **Driving** (`scenes/vehicles/vehicle.gd`, `Vehicle`): what every vehicle
+    does, written once. It comes in at `start_x`, makes its trip, and leaves
+    at `end_x`; then it comes again after `gap_seconds`, but not late at
+    night. It speeds up and brakes smoothly, turns its wheels, dips when it
+    brakes, and honks and waits for anyone in its lane. It writes on its model
+    with `_write()`.
+  - `Trotro` now extends `Vehicle`: its stations, mate, sliding door
+    (`is_door_open()`), and sayings are its own. Its door is at
+    `DOOR` (1.45, 0, -0.6).
+  - **The Uber** (`scenes/vehicles/car.gd`, `Car`, the `Uber` node): it drives
+    east in the south lane (z = 1.9, the trotro's is z = -1.9), from x = -46
+    to 46, every 25 to 50 seconds. It has Uber stickers front and back and a
+    higher horn.
+  - **Sitting in a slit:** the skirt's skin weights changed. Below her hips,
+    her legs carry all of it, so when she sits it covers her lap and her shins
+    down to her ankles. The character script has sitting previews (25 to 27).
+  - **The trotro station's sign:** `Signpost.board_width()` makes the board as
+    wide as its words, and the station stands it clear of the shelter's roof
+    (`TrotroStation.ROOF`).
+  - **The school:** the mango tree moved into the yard (local (10.4, 0, -0.5)),
+    out of the line between the school's sign and the camera.
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports
@@ -689,7 +725,7 @@ of peeling plaster. Flat colors, simple shapes.
   built-in `ui_*` actions. Web builds use the Compatibility renderer
   (`rendering_method.web`).
 - **Colors:** `art/palette/palette.gd` (`Palette`) holds every color,
-  including the sun, sky, and character colors. `art/palette/palette_mesh.gd`
+  including the sun, sky, character, and vehicle colors. `art/palette/palette_mesh.gd`
   (`PaletteMesh`) is a mesh whose color you pick from a dropdown of palette names.
 - **Scenes:**
   - `scenes/world/` holds `lighting.tscn` (the sun, moon, and sky, following
@@ -731,7 +767,8 @@ of peeling plaster. Flat colors, simple shapes.
   - `scenes/main/main.gd` loads the saved game when the game starts
   - `scenes/people/` also holds `townsperson.gd`, `town_life.gd`,
     `street_football.gd`, `goat.gd`, and `chicken.gd` (Job 9)
-  - `scenes/vehicles/` holds `trotro.gd`, and `scenes/places/` also holds
+  - `scenes/vehicles/` holds `vehicle.gd` (`Vehicle`, driving along the road),
+    `trotro.gd`, and `car.gd` (`Car`, the Uber). `scenes/places/` also holds
     `trotro_station.gd`
   - `scenes/props/` also holds `power_line.gd` and `signboard.gd`
 - **Shared helpers:** `scripts/shapes.gd` (`Shapes`) makes palette-colored boxes,
@@ -750,7 +787,7 @@ of peeling plaster. Flat colors, simple shapes.
   the files named after `--`). `tests/test_case.gd` (`TestCase`) is the base
   class, with `check()`, `wait_physics_frames()`, `press_action()`,
   `teleport()`, `wait_until()`, `click_at()`, and `move_mouse_to()`. There are
-  391 checks so far, all passing. `tests/web_check.gd` is different: it runs
+  404 checks so far, all passing. `tests/web_check.gd` is different: it runs
   in a browser, in the "Web check" build (see Commands). The runner saves to `user://test_save.json`,
   never your real save. It also switches the townspeople off
   (`GameState.town_life = false`) so they don't get in the way;
@@ -841,9 +878,23 @@ To rebuild the player character after changing her script or her palette colors:
   --schoolboy gold-coast/art/models/characters/schoolboy.glb
 ```
 The last two lines also rebuild the townsman and the schoolboy, who share her
-skeleton and animations. Then run Godot's `--import` and the tests. If you change her walk, re-measure its
+skeleton and animations. Its preview pictures 25 to 27 show her sitting on a
+stool: her slit must cover her legs down to her ankles. Then run Godot's `--import` and the tests. If you change her walk, re-measure its
 speed and update `walk_animation_speed` in `player_model.gd`, or her feet will
 slide.
+
+To rebuild the trotro and the Uber after changing their script or their
+palette colors:
+```bash
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup \
+  --python blender/scripts/build_vehicles.py -- \
+  --palette gold-coast/art/palette/palette.gd \
+  --out gold-coast/art/models/vehicles \
+  --blend blender/vehicles/vehicles.blend \
+  --renders /tmp/vehicle_renders
+```
+It prints each one's size, triangles, and parts. If you rename a part or a
+marker, change the scripts that look for it (`Vehicle`, `Trotro`, `Car`).
 
 ### Known Godot pitfalls
 - **Open scenes:** if a scene is open in the editor while you change its file on
@@ -940,6 +991,20 @@ slide.
   Chrome, so the browser checks run in your own Terminal.
 - **The first export** after installing the templates printed a few "leaked"
   errors. Every export after that was clean.
+- **The editor's update check:** the editor's network mode is Online (needed
+  to download the templates), so every editor start, `--import` included,
+  checks for a new Godot. In the AI's sandbox that prints "Connection to remote
+  host failed!" errors. They aren't the project's; to stop them, set Editor
+  Settings > Network > Connection > Network Mode back to Offline.
+- **Skin weights and sitting:** a point of a skinned mesh goes where its bones'
+  shares (weights) put it, on average. The slit gave her hips a fifth of its
+  lower part, so when she sat and her knees went 42 cm forward, the bottom of
+  the slit stopped 8 cm short, and her shins came out in front of it. Clothes
+  that hang over a joint should go with the bones below it.
+- **Writing that fits:** a Label3D doesn't wrap or shrink to fit anything. To
+  fit a board or a vehicle, measure the words with
+  `ThemeDB.fallback_font.get_string_size()` (Label3D's own font), as
+  `Signpost.board_width()` and `Vehicle._write()` do.
 
 ## 6. Project structure
 This is the target layout. Create folders as jobs need them.
@@ -953,6 +1018,7 @@ kayayo/                       repo root
     scripts/                  scripts that build models, e.g. build_player_character.py
     characters/               .blend files and preview pictures; reference/ (not in git)
     buildings/                buildings.blend and buildings_preview.png; reference/ (not in git)
+    vehicles/                 vehicles.blend and vehicles_preview.png; the drawings they follow (not in git)
   gold-coast/                 the Godot project (res://)
     project.godot
     autoload/                 global singletons, e.g. game_state.gd (money, time, needs, rent, saving)
@@ -965,7 +1031,7 @@ kayayo/                       repo root
       props/                  billboard.tscn, power_line.gd (poles and street lamps), signboard.gd, later trees
       interactions/           interactable.gd (things you can use with E or a click)
       people/                 vendor.tscn (people who run shops), townsperson.gd, town_life.gd (their routines), children, animals
-      vehicles/               trotro.gd, later taxis
+      vehicles/               vehicle.gd (driving), trotro.gd, car.gd (the Uber), later taxis
       places/                 chop_bar_shop.tscn, home.tscn, market.tscn, trotro_station.gd, training_college.tscn,
                               school.tscn, momo_kiosk.tscn: what happens at each place
       ui/                     hud.tscn, phone.tscn, menu_board.gd, floating labels, later more menus
@@ -973,7 +1039,7 @@ kayayo/                       repo root
     scripts/                  shared helpers not tied to one scene, e.g. shapes.gd, format.gd, food.gd, delivery.gd, course.gd
     art/
       palette/                palette.gd, the single source of colors
-      models/                 .glb files exported from Blender: characters/, buildings/
+      models/                 .glb files exported from Blender: characters/, buildings/, vehicles/
       materials/
     tests/                    test_runner.tscn + test_*.gd; web_check.gd/.tscn/.sh and serve_web.sh (the web version's checks)
     export_presets.cfg        the Web and Web check export settings
@@ -1486,6 +1552,24 @@ Left: trying it in Chrome and Safari (Firefox isn't installed on this Mac).
 
 **Done when:** it plays smoothly in all three browsers, and saves and continues
 there.
+
+**Follow-up (2026-10-28), as I asked after playing it:**
+1. The school's sign was hidden behind the mango tree: the tree moved into the
+   yard, so the whole sign shows (the sign stays by the road and the flag).
+2. The trotro, rebuilt from my drawing in Blender: cream, with a blue stripe,
+   a raised roof, and a sliding door. The mate, the stations, and the sayings
+   work as before.
+3. An Uber: a silver Toyota Yaris from my drawing, driving through town the
+   other way. (The other drawings, a sedan and a Ghana taxi, can be added the
+   same way.)
+4. When a woman sat, her legs came out of her slit: now it covers them, down
+   to her ankles.
+5. "TROTRO STATION" ran off its sign: the board fits its words now, and stands
+   clear of the shelter's roof.
+6. Tests: `tests/test_road.gd` (11 checks: the trotro's wheels, door, and
+   sayings; the Uber's trip, lane, horn, and stickers; the station signs), and
+   new checks in `test_school.gd` (the sign in view) and
+   `test_player_model.gd` (sitting in her slit). 404 in all.
 
 ### Job 17: On itch.io
 **Goal:** a link you can send to anyone.

@@ -83,6 +83,12 @@ enum ColorName {
 	PAPER,
 	WASH_WATER,
 	GUTTER,
+	TROTRO_CREAM,
+	TROTRO_BLUE,
+	CAR_GLASS,
+	CAR_SILVER,
+	CAR_TRIM,
+	TYRE_BLACK,
 }
 
 const COLORS: Dictionary[ColorName, Color] = {
@@ -164,6 +170,13 @@ const COLORS: Dictionary[ColorName, Color] = {
 	ColorName.ALUMINIUM: Color("#B9BDC1"), # cooking pots and the washing basin
 	ColorName.WASH_WATER: Color("#6E9FB4"), # soapy washing-up water
 	ColorName.GUTTER: Color("#3B342E"), # the open gutters along the road
+	# Vehicles (from the pictures in blender/vehicles/).
+	ColorName.TROTRO_CREAM: Color("#F1E3BD"), # the trotro's cream paint
+	ColorName.TROTRO_BLUE: Color("#2A67A6"), # the stripe along the trotro
+	ColorName.CAR_GLASS: Color("#2A4750"), # windows and windscreens: dark, a little green
+	ColorName.CAR_SILVER: Color("#B8C5CB"), # the Uber's silver paint
+	ColorName.CAR_TRIM: Color("#2E393F"), # bumpers, grilles, and mirrors
+	ColorName.TYRE_BLACK: Color("#232A2E"), # tyres, and the dark inside of a vehicle
 	# Pop-up signs and speech bubbles.
 	ColorName.PAPER: Color("#FBF6EA"), # speech bubbles
 }

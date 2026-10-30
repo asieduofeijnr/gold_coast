@@ -2,3 +2,7 @@
 blender/characters/reference/
 *.blend1
 blender/buildings/reference/
+# The drawings the vehicles follow, and concept pictures: references, not part of the game
+blender/vehicles/*.svg
+blender/vehicles/*.svg.png
+assets/concepts/

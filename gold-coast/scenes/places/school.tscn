@@ -65,7 +65,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0, -4.9)
 script = ExtResource("6_flagpole")
 
 [node name="MangoTree" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4, 0, -3.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4, 0, -0.5)
 script = ExtResource("7_shade_tree")
 
 [node name="SchoolSign" type="Node3D" parent="."]

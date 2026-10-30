@@ -206,11 +206,19 @@ def along_chain(bones, joints, blend=0.04):
 
 
 def skirt_weights(p):
-    """The skirt hangs from the hips and, lower down, follows the legs. The
-    middle of the skirt is shared by both legs, so it stretches between them
-    like cloth when she walks."""
-    leg = 0.8 * smoothstep(0.86, 0.55, p.z)  # 0 at the hips, 0.8 from the knees down
-    lower = smoothstep(0.62, 0.35, p.z)  # how much the lower legs take over
+    """The skirt goes with the hips at the waist, and below that with the legs,
+    each side with its own leg. The middle of the skirt is shared by both legs,
+    so it stretches between them like cloth when she walks.
+
+    Below the hips the legs take all of it, leaving nothing to the hips: then
+    when she sits, it stays on her legs, over her lap and down her shins to her
+    ankles. (With some left to the hips, it stayed behind as a tube from her
+    hips to the floor, and her legs came out of it.) Its front goes with the
+    thighs from higher up than its back, so it lies over her lap instead of
+    folding into it."""
+    front = smoothstep(0.02, -0.10, p.y)  # 1 at the front of the skirt (she faces -y), 0 at the back
+    leg = smoothstep(0.95 - 0.02 * front, 0.80 + 0.08 * front, p.z)  # 0 at the waist, 1 below the hips
+    lower = smoothstep(0.54, 0.42, p.z)  # below the knee, the lower legs take over
     left = smoothstep(-0.07, 0.07, p.x)  # 1 on her left side, 0 on her right
     return {
         "Hips": 1.0 - leg,
@@ -424,10 +432,11 @@ def build_skirt(builder):
     """The slit: a long wrap skirt, fitted below the hips, with two trim bands."""
     rings = [  # (height, half-width, half-depth)
         (1.03, 0.118, 0.09), (0.97, 0.15, 0.115), (0.92, 0.172, 0.132), (0.85, 0.18, 0.138),
-        (0.78, 0.178, 0.14), (0.62, 0.165, 0.132), (0.45, 0.152, 0.126), (0.30, 0.146, 0.122),
+        (0.78, 0.178, 0.14), (0.62, 0.165, 0.132), (0.54, 0.16, 0.129), (0.49, 0.157, 0.128),
+        (0.45, 0.152, 0.126), (0.30, 0.146, 0.122),
         (0.26, 0.146, 0.122), (0.24, 0.147, 0.123), (0.20, 0.149, 0.124), (0.17, 0.152, 0.127),
-    ]
-    bands = [SKIRT] * 8 + [TRIM, SKIRT, TRIM]  # one color per gap between rings
+    ]  # the rings at 0.54 and 0.49 round the knee when she sits
+    bands = [SKIRT] * 10 + [TRIM, SKIRT, TRIM]  # one color per gap between rings
     tube(builder, [(Vector((0, 0, z)), rx, ry) for z, rx, ry in rings], SKIRT, skirt_weights, segment_materials=bands)
 
 
@@ -926,7 +935,8 @@ def preview_stage(out_dir):
     return shoot
 
 
-def render_previews(rig, walk, idle, out_dir, eat=None, wash=None, carry=None, carry_idle=None, teach=None, sew=None):
+def render_previews(rig, walk, idle, out_dir, eat=None, wash=None, carry=None, carry_idle=None, teach=None, sew=None,
+                    sit=None):
     shoot = preview_stage(out_dir)
     rig.animation_data.action = idle
     shoot("1_front.png", Vector((0, -1, 0)))
@@ -980,6 +990,15 @@ def render_previews(rig, walk, idle, out_dir, eat=None, wash=None, carry=None, c
         shoot("24_sew_game_angle.png", Vector((1, -1, 0.82)), SEW_FRAMES // 2)
         for prop in props:
             bpy.data.objects.remove(prop)
+    if sit is not None:
+        # On a stand-in stool, the size of the game's: her slit must still cover
+        # her legs, down to her ankles.
+        stool = preview_box("Stool", (0.38, 0.34, SEAT_HEIGHT), (0.0, 0.0, SEAT_HEIGHT / 2.0))
+        rig.animation_data.action = sit
+        shoot("25_sit_side.png", Vector((1, 0, 0)), 0)
+        shoot("26_sit_game_angle.png", Vector((1, -1, 0.82)), 0)
+        shoot("27_sit_front.png", Vector((0.25, -1, 0.2)), 0)
+        bpy.data.objects.remove(stool)
     rig.animation_data.action = idle
 
 
@@ -1043,7 +1062,7 @@ def main():
     export_character(rig, body, args.glb)
     if args.renders:
         render_previews(rig, actions["walk"], actions["idle"], Path(args.renders), actions["eat"], actions["wash"],
-                        actions["carry"], actions["carry_idle"], actions["teach"], actions["sew"])
+                        actions["carry"], actions["carry_idle"], actions["teach"], actions["sew"], actions["sit"])
     if args.blend:
         Path(args.blend).parent.mkdir(parents=True, exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=str(Path(args.blend).resolve()))

@@ -3,7 +3,7 @@ extends TestCase
 ## headmistress sends her to the training college; with one she teaches at the
 ## blackboard, with pupils on the benches, and each lesson pays GH₵50 by mobile
 ## money, up to three a day, on school days from 08:00. On Saturdays the
-## school is closed.
+## school is closed. The mango tree in the yard doesn't hide the school's sign.
 
 const MAIN_SCENE := preload("res://scenes/main/main.tscn")
 
@@ -23,6 +23,7 @@ func run_tests() -> void:
 	var model := _player.get_node("Model") as PlayerModel
 	var lesson := _school.lesson
 	await wait_physics_frames(10)
+	_check_sign_in_view(main)
 
 	await _press_at_blackboard()
 	check(lesson.prompt.begins_with("Teach a lesson (needs") and "Sankofa" in _school.headmistress.saying()
@@ -82,3 +83,22 @@ func _press_at_blackboard() -> void:
 	teleport(_player, spot + Vector3(0.6, 0.05, 0.0))
 	await wait_physics_frames(3)
 	await press_action("interact")
+
+
+# From the game camera, the school's sign can be read: lines from all over its
+# front toward the camera don't run into the mango tree (or anything else).
+func _check_sign_in_view(main: Node) -> void:
+	var board := _school.get_node("SchoolSign") as Signboard
+	var toward_camera := (main.get_node("IsoCamera") as Camera3D).global_basis.z
+	var space := board.get_world_3d().direct_space_state
+	var middle := board.post_height + board.board_size.y / 2.0
+	var hidden := []
+	for along in [-0.45, -0.25, 0.0, 0.25, 0.45]:
+		for up in [-0.3, 0.0, 0.3]:
+			var spot := board.to_global(Vector3(along * board.board_size.x, middle + up * board.board_size.y, 0.05))
+			var line := PhysicsRayQueryParameters3D.create(spot, spot + toward_camera * 40.0, SeeThrough.SIGHT_LAYERS)
+			var hit := space.intersect_ray(line)
+			if not hit.is_empty():
+				hidden.append(hit.collider)
+	check(hidden.is_empty(), "the mango tree doesn't hide the school's sign from the camera (%d of 15 lines blocked)"
+			% hidden.size())

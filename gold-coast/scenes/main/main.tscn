@@ -35,6 +35,7 @@
 [ext_resource type="PackedScene" path="res://scenes/places/training_college.tscn" id="34_college"]
 [ext_resource type="PackedScene" path="res://scenes/places/school.tscn" id="35_school"]
 [ext_resource type="PackedScene" path="res://scenes/places/momo_kiosk.tscn" id="36_momo_kiosk"]
+[ext_resource type="Script" path="res://scenes/vehicles/car.gd" id="37_car"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_town"]
 geometry_parsed_geometry_type = 1
@@ -138,6 +139,13 @@ shelter = false
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 46, 0, -1.9)
 script = ExtResource("24_trotro")
 stations = [NodePath("../TrotroStationEast"), NodePath("../TrotroStationWest")]
+
+[node name="Uber" type="AnimatableBody3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -46, 0, 1.9)
+script = ExtResource("37_car")
+start_x = -46.0
+end_x = 46.0
+gap_seconds = Vector2(25, 50)
 
 [node name="PowerLine" type="StaticBody3D" parent="." groups=["navigation_source"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 0, 6.7)

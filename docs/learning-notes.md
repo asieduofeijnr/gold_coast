@@ -387,3 +387,26 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   reload. The web check tests exactly that: it saves, reloads the page, and
   looks for the save.
 
+## After Job 16: a new trotro, an Uber, and sitting in a slit
+
+- **Skin weights.** Each point of an animated mesh has a few bones that move
+  it, each with a share (its *weight*), and the shares add up to 1. The point
+  goes to the average of where each bone would carry it. The bottom of her
+  slit was 80% her legs and 20% her hips. When she sat, her knees went 42 cm
+  forward, but the slit only went 80% of the way, so her shins came out in
+  front of it. Now her legs carry all of it below her hips.
+- **One class for everything that drives.** The trotro and the Uber both drive
+  along the road, turn their wheels, and honk at people in the way. That's
+  written once, in `Vehicle`. `Trotro` and `Car` *extend* it (they're kinds of
+  Vehicle) and add what's their own: the stations, the mate, and the sliding
+  door, or the Uber's stickers. `super()` runs the parent's version of a
+  function, so `Trotro._ready()` does everything `Vehicle._ready()` does, then
+  makes its mate.
+- **Moving parts and markers in a model.** In Blender, the wheels and the
+  trotro's door are objects of their own, so in Godot they're nodes of their
+  own, which the game can turn and slide. Empty objects (*markers*) have no
+  shape, just a place and a direction. The game puts the writing on them, so
+  the words stay on the trotro wherever it goes.
+- **A shape from its outline.** Each vehicle's body is its outline seen from
+  the side (a list of points) pushed out sideways to its width, like a cookie
+  cutter, then cut into bands of color and rounded off with a bevel.

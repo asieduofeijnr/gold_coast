@@ -9,6 +9,9 @@ extends Node3D
 ## Place it on the pavement's edge by the road, with its -Z pointing away from
 ## the road. The trotro stops with its door level with it.
 
+## The shelter's zinc roof.
+const ROOF := Vector3(3.0, 0.06, 2.0)
+
 ## The words on the station's sign.
 @export var title := "TROTRO STATION":
 	set(value):
@@ -121,12 +124,15 @@ func _rebuild() -> void:
 		for x in [-1.3, 1.3]:
 			for z in [-0.35, -1.85]:
 				_add(Shapes.box(Vector3(0.08, 2.4, 0.08), Vector3(x, 1.2, z), Palette.ColorName.ZINC_DARK))
-		var roof := Shapes.box(Vector3(3.0, 0.06, 2.0), Vector3(0, 2.45, -1.1), Palette.ColorName.ZINC_LIGHT)
+		var roof := Shapes.box(ROOF, Vector3(0, 2.45, -1.1), Palette.ColorName.ZINC_LIGHT)
 		roof.rotation.x = 0.08 # sloping toward the back, for the rain
 		_add(roof)
+	# The sign stands at the bench's end, or (with a shelter) far enough along
+	# that its whole board is clear of the roof.
 	var signpost := Signpost.new()
 	signpost.text = title
-	signpost.position = Vector3(-1.9 if shelter else -1.2, 0, -0.3)
+	var along := ROOF.x / 2.0 + 0.15 + signpost.board_width() / 2.0 if shelter else 1.2
+	signpost.position = Vector3(-along, 0, -0.3)
 	_add(signpost)
 
 

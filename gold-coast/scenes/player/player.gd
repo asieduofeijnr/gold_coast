@@ -110,6 +110,19 @@ func can_use(thing: Interactable) -> bool:
 	return thing.enabled and (GameState.delivery == null or thing.works_while_carrying)
 
 
+## Puts her straight onto `spot`, facing `facing` (her turn around the up
+## axis, as `rotation.y`), standing still: for carrying on from a saved game.
+func place(spot: Vector3, facing: float) -> void:
+	global_position = spot
+	rotation.y = facing
+	velocity = Vector3.ZERO
+	has_destination = false
+	_use_on_arrival = null
+	reset_physics_interpolation()
+	GameState.player_position = spot
+	GameState.player_facing = facing
+
+
 ## Walks to `point` on the ground, going around anything in the way. The path
 ## comes from the walkable area (see scenes/world/walkable_area.gd). If the spot
 ## can't be reached, she walks as close as she can get.
@@ -163,6 +176,9 @@ func interactable_at(screen_position: Vector2) -> Interactable:
 
 
 func _physics_process(delta: float) -> void:
+	# Where she is and which way she faces, for saving the game.
+	GameState.player_position = global_position
+	GameState.player_facing = rotation.y
 	if _act == Act.IN_PLACE or _act == Act.GETTING_UP:
 		_hold_still()
 		return

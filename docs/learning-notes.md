@@ -329,3 +329,31 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   lines from her toward the camera, and a line starting inside the kiosk's
   solid box never "hits" it, so the kiosk never faded. Sitting outside on
   Auntie Dede's stool fixed it, and that's how MoMo agents really work anyway.
+
+## Job 15: The menu on her phone, saving anywhere, and the title screen
+
+- **A menu that belongs to the world.** Instead of a plain box, the game's menu
+  is on her phone, the same Nokia-style phone that shows her money. Game
+  makers call this a *diegetic* menu: something the character herself could
+  be looking at. The phone already had a screen, a pixel font, and keys, so the
+  menu just needed a new kind of screen (a list with the picked item lit up)
+  and keys that do something.
+- **One way in for every kind of input.** The phone's keys can be clicked, and
+  the keyboard can stand in for them (arrows, Enter, Esc). Both end up calling
+  the same `press("down")` or `press("select")`, so the menu only has to
+  understand one thing. `Phone.key_for()` turns a keyboard key into the phone
+  key it stands for.
+- **Saving what the scene knows.** `GameState` doesn't know where she's
+  standing (that's the Player node's job), so the player writes her spot and
+  facing into `GameState` every step, and the save takes them from there. On
+  loading, `Player.place()` puts her back, and the camera snaps to her.
+- **Starting afresh by reloading.** Loading a save mid-game, or starting a new
+  one, reloads the whole town scene, so every townsperson, stall, and timer
+  starts clean. A flag in the autoload (`GameState.start_with`) survives the
+  reload and tells the new scene what to do: autoloads aren't part of the
+  scene, so they stay put when it reloads.
+- **Pausing, and what keeps running.** While the menu is open, the game is
+  paused (`get_tree().paused`). Only nodes set to keep going (process mode
+  Always), like the HUD with the phone and its menu, still work. That's why the
+  clock, the townspeople, and the trotro all freeze while you read the phone.
+

@@ -134,6 +134,16 @@ static func edge_direction(mouse: Vector2, view_size: Vector2, margin: float) ->
 	return push.normalized()
 
 
+## Jumps straight to the target (after it's been moved there, say by carrying
+## on from a saved game), instead of gliding across.
+func snap() -> void:
+	if target == null:
+		return
+	following = true
+	focus = _target_point()
+	_place()
+
+
 func _target_point() -> Vector3:
 	# The interpolated position is where the target is drawn this frame,
 	# which keeps movement smooth on high refresh rate screens.

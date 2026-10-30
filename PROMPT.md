@@ -1,9 +1,7 @@
 # Gold Coast: AI game dev prompt
 
-> **Current job: none yet.** Phase one is done: Jobs 1–9, then skills (the
-> training college, the school, and other skilled work). Plan the next phase
-> ("the main stuff") with me before starting. Job 10 is next on the roadmap
-> unless we change it.
+> **Current job: Job 16, "Web build"**, in phase two: online (details in
+> section 8). Phase one (Jobs 1–9 and skills) and Job 15 are done.
 
 **How to use this file:** start a fresh Codex session for each job and tell it
 to read this file and do the current job. The AI does only that job. When the
@@ -602,6 +600,45 @@ of peeling plaster. Flat colors, simple shapes.
   - **Also:** Madam Serwaa's loads go to the school (GH₵16, 32 min) and the
     college (GH₵16, 30 min) too. The goats moved to the far south, and
     townspeople come and go from the school gate and the college door.
+- **Job 15 is done: the menu on her phone, saving anywhere, and the title screen.**
+  - **The phone's menu** (`scenes/ui/pause_menu.gd`, `PauseMenu`, in the HUD):
+    - M or Esc (the `phone_menu` action), or a click on the phone's middle
+      key, opens it.
+    - She holds the phone up (`Phone.hold_up()`: bigger, beside the middle of
+      the screen), the game dims behind it, and the game pauses.
+    - The menu has RESUME, SAVE GAME, LOAD GAME, NEW GAME, and HOW TO PLAY (8
+      pages: `PauseMenu.HOW_TO_PLAY`).
+    - Keys: the scroll key or arrow keys (or W and S) move, the middle key or
+      Enter (or E) picks, and C, Esc, or M goes back. A click beside the phone
+      closes it.
+  - **The phone** (`Phone`) can now show:
+    - a menu (`show_menu()`): a list with the picked item lit up, a scroll bar,
+      and SELECT over the middle key, like an old Nokia's
+    - a page (`show_page()`): a title, three lines, and the middle key's label
+      (OK, YES, NEXT)
+    - Its keys work, clicked or through `press()`, and they light up when
+      pressed. Its font gained "/".
+  - **Saving anywhere:**
+    - The save (version 3, now `user://gold_coast_save.json`) also holds where
+      she's standing and which way she faces, and the load on her head with
+      when it's due (`Delivery.to_save()` and `from_save()`).
+    - The player keeps `GameState.player_position` and `player_facing` up to
+      date, and `Player.place()` puts her back.
+    - `GameState.save_refusal()` says why not ("SHE IS BUSY", "SHE IS
+      ASLEEP"); saving is fine in her bed.
+    - Loading puts her back on the spot (`GameState.spot_loaded`), and the
+      camera jumps to her (`IsoCamera.snap()`).
+    - The market's next offer isn't saved: it makes a new one.
+  - **The title screen** (`scenes/ui/title_screen.gd`, `TitleScreen`, in the
+    HUD): AKWAABA! / GOLD COAST / HUSTLE · LEARN · RISE on a sign in Ghana's
+    colors, the saved game's day, time, and money (`GameState.peek_save()`),
+    and the start menu on her phone, held up: CONTINUE (if there's a save),
+    NEW GAME, and HOW TO PLAY.
+  - **Starting:** `main.gd` shows the title screen when the game starts.
+    Loading or starting a new game from the menu reloads the scene, and
+    `GameState.start_with` ("new" or "load") skips the title screen then. F7
+    skips it too. In tests, where the main scene isn't the game's own scene,
+    `restart()` does it in place instead.
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports
@@ -619,7 +656,8 @@ of peeling plaster. Flat colors, simple shapes.
   edges. The UI stretch mode is `canvas_items`. The Input Map actions are
   `move_forward`, `move_back`, `move_left`, `move_right`, `zoom_in`,
   `zoom_out`, `recenter_camera`, `move_to_click`, `sleep` (Z), `interact` (E),
-  and the debug keys F2 to F7. Menus use Godot's built-in `ui_*` actions.
+  `phone_menu` (M and Esc), and the debug keys F2 to F7. Menus use Godot's
+  built-in `ui_*` actions.
 - **Colors:** `art/palette/palette.gd` (`Palette`) holds every color,
   including the sun, sky, and character colors. `art/palette/palette_mesh.gd`
   (`PaletteMesh`) is a mesh whose color you pick from a dropdown of palette names.
@@ -656,7 +694,7 @@ of peeling plaster. Flat colors, simple shapes.
     (`blackboard.gd`, `school_bench.gd`, `flagpole.gd`, `shade_tree.gd`,
     `desk.gd`, `sewing_machine.gd`)
   - `scenes/interactions/` also holds `skilled_job.gd`, and `scenes/ui/` holds
-    `course_board.gd` and `player_marker.gd`
+    `course_board.gd`, `player_marker.gd`, `pause_menu.gd`, and `title_screen.gd`
   - `scenes/interactions/` also holds `delivery_spot.gd`
   - `scenes/ui/` also holds the menu board and the floating labels, including
     `guide_marker.gd`, `nameplate.gd`, and `building_names.gd` (names on hover)
@@ -681,7 +719,7 @@ of peeling plaster. Flat colors, simple shapes.
   the files named after `--`). `tests/test_case.gd` (`TestCase`) is the base
   class, with `check()`, `wait_physics_frames()`, `press_action()`,
   `teleport()`, `wait_until()`, `click_at()`, and `move_mouse_to()`. There are
-  357 checks so far, all passing. The runner saves to `user://test_save.json`,
+  382 checks so far, all passing. The runner saves to `user://test_save.json`,
   never your real save. It also switches the townspeople off
   (`GameState.town_life = false`) so they don't get in the way;
   `test_town.gd` switches them back on. Tests that need exact times stop the clock with
@@ -706,7 +744,8 @@ was written, keep it working and build on it.
    - Automated: headless tests that print PASS or FAIL for each check and exit
      with code 0 (all passed) or 1 (something failed)
    - Manual: a short checklist I can follow in the Godot editor
-5. **Commit when the tests pass**, with one commit per job (e.g. `Job 1: walk around`).
+5. **Commit when the tests pass**, with one commit per job (e.g. `Job 1: walk around`),
+   on a branch of its own (like `job-15`). It's merged into main when I say so.
    Never run destructive git commands (`reset --hard`, `clean -fd`, force push)
    without asking me first.
 6. **Placeholders first.** Use simple shapes for now; real Blender models come
@@ -840,6 +879,12 @@ slide.
 - **Sounds at quit:** quitting while a sound plays (like the phone's text beep)
   makes Godot report it as leaked. The test runner waits a moment before it
   quits.
+- **Reloading in tests:** in a test, `get_tree().reload_current_scene()` would
+  reload the test runner, not the town, so `main.gd`'s `restart()` only
+  reloads when the main scene is the game's own scene.
+- **Loading starts the clock:** `GameState.load_game()` resets first, so the
+  clock runs again (`time_speed` 1). A test that wants it stopped stops it
+  again after loading.
 
 ## 6. Project structure
 This is the target layout. Create folders as jobs need them.
@@ -883,7 +928,7 @@ and folder names.
 ## 7. Roadmap
 Each job takes one session and ends with a test. Mark a job `[x]` when it's done.
 
-**Phase 1: Prototype**
+**Phase one, part 1: Prototype** (done)
 - [x] **Job 1: Walk around.** Ground, a road, a capsule player with
   camera-relative WASD, a fixed isometric camera that follows the player, and
   sun and environment lighting. *Test:* holding W moves the player up the screen.
@@ -896,7 +941,7 @@ Each job takes one session and ends with a test. Mark a job `[x]` when it's done
   balance, `GH₵100.00`. *Test:* the formatting and earn/spend tests pass, and
   the phone updates when money changes.
 
-**Phase 2: First gameplay loop**
+**Phase one, part 2: First gameplay loop** (done)
 - [x] **Job 4: See-through buildings.** Buildings between the camera and the
   player fade out. Also added: edge scrolling, zoom, and click to move with
   pathfinding. *Test:* the player stays visible behind every building.
@@ -930,10 +975,27 @@ Each job takes one session and ends with a test. Mark a job `[x]` when it's done
   minding the MoMo kiosk. *Test:* she can't do the work without the
   certificate, and the certificate takes the fees and every class.
 
-Jobs 1–9 and skills are what I call phase one. Before Job 10, we plan the next
-phase together ("the main stuff").
+**Phase two: Online** (current, agreed on 2026-10-27). Anyone can play from an
+itch.io link in their browser, with one save (plus the automatic save in bed)
+that can follow them to any computer as a cloud save.
+- [x] **Job 15: Save button and title screen.** A title screen (Continue, New
+  game, How to play) and the game's menu, both on her phone (Resume, Save,
+  Load, New game, How to play), and saving anywhere she's free, with her spot
+  and her load. *Test:* saving on the street and loading puts her back on the
+  spot, with her load, at the saved time.
+- [ ] **Job 16: Web build.** A Web export (without threads), the daylight colors
+  fixed for the web renderer, and a speed pass to 60 fps on an ordinary laptop.
+  *Test:* it builds and starts with no errors, and it plays, saves, and
+  continues after a reload in Chrome, Safari, and Firefox.
+- [ ] **Job 17: On itch.io.** A private, password-protected page first, with
+  screenshots and the controls, and the steps for uploading new versions.
+  *Test:* on another computer: play, save, close the browser, and continue.
+- [ ] **Job 18: Cloud saves.** Sign in, and your save follows you to any
+  computer: every save is also uploaded, and Continue offers the newer save. It
+  still works without the internet. Then the itch.io page goes public.
+  *Test:* save on one computer and continue on another.
 
-**Phase 3: Make it look like Ghana**
+**Later: Make it look like Ghana**
 - [ ] **Job 10: Color bible.** Built from one reference image I choose, with a
   day version and a night version of every color. It replaces the provisional
   palette, and nothing goes into the game without it.
@@ -941,8 +1003,8 @@ phase together ("the main stuff").
   sun color, ambient light, fog, exposure) and presets: harmattan morning,
   midday, golden hour, night, dumsor night (a power cut), and rainy season.
 - [x] **Job 12: Blender pipeline** (done early for buildings).
-  `blender/scripts/build_buildings.py` builds the five buildings in the village
-  style and exports `.glb` files with their own collision. To fix a model,
+  `blender/scripts/build_buildings.py` builds the buildings (seven now) in the
+  village style and exports `.glb` files with their own collision. To fix a model,
   change its line and run the script again; never hand-edit the mesh. Keep
   shapes simple rather than aiming for realism. Still to do in the same style:
   props from the pictures (round thatched huts, fences, trees, palms, banana
@@ -953,7 +1015,7 @@ phase together ("the main stuff").
 - [ ] **Job 14: Enterable home.** When you step inside, the roof and front wall
   hide. It's the same scene, with no loading screen.
 
-**Phase 4: Living city (to be planned later)**
+**Later: Living city (to be planned later)**
 Pedestrians; trotros and taxis driving routes, with a mate calling out the
 stops (Job 9 added townspeople and one trotro route early); traffic jams; cross streets and more neighborhoods; weather and events (harmattan,
 rainy-season flooding, dumsor); a phone UI (map, mobile money).
@@ -1294,6 +1356,117 @@ section 4 for the details):
    - `tests/test_player_model.gd`: the pin
 
 **Done when:** she can save up, get a certificate, and earn with it, and the
+tests pass.
+
+### Job 15: Save button and title screen (done)
+**Goal:** save whenever you like, and pick up from the title screen. Built as
+planned below, with the menu on her phone as I asked; the market's next offer
+isn't saved (it simply makes a new one). Tests: `tests/test_menu.gd`, 25
+checks (382 in all).
+1. **A title screen** when the game starts: GOLD COAST, and then:
+   - **Continue**, showing the save's day, time, and money (like "Day 5,
+     14:20, GH₵230")
+   - **New game**, which asks first if there's a save
+   - **How to play**: the keys and the mouse
+   - Browsers only let a game play sound after the first click, and this
+     screen gives them that click.
+2. **A pause menu**, opened from a menu key on the phone (on screen, so you can
+   click it) or with Esc. In a browser at full screen, Esc is taken by the
+   browser, so the on-screen key matters. The menu has Resume, Save game, Load
+   game, New game, and How to play, and the game pauses while it's open.
+3. **Save anywhere she's free:**
+   - The save gains where she's standing and which way she faces, the load on
+     her head (with its time left), and the market's next offer.
+   - Saving is refused, with a reason, while she's busy (eating, in class,
+     teaching) or asleep on the street.
+   - The phone texts GAME SAVED, and going to bed still saves too.
+4. **Loading** puts her back on her spot, with her load, at the saved time.
+   Townspeople pick up their day from that time.
+5. **The save file's name** becomes Gold Coast's own (like
+   `user://gold_coast_save.json`), so other Godot games in the same browser
+   can't mix with it. Older saves still load.
+6. **Tests:**
+   - saving on the street and loading puts her back on the spot, with her
+     load and the time
+   - saving while she's busy is refused
+   - New game and Load ask first
+   - the title screen's Continue shows the save
+   - the usual sabotage checks
+
+**Done when:** you can save anywhere she's free, quit, start again, choose
+Continue, and carry on from the same spot.
+
+### Job 16: Web build (current)
+**Goal:** the game runs well in Chrome, Safari, and Firefox on an ordinary laptop.
+1. **Templates:** download Godot 4.7.2's export templates, about 1 GB. You can
+   do it in the editor (Editor > Manage Export Templates > Download and
+   Install), or the AI can fetch them from GitHub if you're happy with that.
+2. **Export setup:** a "Web" export preset, without threads. Without threads,
+   any ordinary web host works, with no special server settings. One command
+   builds it into `gold-coast/build/web/`, which git ignores.
+3. **The look:** web builds draw with Godot's Compatibility renderer (WebGL 2),
+   and the project switches to it by itself (`rendering_method.web`). A test on
+   2026-10-27 showed daylight comes out washed out with it. Fix that for the
+   web renderer only, without changing how it looks on the Mac, with before
+   and after pictures.
+4. **Speed:** that test ran at 41 to 76 fps on an M4 Pro. Measure the frame
+   rate in the browser, then trim what's expensive (shadow quality, the street
+   lamps' lights, far-away townspeople) until it holds 60 fps on an ordinary
+   laptop.
+5. **Try it on the Mac:** serve the build from the computer, open it in each
+   browser, play, save, reload the page, and continue.
+6. **Tests:** the export builds with no errors, the game starts with the web
+   renderer with no errors, and a checklist for each browser (it starts, you
+   can play, it saves, and it continues after a reload).
+
+**Done when:** it plays smoothly in all three browsers, and saves and continues
+there.
+
+### Job 17: On itch.io
+**Goal:** a link you can send to anyone.
+1. **The account:** I make a free itch.io account; the AI prepares everything
+   to upload.
+2. **The page:** the title, a short description, screenshots, the controls, and
+   a full-screen button. It's private (with a password) at first, for me and
+   friends to try.
+3. **Updating it:** the steps (or one script) to rebuild and upload a new
+   version after each job.
+4. **Tests:** open the link on a different computer, play, save, close the
+   browser, open it again, and continue.
+
+**Done when:** the private link works on another computer.
+
+### Job 18: Cloud saves
+**Goal:** sign in once, and carry on from any computer.
+1. **Decide together first:**
+   - the online service: Firebase or Supabase. Both have free plans.
+     Firebase's free projects keep running; Supabase's go to sleep after a
+     week with nobody using them, until you wake them in its dashboard.
+   - how players sign in: an email and a password (they can reset a
+     forgotten password), or a save code the game makes (no personal data,
+     but losing the code means losing the cloud save)
+2. **The service:** I make the free project, following the AI's steps. The game
+   only holds its public key. The service's rules make sure each player can
+   read and write only their own save.
+3. **In the game:**
+   - Sign up, Sign in, and Sign out on the title screen and in the pause menu
+   - a little cloud on the phone showing whether the save is up to date
+4. **Saving:** every save (the Save button and bed) also goes to the cloud.
+   Continue fetches the cloud save and uses the newer one, asking if they
+   differ.
+5. **Offline:** with no internet, the game carries on with the browser's save
+   and uploads it later.
+6. **Privacy:** only the email (if used) and the save are stored. There's a
+   button to delete your cloud save, and a short privacy note on the itch.io
+   page.
+7. **Tests:**
+   - automated, with a pretend service (no internet needed): signing in (and
+     failing), uploading, downloading, choosing the newer save, and working
+     offline
+   - a check on the real service from two computers
+8. **Then** the itch.io page goes public.
+
+**Done when:** you can save on one computer and continue on another, and the
 tests pass.
 
 ## 9. Report format (end of every job)

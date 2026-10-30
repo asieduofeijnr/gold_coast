@@ -6,6 +6,9 @@ extends CanvasLayer
 ## going and how many minutes are left. Rent, its reminder, and the bedtime
 ## save (with what she earned and spent that day) come as texts too.
 ##
+## It also holds the title screen (TitleScreen) and the game's menu, which is
+## on the phone (PauseMenu: M, Esc, or the phone's middle key).
+##
 ## It keeps working while the game is paused (when a menu is open), so the
 ## phone can still show texts then.
 
@@ -155,7 +158,7 @@ func _show_status() -> void:
 
 # Debug keys, only in builds made for testing: F2 adds money, F3 spends it,
 # F4 skips ahead an hour, F5 turns fast time on or off, F6 fills her needs, and
-# F7 starts a new game (deleting the saved one).
+# F7 starts a new game straight away (deleting the saved one).
 func _unhandled_input(event: InputEvent) -> void:
 	if not OS.is_debug_build():
 		return
@@ -172,5 +175,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("debug_new_game"):
 		GameState.delete_save()
 		GameState.reset()
+		GameState.start_with = "new" # no title screen
 		get_tree().paused = false
 		get_tree().reload_current_scene()

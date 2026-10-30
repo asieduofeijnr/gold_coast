@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/phone.tscn" id="2_phone"]
+[ext_resource type="Script" path="res://scenes/ui/title_screen.gd" id="3_title_screen"]
+[ext_resource type="Script" path="res://scenes/ui/pause_menu.gd" id="4_pause_menu"]
 
 [node name="HUD" type="CanvasLayer"]
 process_mode = 3
@@ -17,6 +19,26 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
+[node name="TitleScreen" type="Control" parent="." node_paths=PackedStringArray("phone")]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_title_screen")
+phone = NodePath("../Phone")
+
+[node name="MenuShade" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0)
+
 [node name="Phone" parent="." instance=ExtResource("2_phone")]
 anchors_preset = 2
 anchor_top = 1.0
@@ -28,3 +50,8 @@ offset_bottom = -16.0
 grow_vertical = 0
 scale = Vector2(0.9, 0.9)
 pivot_offset = Vector2(0, 318)
+
+[node name="PauseMenu" type="Node" parent="." node_paths=PackedStringArray("phone", "shade")]
+script = ExtResource("4_pause_menu")
+phone = NodePath("../Phone")
+shade = NodePath("../MenuShade")

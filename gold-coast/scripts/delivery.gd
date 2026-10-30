@@ -21,3 +21,24 @@ var pay := 0
 var minutes := 30.0
 ## When it's due, as GameState.now() gives it. Set when she picks it up.
 var due := 0.0
+
+
+## The load as it's written into a saved game.
+func to_save() -> Dictionary:
+	return {"goods": goods, "color": color, "place": place, "phone_place": phone_place, "receiver": receiver,
+			"payer": payer, "pay": pay, "minutes": minutes, "due": due}
+
+
+## A load read back from a saved game (see to_save()).
+static func from_save(data: Dictionary) -> Delivery:
+	var headload := Delivery.new()
+	headload.goods = str(data.get("goods", ""))
+	headload.color = int(data.get("color", Palette.ColorName.LIGHT_SOUP)) as Palette.ColorName
+	headload.place = str(data.get("place", ""))
+	headload.phone_place = str(data.get("phone_place", ""))
+	headload.receiver = str(data.get("receiver", ""))
+	headload.payer = str(data.get("payer", ""))
+	headload.pay = int(data.get("pay", 0))
+	headload.minutes = float(data.get("minutes", 30.0))
+	headload.due = float(data.get("due", 0.0))
+	return headload

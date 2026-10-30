@@ -6,8 +6,9 @@ extends Node
 ## It's an autoload called GameState, so any script can use GameState.money,
 ## GameState.minutes, GameState.hunger, and so on.
 ##
-## It also saves and loads the game: going to bed at home saves everything that
-## matters to a file (see save_game()), and load_game() brings it back.
+## It also saves and loads the game: going to bed at home, or the phone's Save
+## game, saves everything that matters to a file (see save_game()), including
+## where she's standing and the load on her head, and load_game() brings it back.
 
 ## Fires whenever your money changes, with the new amount (in pesewas).
 signal money_changed(new_amount: int)
@@ -78,8 +79,12 @@ const REMINDER_TIME := 18.0 * 60.0
 ## Who course fees go to, as the phone's texts show it.
 const COLLEGE := "COLLEGE"
 ## Bump this when the save file's layout changes, so old saves aren't misread.
-## (Version 1 saves, from before the training college, still load.)
-const SAVE_VERSION := 2
+## (Older saves still load: version 1 from before the training college, and
+## version 2 from before saving anywhere.)
+const SAVE_VERSION := 3
+## The game's save file: named for Gold Coast, so other Godot games played in
+## the same web browser (which share its storage) never mix with it.
+const SAVE_FILE := "user://gold_coast_save.json"
 
 @export_group("Needs")
 ## Hunger lost per game hour. At 6, she's empty about 16 hours after eating.
@@ -170,7 +175,18 @@ var class_days := {}
 var skills: Array[String] = []
 
 ## The file the game is saved to. Tests use a file of their own.
-var save_path := "user://save.json"
+var save_path := SAVE_FILE
+## Where she's standing, and which way she faces (her turn around the up axis).
+## The player keeps these up to date, so a save can include them.
+var player_position := Vector3.ZERO
+var player_facing := 0.0
+## Whether the saved game last loaded said where she was (saves from before you
+## could save anywhere don't).
+var spot_loaded := false
+## How the game begins next time the main scene loads: "" with the title
+## screen, "new" with a new game, or "load" carrying on from the saved game.
+## (The phone's menu sets it before reloading the scene.)
+var start_with := ""
 ## Whether townspeople and the trotro go about their day. Tests switch this off
 ## so nothing wanders into their way.
 var town_life := true
@@ -468,6 +484,23 @@ func did_job(job: String) -> void:
 	_jobs_today[job] = jobs_done_today(job) + 1
 
 
+## Why she can't save the game right now, as the phone says it ("" if she
+## can): not while she's busy (eating, in class, at work), or asleep anywhere
+## but in her bed.
+func save_refusal() -> String:
+	if activity != "":
+		return "SHE IS BUSY"
+	if sleeping and not in_bed:
+		return "SHE IS ASLEEP"
+	return ""
+
+
+## The saved game, without loading it: its "day", "minutes", "money", and the
+## rest (an empty dictionary if there isn't one, or it can't be read).
+func peek_save() -> Dictionary:
+	return _read_save()
+
+
 ## Saves the game to `save_path`. Returns whether it worked.
 func save_game() -> bool:
 	var file := FileAccess.open(save_path, FileAccess.WRITE)
@@ -487,20 +520,9 @@ func has_save() -> bool:
 ## Loads the saved game from `save_path`. Returns false, and changes nothing,
 ## if there isn't one or it can't be read.
 func load_game() -> bool:
-	if not has_save():
+	var data := _read_save()
+	if data.is_empty():
 		return false
-	var json := JSON.new()
-	if json.parse(FileAccess.get_file_as_string(save_path)) != OK:
-		return false # not a saved game (or a damaged one)
-	var data: Variant = json.data
-	if not data is Dictionary or not (data.get("version") is float or data.get("version") is int):
-		return false
-	var version := int(data.version)
-	if version < 1 or version > SAVE_VERSION:
-		return false
-	for key in ["money", "day", "minutes", "hunger", "energy"]:
-		if not data.has(key):
-			return false
 	_loading = true
 	reset()
 	money = int(data.money)
@@ -520,10 +542,39 @@ func load_game() -> bool:
 				skills.append(skill)
 	_jobs_today = _whole_numbers(data.get("jobs_today", {}))
 	_jobs_day = int(data.get("jobs_day", 0))
+	var spot: Variant = data.get("player")
+	if spot is Dictionary:
+		player_position = Vector3(float(spot.get("x", 0.0)), float(spot.get("y", 0.0)), float(spot.get("z", 0.0)))
+		player_facing = float(spot.get("facing", 0.0))
+		spot_loaded = true
+	var carried: Variant = data.get("delivery")
+	if carried is Dictionary:
+		delivery = Delivery.from_save(carried)
+	load_changed.emit(delivery) # the phone, the ring, and the arrow catch up (with or without a load)
 	if data.get("sleeping", false):
 		_fall_asleep(data.get("passed_out", false), data.get("in_bed", false))
 	_loading = false
 	return true
+
+
+# Reads the saved game from `save_path`, checking it's really a saved game: it
+# returns an empty dictionary if there isn't one, or it's damaged or too new.
+func _read_save() -> Dictionary:
+	if not has_save():
+		return {}
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(save_path)) != OK:
+		return {} # not a saved game (or a damaged one)
+	var data: Variant = json.data
+	if not data is Dictionary or not (data.get("version") is float or data.get("version") is int):
+		return {}
+	var version := int(data.version)
+	if version < 1 or version > SAVE_VERSION:
+		return {}
+	for key in ["money", "day", "minutes", "hunger", "energy"]:
+		if not data.has(key):
+			return {}
+	return data
 
 
 ## Deletes the saved game, for a new game.
@@ -542,7 +593,9 @@ func reset() -> void:
 	in_bed = false
 	is_walking = false
 	activity = ""
-	delivery = null
+	if delivery != null:
+		delivery = null
+		load_changed.emit(null)
 	rent_owed = 0
 	next_rent_day = FIRST_RENT_DAY
 	bowls_washed_day = 0
@@ -551,6 +604,7 @@ func reset() -> void:
 	skills.clear()
 	_jobs_today = {}
 	_jobs_day = 0
+	spot_loaded = false
 	_reminded_for = 0
 	time_speed = 1.0
 	set_needs(FULL, FULL)
@@ -643,6 +697,8 @@ func _save_data() -> Dictionary:
 		"skills": skills,
 		"jobs_today": _jobs_today,
 		"jobs_day": _jobs_day,
+		"player": {"x": player_position.x, "y": player_position.y, "z": player_position.z, "facing": player_facing},
+		"delivery": delivery.to_save() if delivery != null else null,
 	}
 
 

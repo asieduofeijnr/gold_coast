@@ -77,8 +77,11 @@ func _ready() -> void:
 		_animation_player.get_animation(animation_name).loop_mode = Animation.LOOP_LINEAR
 	_animation_player.play("idle")
 	_animation_player.seek(randf() * _animation_player.current_animation_length) # nobody breathes in step
+	_animate_only_on_screen(self, _animation_player)
 	_meshes = _model.find_children("*", "MeshInstance3D")
 	_dress()
+	for body: MeshInstance3D in _meshes:
+		CharacterParts.merge(body) # one part instead of one per color: much quicker to draw
 	var on_head := BoneAttachment3D.new()
 	on_head.bone_name = "Head"
 	(_model.find_child("Skeleton3D") as Skeleton3D).add_child(on_head)
@@ -223,6 +226,19 @@ func _animate(speed: float) -> void:
 		var pose := _pose if _pose != &"" else (&"carry_idle" if is_carrying() else &"idle")
 		_play(pose)
 		_animation_player.speed_scale = 1.0
+
+
+## Makes `player` (a character's animations) only move while `character` is on
+## the screen. With fifty people in town, animating them all every frame was
+## the game's biggest cost, so people off the screen (or hidden) hold still
+## until the camera can see them again. They keep walking their routes.
+static func _animate_only_on_screen(character: Node3D, player: AnimationPlayer) -> void:
+	var on_screen := VisibleOnScreenNotifier3D.new()
+	on_screen.aabb = AABB(Vector3(-0.6, 0.0, -0.6), Vector3(1.2, 2.3, 1.2))
+	on_screen.screen_entered.connect(func() -> void: player.active = true)
+	on_screen.screen_exited.connect(func() -> void: player.active = false)
+	character.add_child(on_screen, false, Node.INTERNAL_MODE_FRONT)
+	player.active = false # until the camera first sees them
 
 
 func _play(animation: StringName) -> void:

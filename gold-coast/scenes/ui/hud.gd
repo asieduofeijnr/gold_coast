@@ -20,6 +20,7 @@ const FAST_TIME_SPEED := 30.0
 const SLEEP_SHADE := 0.55
 
 var _shade_tween: Tween
+var _fps_label: Label
 
 @onready var phone: Phone = $Phone
 @onready var _sleep_shade: ColorRect = $SleepShade
@@ -156,9 +157,39 @@ func _show_status() -> void:
 		phone.screen_title = "MOBILE MONEY"
 
 
+## Whether the frame rate is showing (F8, in builds made for testing).
+func is_showing_fps() -> bool:
+	return _fps_label != null and _fps_label.visible
+
+
+func _process(_delta: float) -> void:
+	if _fps_label != null and _fps_label.visible:
+		_fps_label.text = "%d fps" % Engine.get_frames_per_second()
+
+
+# Shows or hides the frame rate in the top right corner.
+func _toggle_fps() -> void:
+	if _fps_label == null:
+		_fps_label = Label.new()
+		_fps_label.anchor_left = 1.0
+		_fps_label.anchor_right = 1.0
+		_fps_label.offset_left = -96.0
+		_fps_label.offset_top = 8.0
+		_fps_label.offset_right = -12.0
+		_fps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		_fps_label.add_theme_font_size_override("font_size", 18)
+		_fps_label.add_theme_color_override("font_outline_color", Color.BLACK)
+		_fps_label.add_theme_constant_override("outline_size", 6)
+		_fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_fps_label.visible = false
+		add_child(_fps_label)
+	_fps_label.visible = not _fps_label.visible
+
+
 # Debug keys, only in builds made for testing: F2 adds money, F3 spends it,
-# F4 skips ahead an hour, F5 turns fast time on or off, F6 fills her needs, and
-# F7 starts a new game straight away (deleting the saved one).
+# F4 skips ahead an hour, F5 turns fast time on or off, F6 fills her needs,
+# F7 starts a new game straight away (deleting the saved one), and F8 shows the
+# frame rate (frames drawn each second: for checking the game runs smoothly).
 func _unhandled_input(event: InputEvent) -> void:
 	if not OS.is_debug_build():
 		return
@@ -172,6 +203,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		GameState.time_speed = 1.0 if GameState.time_speed > 1.0 else FAST_TIME_SPEED
 	elif event.is_action_pressed("debug_fill_needs"):
 		GameState.set_needs(GameState.FULL, GameState.FULL)
+	elif event.is_action_pressed("debug_show_fps"):
+		_toggle_fps()
 	elif event.is_action_pressed("debug_new_game"):
 		GameState.delete_save()
 		GameState.reset()

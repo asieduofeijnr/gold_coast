@@ -88,6 +88,8 @@ func _ready() -> void:
 		animation_player.get_animation(animation_name).loop_mode = Animation.LOOP_LINEAR
 	animation_player.play("idle")
 	_meshes = _character.find_children("*", "MeshInstance3D")
+	for body: MeshInstance3D in _meshes:
+		CharacterParts.merge(body) # one part instead of one per color: much quicker to draw
 	_zzz = Shapes.name_label("Z z z")
 	_zzz.position = Vector3(0.0, 0.9, 0.9)
 	_zzz.visible = false

@@ -8,6 +8,11 @@ extends Node3D
 ##
 ## In the editor, drag "Time Of Day" to preview any time. In the game, the
 ## lighting follows GameState's clock.
+##
+## Web browsers draw the game with Godot's Compatibility renderer, which has no
+## ambient occlusion and handles bright light differently: with the same
+## settings, daylight looks washed out. So with that renderer, the light is
+## mapped to the screen a little differently (COMPATIBILITY_LOOK).
 
 const SUNRISE := 6.0 * 60.0
 const SUNSET := 18.5 * 60.0
@@ -15,6 +20,16 @@ const SUNSET := 18.5 * 60.0
 const HIGHEST_SUN := 65.0
 const MOON_STRENGTH := 0.45
 const MOON_ROTATION := Vector3(-55.0, 150.0, 0.0)
+## With the Compatibility renderer (the web's), these environment settings make
+## it look like the desktop game. They were picked by comparing pictures of the
+## same five views (day, evening, and night) with both renderers.
+const COMPATIBILITY_LOOK := {
+	"tonemap_mode": Environment.TONE_MAPPER_LINEAR,
+	"tonemap_exposure": 0.94,
+	"adjustment_enabled": true,
+	"adjustment_contrast": 0.86,
+	"adjustment_saturation": 1.15,
+}
 
 # How the light looks through the day. Each moment is [time in minutes, sun
 # color, sun strength, sky overhead, sky at the horizon, ground past the map's
@@ -49,7 +64,18 @@ var _sky_time := -INF
 func _ready() -> void:
 	_moon.rotation_degrees = MOON_ROTATION
 	_moon.light_color = Palette.color(Palette.ColorName.MOON_LIGHT)
+	if not Engine.is_editor_hint() and RenderingServer.get_current_rendering_method() == "gl_compatibility":
+		_world_environment.environment = compatibility_environment(_world_environment.environment)
 	_apply()
+
+
+## A copy of `environment` with COMPATIBILITY_LOOK's settings, for the
+## Compatibility renderer. (The original stays as it is.)
+static func compatibility_environment(environment: Environment) -> Environment:
+	var adjusted := environment.duplicate() as Environment
+	for setting: String in COMPATIBILITY_LOOK:
+		adjusted.set(setting, COMPATIBILITY_LOOK[setting])
+	return adjusted
 
 
 func _process(_delta: float) -> void:

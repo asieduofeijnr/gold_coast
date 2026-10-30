@@ -1,7 +1,8 @@
 # Gold Coast: AI game dev prompt
 
 > **Current job: Job 16, "Web build"**, in phase two: online (details in
-> section 8). Phase one (Jobs 1–9 and skills) and Job 15 are done.
+> section 8). Phase one (Jobs 1–9 and skills) and Job 15 are done. Job 16 is
+> built: only trying it in the browsers is left.
 
 **How to use this file:** start a fresh Codex session for each job and tell it
 to read this file and do the current job. The AI does only that job. When the
@@ -639,6 +640,34 @@ of peeling plaster. Flat colors, simple shapes.
     `GameState.start_with` ("new" or "load") skips the title screen then. F7
     skips it too. In tests, where the main scene isn't the game's own scene,
     `restart()` does it in place instead.
+- **Job 16 is built: the web version** (trying it in the browsers is left).
+  - **Exporting:** `export_presets.cfg` has two presets.
+    - "Web" builds the game into `build/web/`, without threads (so any web
+      host works) and without the tests. Git ignores `build/`, and
+      `build/.gdignore` stops Godot importing the built files (or they'd end
+      up inside the next build).
+    - "Web check" is a test build: its `web_check` feature makes it start with
+      `tests/web_check.tscn` instead of the title screen
+      (`application/run/main_scene.web_check`).
+  - **The web's look:** browsers draw with the Compatibility renderer (WebGL
+    2). `Lighting.compatibility_environment()` gives it a linear tone map,
+    exposure 0.94, contrast 0.86, and saturation 1.15, so daylight isn't
+    washed out. It's used only with that renderer: the Mac's look is
+    unchanged.
+  - **Speed:**
+    - `CharacterParts.merge()` draws each character in one part instead of
+      one per color, keeping the colors as vertex colors. Gold jewelry stays a
+      shiny part of its own on the Mac; with the web renderer it's merged too.
+    - Townspeople and vendors only animate while they're on the screen
+      (`Townsperson._animate_only_on_screen()`).
+    - With the web renderer on the Mac, the town went from 30–62 fps to
+      87–124. Smaller shadows and less MSAA made no difference, so they're
+      unchanged.
+  - **F8** shows the frame rate, in builds made for testing.
+  - **Trying it:** `tests/serve_web.sh` builds both versions and serves them on
+    this computer. `tests/web_check.sh` runs the web check in Chrome with no
+    window. The web check shows its results on the page, too.
+  - The phone's font gained "+" (the bedtime GAME SAVED text showed "IN ?GH₵").
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports
@@ -656,8 +685,9 @@ of peeling plaster. Flat colors, simple shapes.
   edges. The UI stretch mode is `canvas_items`. The Input Map actions are
   `move_forward`, `move_back`, `move_left`, `move_right`, `zoom_in`,
   `zoom_out`, `recenter_camera`, `move_to_click`, `sleep` (Z), `interact` (E),
-  `phone_menu` (M and Esc), and the debug keys F2 to F7. Menus use Godot's
-  built-in `ui_*` actions.
+  `phone_menu` (M and Esc), and the debug keys F2 to F8. Menus use Godot's
+  built-in `ui_*` actions. Web builds use the Compatibility renderer
+  (`rendering_method.web`).
 - **Colors:** `art/palette/palette.gd` (`Palette`) holds every color,
   including the sun, sky, and character colors. `art/palette/palette_mesh.gd`
   (`PaletteMesh`) is a mesh whose color you pick from a dropdown of palette names.
@@ -708,7 +738,8 @@ of peeling plaster. Flat colors, simple shapes.
   cylinders, and balls, solid boxes, and floating name labels.
   `scripts/format.gd` (`Format`) turns money and times into text,
   `scripts/cedi_text.gd` (`CediText`) draws ₵, `scripts/food.gd` (`Food`)
-  describes a dish, and `scripts/delivery.gd` (`Delivery`) describes a load.
+  describes a dish, `scripts/delivery.gd` (`Delivery`) describes a load, and
+  `scripts/character_parts.gd` (`CharacterParts`) merges a character's parts.
 - **Editor scripts:** the palette mesh, ground, road, lighting, camera,
   building, and billboard scripts are `@tool` scripts, so they also run in the
   editor and the scene looks right before you press Play. The pieces they make
@@ -719,7 +750,8 @@ of peeling plaster. Flat colors, simple shapes.
   the files named after `--`). `tests/test_case.gd` (`TestCase`) is the base
   class, with `check()`, `wait_physics_frames()`, `press_action()`,
   `teleport()`, `wait_until()`, `click_at()`, and `move_mouse_to()`. There are
-  382 checks so far, all passing. The runner saves to `user://test_save.json`,
+  391 checks so far, all passing. `tests/web_check.gd` is different: it runs
+  in a browser, in the "Web check" build (see Commands). The runner saves to `user://test_save.json`,
   never your real save. It also switches the townspeople off
   (`GameState.town_life = false`) so they don't get in the way;
   `test_town.gd` switches them back on. Tests that need exact times stop the clock with
@@ -769,7 +801,15 @@ $GODOT --headless --path . res://tests/test_runner.tscn -- test_chop_bar.gd  # o
 $GODOT --path .                                          # play the game in a window
 $GODOT --path . --editor                                 # open the editor
 $GODOT --path . --write-movie /tmp/shots/frame.png --quit-after 60  # save 60 frames as images to check the look
+$GODOT --path . --rendering-method gl_compatibility      # play with the web's renderer, on the Mac
+
+mkdir -p build/web && $GODOT --headless --path . --export-release "Web" build/web/index.html  # build the web version
+sh tests/serve_web.sh   # build both web versions and serve them: the game at http://127.0.0.1:8060/web/,
+                        # the web check at http://127.0.0.1:8060/web_check/ (Ctrl+C stops it)
+sh tests/web_check.sh   # the web check in Chrome with no window (exit code 0 = it passed)
 ```
+The AI's sandbox can't run the last two: it stops programs opening network
+connections, even on this computer. Run them in your own Terminal window.
 Any `ERROR` or `SCRIPT ERROR` line in the output counts as a failure, even if
 the tests pass. After adding a new `class_name` script from outside the editor,
 run `--import` before anything else, or other scripts can't find the class.
@@ -885,6 +925,21 @@ slide.
 - **Loading starts the clock:** `GameState.load_game()` resets first, so the
   clock runs again (`time_speed` 1). A test that wants it stopped stops it
   again after loading.
+- **The web renderer and animated characters:** the Compatibility renderer
+  bends (skins) each part of an animated character on its own, every frame, so
+  a character in seven colored parts costs seven times as much as one in a
+  single part. Keep characters to one or two parts (`CharacterParts.merge()`),
+  and don't animate what's off the screen. Forward+ doesn't have this problem,
+  so it only shows up with the web renderer.
+- **The web renderer's look:** it has no ambient occlusion (SSAO), and its
+  tone mapping looks different, so the same settings come out washed out. To
+  see it on the Mac, run with `--rendering-method gl_compatibility`.
+- **The AI's sandbox:** it can't download from GitHub's release files or from
+  godotengine.org, so export templates are installed in the editor (Editor >
+  Manage Export Templates). It also can't serve the web build or start
+  Chrome, so the browser checks run in your own Terminal.
+- **The first export** after installing the templates printed a few "leaked"
+  errors. Every export after that was clean.
 
 ## 6. Project structure
 This is the target layout. Create folders as jobs need them.
@@ -920,7 +975,9 @@ kayayo/                       repo root
       palette/                palette.gd, the single source of colors
       models/                 .glb files exported from Blender: characters/, buildings/
       materials/
-    tests/                    test_runner.tscn + test_*.gd
+    tests/                    test_runner.tscn + test_*.gd; web_check.gd/.tscn/.sh and serve_web.sh (the web version's checks)
+    export_presets.cfg        the Web and Web check export settings
+    build/                    web builds (not in git, except build/.gdignore)
 ```
 Keep each scene and its script in the same folder. Use `snake_case` for file
 and folder names.
@@ -1396,8 +1453,16 @@ checks (382 in all).
 **Done when:** you can save anywhere she's free, quit, start again, choose
 Continue, and carry on from the same spot.
 
-### Job 16: Web build (current)
+### Job 16: Web build (built; trying it in the browsers is left)
 **Goal:** the game runs well in Chrome, Safari, and Firefox on an ordinary laptop.
+Built as planned below. The templates were installed in the editor (the AI's
+sandbox blocks their download). The look: a linear tone map with a little less
+exposure and contrast and more color, for the web renderer only. The speed:
+the characters' parts merged, and only those on the screen animate (fewer
+shadows and less MSAA didn't help). With the web renderer on the Mac, the town
+went from 30–62 fps to 87–124. Tests: `tests/test_web_ready.gd`, 8 checks (391
+in all), and the web check (`tests/web_check.gd`), which runs in a browser.
+Left: trying it in Chrome and Safari (Firefox isn't installed on this Mac).
 1. **Templates:** download Godot 4.7.2's export templates, about 1 GB. You can
    do it in the editor (Editor > Manage Export Templates > Download and
    Install), or the AI can fetch them from GitHub if you're happy with that.

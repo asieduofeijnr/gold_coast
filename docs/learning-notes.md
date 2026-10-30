@@ -357,3 +357,33 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   Always), like the HUD with the phone and its menu, still work. That's why the
   clock, the townspeople, and the trotro all freeze while you read the phone.
 
+## Job 16: The web version
+
+- **Export templates and presets.** A game made in Godot runs in a browser on
+  a copy of the Godot engine built for the web, a WebAssembly file (`.wasm`)
+  that browsers can run. That ready-made engine is an *export template*.
+  Exporting puts the template next to a pack of the game's own files (`.pck`),
+  and an *export preset* says which template and settings to use. The "Web"
+  preset leaves out threads: with threads, the website must send special
+  security settings (cross-origin isolation), and not every host can.
+- **Two renderers, two looks.** Godot can draw in different ways. On the Mac
+  it uses Forward+, on the graphics card's own interface (Metal). Browsers
+  only offer WebGL 2, so web builds use the simpler Compatibility renderer. It
+  has no ambient occlusion (the soft shading in corners) and handles bright
+  light differently, so the same scene came out pale. The game checks which
+  renderer it's on and changes the lighting only for the web one.
+- **Parts and skinning.** A character is a mesh with one part per color (skin,
+  top, skirt...), and each part is drawn separately. For an animated
+  character, the web renderer also bends (*skins*) each part to follow the
+  skeleton, every frame. Fifty people with up to seven parts each was a lot of
+  bending. Merging each character into one part, with the colors painted onto
+  the mesh's corners (*vertex colors*), made it nearly twice as fast.
+- **Only animate what you can see.** A `VisibleOnScreenNotifier3D` sends a
+  signal when something comes into the camera's view and another when it
+  leaves. The townspeople switch their animations off while they're out of
+  view: nobody can see them standing still.
+- **Saves in a browser.** In a browser, `user://` is kept in the browser's own
+  storage for that website (IndexedDB), so a save is still there after a
+  reload. The web check tests exactly that: it saves, reloads the page, and
+  looks for the save.
+

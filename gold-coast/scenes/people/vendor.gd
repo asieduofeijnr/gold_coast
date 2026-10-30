@@ -44,10 +44,13 @@ var _rest_angle := 0.0
 func _ready() -> void:
 	_rest_angle = rotation.y
 	_dress()
+	for body: MeshInstance3D in _character.find_children("*", "MeshInstance3D"):
+		CharacterParts.merge(body) # one part instead of one per color: much quicker to draw
 	var animation := pose if _animation_player.has_animation(pose) else &"idle"
 	_animation_player.get_animation(animation).loop_mode = Animation.LOOP_LINEAR
 	_animation_player.play(animation)
 	_animation_player.seek(randf() * _animation_player.current_animation_length) # don't breathe in time with the player
+	Townsperson._animate_only_on_screen(self, _animation_player)
 	var layer := CanvasLayer.new()
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS # so she can talk while a menu has the game paused
 	add_child(layer, false, Node.INTERNAL_MODE_FRONT)

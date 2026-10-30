@@ -1,3 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+# Exported builds (made with the export presets), but not the file that keeps
+# Godot from importing them
+/build/*
+!/build/.gdignore

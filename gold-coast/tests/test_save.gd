@@ -107,6 +107,7 @@ func _check_in_game() -> void:
 	var text := phone.shown_sms()
 	check(GameState.has_save() and text == PackedStringArray(["GAME SAVED", "DAY 1", "IN +GH₵20.00", "OUT -GH₵5.00"]),
 			"going to bed at home saves the game, and the phone sums up the day: %s" % " / ".join(text))
+	check(phone.can_show("".join(text)), "  ...and its screen can draw every character (the + too)")
 
 	GameState.set_needs(80.0, 100.0) # rested: she wakes up
 	await wait_until(func() -> bool: return (main.get_node("Player") as Player).is_free(), 4.0)

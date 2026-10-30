@@ -1,0 +1,111 @@
+# Puts Gold Coast on itch.io (https://nobaddays.itch.io/gold-coast) whenever
+# main changes. It runs every test, builds the web version, and uploads it
+# with butler, itch.io's upload tool. If a test fails, nothing is uploaded, so
+# a broken version never reaches the players.
+#
+# It needs one secret in the repository's settings (Settings > Secrets and
+# variables > Actions): BUTLER_API_KEY, an API key from itch.io (Account
+# settings > API keys). Without it, it still tests and builds, but doesn't
+# upload.
+#
+# To run it by hand: the Actions tab > "Put the game on itch.io" > Run workflow.
+
+name: Put the game on itch.io
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One upload at a time, in order.
+concurrency:
+  group: itch
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: 4.7.2
+  ITCH_GAME: nobaddays/gold-coast
+  ITCH_CHANNEL: html5
+
+jobs:
+  test-build-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v5
+
+      - name: Remember Godot between runs
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-web
+
+      - name: Download Godot and its web export template
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          release="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          editor="Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          templates="Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          mkdir -p ~/godot && cd ~/godot
+          # Check the downloads against the checksums Godot publishes with them.
+          curl -fsSL -o SHA512-SUMS.txt "$release/SHA512-SUMS.txt"
+          for file in "$editor.zip" "$templates"; do
+            curl -fsSL -o "$file" "$release/$file"
+            grep " $file\$" SHA512-SUMS.txt | sha512sum -c -
+          done
+          unzip -q "$editor.zip"
+          mv "$editor" godot
+          # Only the template the Web preset uses (no threads), not all of them.
+          mkdir -p templates
+          unzip -q -j "$templates" templates/version.txt templates/web_nothreads_release.zip -d templates
+          rm "$editor.zip" "$templates"
+
+      - name: Set Godot up
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          ln -s ~/godot/templates ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          echo "$HOME/godot" >> "$GITHUB_PATH"
+
+      - name: Import the project
+        working-directory: gold-coast
+        run: godot --headless --path . --import
+
+      - name: Run the tests
+        working-directory: gold-coast
+        run: |
+          set -o pipefail
+          godot --headless --path . res://tests/test_runner.tscn 2>&1 | tee test-output.txt
+          if grep -q "SCRIPT ERROR" test-output.txt; then
+            echo "::error::A script error happened during the tests"
+            exit 1
+          fi
+          errors=$(grep -c "^ERROR" test-output.txt || true)
+          if [ "$errors" -gt 0 ]; then
+            echo "::warning::$errors ERROR lines in the test output (the tests still passed)"
+          fi
+
+      - name: Build the web version
+        working-directory: gold-coast
+        run: |
+          mkdir -p build/web
+          godot --headless --path . --export-release "Web" build/web/index.html
+          ls -la build/web
+
+      - name: Upload it to itch.io
+        if: env.BUTLER_API_KEY != ''
+        run: |
+          set -euo pipefail
+          curl -fsSL -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d butler-tool
+          chmod +x butler-tool/butler
+          butler-tool/butler -V
+          butler-tool/butler push gold-coast/build/web "${ITCH_GAME}:${ITCH_CHANNEL}" --userversion "${GITHUB_SHA::7}"
+
+      - name: No itch.io key yet
+        if: env.BUTLER_API_KEY == ''
+        run: echo "::warning::BUTLER_API_KEY isn't set, so nothing was uploaded. Add it in Settings > Secrets and variables > Actions."

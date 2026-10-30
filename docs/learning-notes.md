@@ -410,3 +410,22 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
 - **A shape from its outline.** Each vehicle's body is its outline seen from
   the side (a list of points) pushed out sideways to its width, like a cookie
   cutter, then cut into bands of color and rounded off with a bevel.
+
+## Job 17: On itch.io, updated automatically
+
+- **A pipeline (CI/CD).** Instead of building and uploading the game by hand,
+  a list of steps runs by itself whenever main changes on GitHub. GitHub
+  Actions lends a computer for a few minutes, which follows the steps in
+  `.github/workflows/itch.yml`: get the code, download Godot, run the tests,
+  build the web version, and upload it. *Continuous integration* is testing
+  every change; *continuous delivery* is shipping it when the tests pass.
+- **Tests as a gate.** The upload only happens if every test passes, so a
+  mistake that breaks the game stops at GitHub instead of reaching the players.
+- **Secrets.** Uploading to itch.io needs a key, like a password. It's kept in
+  GitHub's secrets: the pipeline can use it, but nobody can read it back, and
+  it's never in the code. If a key ever leaks, delete it on itch.io and make a
+  new one.
+- **butler and channels.** butler is itch.io's upload tool. It uploads to a
+  *channel* (ours is `html5`), and each upload replaces the last one on that
+  channel, so the page always plays the newest version, with the settings
+  (like "played in the browser") kept.

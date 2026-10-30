@@ -815,7 +815,8 @@ was written, keep it working and build on it.
      with code 0 (all passed) or 1 (something failed)
    - Manual: a short checklist I can follow in the Godot editor
 5. **Commit when the tests pass**, with one commit per job (e.g. `Job 1: walk around`),
-   on a branch of its own (like `job-15`). It's merged into main when I say so.
+   on a branch of its own (like `job-15`). It's merged into main when I say so,
+   and merging into main also puts the new version on itch.io (see Commands).
    Never run destructive git commands (`reset --hard`, `clean -fd`, force push)
    without asking me first.
 6. **Placeholders first.** Use simple shapes for now; real Blender models come
@@ -848,6 +849,15 @@ sh tests/web_check.sh   # the web check in Chrome with no window (exit code 0 = 
 ```
 The AI's sandbox can't run the last two: it stops programs opening network
 connections, even on this computer. Run them in your own Terminal window.
+
+**Putting it online:** whenever main changes on GitHub, GitHub Actions runs
+`.github/workflows/itch.yml` on one of GitHub's computers: it runs every test,
+builds the web version, and uploads it to https://nobaddays.itch.io/gold-coast
+with butler (itch.io's upload tool), to the `html5` channel. If a test fails,
+nothing is uploaded. Watch it in the repository's Actions tab, where you can
+also run it by hand (Run workflow). It needs the `BUTLER_API_KEY` secret (an
+itch.io API key) in the repository's settings; never put that key in a file
+or a chat.
 Any `ERROR` or `SCRIPT ERROR` line in the output counts as a failure, even if
 the tests pass. After adding a new `class_name` script from outside the editor,
 run `--import` before anything else, or other scripts can't find the class.
@@ -1012,6 +1022,7 @@ This is the target layout. Create folders as jobs need them.
 ```text
 kayayo/                       repo root
   PROMPT.md                   this file
+  .github/workflows/itch.yml  tests, builds, and uploads the game to itch.io when main changes
   CREDITS.md                  third-party assets and licenses (create when first needed)
   docs/
     learning-notes.md         plain-language notes on new concepts, added after every job
@@ -1587,7 +1598,15 @@ doesn't need it) or mobile option. The page's tagline and description are in
    a full-screen button. It's private (with a password) at first, for me and
    friends to try.
 3. **Updating it:** the steps (or one script) to rebuild and upload a new
-   version after each job.
+   version after each job. **Done (2026-10-30), as an automatic pipeline:**
+   `.github/workflows/itch.yml` tests, builds, and uploads the game whenever
+   main changes (see Commands). To switch it on, once:
+   - on itch.io: Account settings > API keys > Generate new API key
+   - on GitHub: the repository's Settings > Secrets and variables > Actions >
+     New repository secret, named `BUTLER_API_KEY`, with that key
+   - after its first upload: on the game's itch.io edit page, tick "This file
+     will be played in the browser" for the new `html5` upload, and delete
+     the zip uploaded by hand. Later uploads keep that setting.
 4. **Tests:** open the link on a different computer, play, save, close the
    browser, open it again, and continue.
 

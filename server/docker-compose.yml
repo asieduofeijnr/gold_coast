@@ -1,0 +1,63 @@
+# Gold Coast's game server, on this computer: Nakama, and the database where
+# it keeps everyone's accounts and saves (PostgreSQL). With Docker Desktop
+# running, start it from the repo's folder (kayayo/) with
+#   docker compose -f server/docker-compose.yml up -d
+# and stop it with
+#   docker compose -f server/docker-compose.yml down
+# Accounts and saves stay in the "gold_coast_db" volume between runs.
+#
+# Only this computer can reach it (127.0.0.1), so the passwords here are fine
+# for building and testing. The online server will get its own.
+
+name: gold-coast
+
+services:
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nakama
+      POSTGRES_PASSWORD: local-only
+    volumes:
+      - gold_coast_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "nakama"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  nakama:
+    image: heroiclabs/nakama:3.22.0
+    # This Nakama is built for Intel (amd64) computers only. On a Mac with an
+    # Apple chip, Docker Desktop translates it as it runs, which is fine for
+    # building and testing; rented servers (like DigitalOcean's) are amd64.
+    platform: linux/amd64
+    depends_on:
+      database:
+        condition: service_healthy
+    # First it makes (or updates) the database's tables, then it starts. Players
+    # stay logged in for 30 days (the refresh token), and the game renews their
+    # 2-hour session by itself.
+    entrypoint:
+      - /bin/sh
+      - -ecx
+      - >
+        /nakama/nakama migrate up --database.address postgres:local-only@database:5432/nakama &&
+        exec /nakama/nakama --name gold-coast
+        --database.address postgres:local-only@database:5432/nakama
+        --runtime.path /nakama/data/modules
+        --session.token_expiry_sec 7200
+        --session.refresh_token_expiry_sec 2592000
+        --logger.level INFO
+    volumes:
+      - ./modules:/nakama/data/modules
+    ports:
+      - "127.0.0.1:7350:7350" # the game talks to it here
+      - "127.0.0.1:7351:7351" # its console, in a browser: http://127.0.0.1:7351 (admin / password)
+    healthcheck:
+      test: ["CMD", "/nakama/nakama", "healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  gold_coast_db:

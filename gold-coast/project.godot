@@ -19,6 +19,8 @@ run/main_scene.web_check="res://tests/web_check.tscn"
 [autoload]
 
 GameState="*res://autoload/game_state.gd"
+Nakama="*res://addons/com.heroiclabs.nakama/Nakama.gd"
+Online="*res://autoload/online.gd"
 
 [display]
 

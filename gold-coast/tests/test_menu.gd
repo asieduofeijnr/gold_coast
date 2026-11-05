@@ -42,7 +42,7 @@ func _check_opening() -> void:
 	await press_action("phone_menu")
 	await wait_physics_frames(20) # let the phone come up
 	check(_menu.is_open() and get_tree().paused and _phone.is_held_up() and _phone.screen == Phone.Screen.MENU
-			and _phone.menu_items == PackedStringArray(PauseMenu.ITEMS),
+			and _phone.menu_items == _menu.items() and _menu.items()[4] == "LOG IN",
 			"M (or Esc) holds her phone up with the menu on it, and the game pauses: %s" % " / ".join(_phone.menu_items))
 	await press_action("ui_down")
 	check(_phone.picked_item() == "SAVE GAME", "the arrow keys move down the menu")
@@ -171,7 +171,7 @@ func _check_title_screen() -> void:
 	title.open()
 	await wait_physics_frames(20)
 	check(title.is_open() and get_tree().paused and _phone.is_held_up()
-			and title.items() == PackedStringArray(["CONTINUE", "NEW GAME", "HOW TO PLAY"])
+			and title.items() == PackedStringArray(["CONTINUE", "NEW GAME", "HOW TO PLAY", "LOG IN"])
 			and "day 5, 14:20" in title.saved_game_line() and "GH₵230.00" in title.saved_game_line(),
 			"the title screen offers to carry on from the saved game: \"%s\"" % title.saved_game_line())
 	await press_action("ui_accept")
@@ -181,8 +181,8 @@ func _check_title_screen() -> void:
 	GameState.delete_save()
 	title.open()
 	await wait_physics_frames(5)
-	check(title.items() == PackedStringArray(["NEW GAME", "HOW TO PLAY"]) and title.saved_game_line() == "",
-			"with no saved game, it offers NEW GAME and HOW TO PLAY")
+	check(title.items() == PackedStringArray(["NEW GAME", "HOW TO PLAY", "LOG IN"]) and title.saved_game_line() == "",
+			"with no saved game, it offers NEW GAME and HOW TO PLAY (and LOG IN, playing offline)")
 	await press_action("ui_accept")
 	await wait_physics_frames(5)
 	check(not title.is_open() and not get_tree().paused, "  ...and NEW GAME starts")

@@ -429,3 +429,59 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   *channel* (ours is `html5`), and each upload replaces the last one on that
   channel, so the page always plays the newest version, with the settings
   (like "played in the browser") kept.
+
+## Job 18, part 1: accounts, with a game server
+
+- **A game server.** Some things can't live only in a player's browser: an
+  account, a save you can reach from anywhere, other players. They live on a
+  *server*, a program that's always running and that every player's game
+  talks to. Gold Coast's is Nakama, made for games.
+- **Docker.** Nakama needs a database and some setup. Docker runs each
+  program in its own *container*, a sealed box with everything it needs, so
+  one command (`docker compose up`) starts both, the same way on any computer.
+- **Never trust only the game.** The game checks the form (your age, a good
+  username) so you see mistakes straight away, but a player could change their
+  copy of the game. So the server checks again, with its own rules
+  (`server/modules/gold_coast.lua`), before it makes an account.
+- **Staying logged in.** When you log in, the server gives the game a *token*,
+  a pass that says who you are, for a while, and a *refresh token* to get a new
+  one. The game keeps them in the browser, so next time it logs you in by
+  itself; logging out throws them away.
+- **A pretend server for tests.** The tests can't depend on a real server
+  being up, so they swap in `FakeBackend`: same functions, answers from
+  memory. Only the part that talks to the real server (`NakamaBackend`) is
+  swapped, so everything else is tested for real.
+
+## Job 18, part 2: one shared town
+
+- **A match.** On the server, the town is a *match*: a little program that
+  everyone logged in joins. Each game sends it a short message about 10
+  times a second (where she is, which way she faces, what she's doing), and
+  the match passes it on to everyone else. It keeps the latest one from each
+  player, so someone who joins sees everyone straight away.
+- **Smoothing.** Ten messages a second would look jerky if the other players
+  jumped from spot to spot. Instead, each frame they move part of the way to
+  where they should be (a bit more when they're far behind), so they glide.
+  If the gap is huge (they loaded a game across town), they jump.
+- **Players and connections.** The same account can be logged in twice (two
+  windows), so the town tells players apart by their *connection* (session),
+  not their account, and ignores its own messages coming back.
+- **Sharing only what's needed.** Each game still runs its own town (its
+  townspeople, money, and clock); only where the players are is shared. That
+  keeps it light, and works the same whether one person is online or many.
+
+## Job 18, part 3: one clock for everyone
+
+- **One source of truth.** If every game kept its own clock, two players
+  standing side by side could see noon and midnight. So the server's clock is
+  the one that counts: it tells each game the time, and the games follow it.
+  This is how most online games keep things fair: the server decides, the
+  games show it.
+- **Drift.** Even clocks that start together slowly drift apart (and pausing
+  the game stops yours but not the town's). So the town tells the time every
+  10 seconds, and a game that's more than a minute out is put right.
+- **No skipping time together.** In single player, sleeping fast-forwards the
+  night. In a shared town one player can't fast-forward everyone's world, so
+  the rules change online: the bed refills her energy quickly instead, and
+  activities just take their few seconds. A rule that only made sense alone
+  had to change when other people arrived.

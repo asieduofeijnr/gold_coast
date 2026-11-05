@@ -7,6 +7,9 @@ extends Node
 ##   anywhere but her bed); otherwise the phone says why not
 ## - LOAD GAME: back to the saved game (it asks first)
 ## - NEW GAME: starts again (it asks first)
+## - LOG OUT: saves her game (if she's free), logs out, and goes back to the
+##   title screen; playing offline, it's LOG IN, back to the title screen to
+##   sign up or log in
 ## - HOW TO PLAY: the controls and the basics, a page at a time
 ## Choose with the phone's scroll key (or the arrow keys, or W and S), and pick
 ## with its middle key (or Enter, or E). C (or Esc, or M) goes back. A click
@@ -16,7 +19,7 @@ extends Node
 ## ("new"). The main scene does the rest.
 signal restart_requested(how: String)
 
-const ITEMS: Array[String] = ["RESUME", "SAVE GAME", "LOAD GAME", "NEW GAME", "HOW TO PLAY"]
+const ITEMS: Array[String] = ["RESUME", "SAVE GAME", "LOAD GAME", "NEW GAME", "LOG OUT", "HOW TO PLAY"]
 ## How to play, a page at a time: three lines of up to 14 letters, in the
 ## phone's own font.
 const HOW_TO_PLAY := [
@@ -97,11 +100,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## The menu's items, as it shows them: LOG OUT when she's logged in, or LOG IN
+## when she's playing offline.
+func items() -> PackedStringArray:
+	var shown := PackedStringArray(ITEMS)
+	shown[ITEMS.find("LOG OUT")] = "LOG OUT" if Online.is_logged_in() else "LOG IN"
+	return shown
+
+
 func _on_item_chosen(index: int) -> void:
 	if not _open or _page != "":
 		return
 	_item = index
-	match ITEMS[index]:
+	match items()[index]:
 		"RESUME":
 			close()
 		"SAVE GAME":
@@ -111,6 +122,15 @@ func _on_item_chosen(index: int) -> void:
 		"NEW GAME":
 			_page = "new"
 			phone.show_page(PackedStringArray(["START AGAIN?", "UNSAVED PLAY", "WILL BE LOST."]), "YES", "NEW GAME")
+		"LOG OUT":
+			_page = "account"
+			if GameState.save_refusal() == "":
+				phone.show_page(PackedStringArray(["LOG OUT?", "IT SAVES YOUR", "GAME FIRST."]), "YES", "LOG OUT")
+			else:
+				phone.show_page(PackedStringArray(["LOG OUT?", "UNSAVED PLAY", "WILL BE LOST."]), "YES", "LOG OUT")
+		"LOG IN":
+			_page = "account"
+			phone.show_page(PackedStringArray(["PLAYING", "OFFLINE. SIGN", "UP OR LOG IN?"]), "YES", "LOG IN")
 		"HOW TO PLAY":
 			_page = "help"
 			_help_page = 0
@@ -151,6 +171,14 @@ func _on_page_accepted() -> void:
 			var how := _page
 			close()
 			restart_requested.emit(how)
+		"account":
+			# Her game is saved (if she's free), then logging out (or leaving
+			# offline play) goes back to the title screen, where the account card asks.
+			if GameState.save_refusal() == "":
+				GameState.save_game()
+			close()
+			Online.log_out()
+			restart_requested.emit("")
 		"help":
 			if _help_page < HOW_TO_PLAY.size() - 1:
 				_help_page += 1
@@ -179,7 +207,7 @@ func _on_back_pressed() -> void:
 
 func _show_menu(selected: int) -> void:
 	_page = ""
-	phone.show_menu("MENU", PackedStringArray(ITEMS), selected)
+	phone.show_menu("MENU", items(), selected)
 
 
 func _show_help() -> void:

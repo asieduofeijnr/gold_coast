@@ -7,13 +7,20 @@ extends Node
 
 const TESTS_FOLDER := "res://tests"
 const NOT_TESTS: Array[String] = ["test_case.gd", "test_runner.gd"]
-## Tests save to their own file, so they never touch your saved game.
+## Tests save to their own file, so they never touch your saved game, and keep
+## their own login, so they never touch yours.
 const TEST_SAVE := "user://test_save.json"
+const TEST_ACCOUNT := "user://test_account.json"
 
 
 func _ready() -> void:
 	GameState.save_path = TEST_SAVE
 	GameState.town_life = false # tests that want townspeople switch them on
+	# No real server in tests: a pretend one, and playing offline unless a test
+	# logs in (test_account.gd does).
+	Online.account_file = TEST_ACCOUNT
+	Online.backend = FakeBackend.new()
+	Online.play_offline()
 	var failures := 0
 	var files := DirAccess.get_files_at(TESTS_FOLDER)
 	files.sort()
@@ -31,6 +38,7 @@ func _ready() -> void:
 		test.queue_free()
 
 	GameState.delete_save()
+	DirAccess.remove_absolute(TEST_ACCOUNT)
 	# Give any sound still playing (like the phone's text beep) a moment to be
 	# cleaned up, or Godot reports it as leaked when the game quits.
 	await get_tree().create_timer(0.3).timeout

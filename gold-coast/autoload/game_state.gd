@@ -64,6 +64,11 @@ const STARTING_MONEY := 10000
 const START_DAY := 1
 const START_MINUTES := 7.0 * 60.0
 const MINUTES_PER_DAY := 24.0 * 60.0
+## Following the shared town's clock: within this many game minutes of it is
+## close enough, and up to CLOCK_NUDGE minutes ahead of it, she's put back a
+## little; any other difference, her clock moves forward to the town's.
+const CLOCK_SLACK := 1.0
+const CLOCK_NUDGE := 30.0
 ## Needs go from FULL down to 0. Below LOW she's hungry or sleepy.
 const FULL := 100.0
 const LOW := 25.0
@@ -136,6 +141,17 @@ var spent_today := 0
 ## How fast game time passes, in game minutes per real second. At 1, a game
 ## hour takes a real minute and a whole day takes 24 minutes.
 var time_speed := 1.0
+## Whether her clock follows the shared town's (online: TownPlayers sets it).
+## Then the clock never speeds up for her alone: sleeping is a quick rest (her
+## energy comes back as fast as a night's sleep would, but the night doesn't
+## pass), and an activity lasts its few real seconds without moving the clock.
+var shared_clock := false:
+	set(value):
+		if value != shared_clock:
+			shared_clock = value
+			_clock_synced = false
+			time_speed = sleep_time_speed if sleeping and not value else 1.0
+			_normal_time_speed = 1.0
 ## The day number, counting from 1.
 var day := START_DAY
 ## Minutes since midnight, from 0 up to 1440 (with fractions). Show it to the
@@ -196,6 +212,8 @@ var _announced_time := Vector2i(-1, -1)
 var _announced_needs := Vector2i(-1, -1)
 # The time speed to go back to after waking up or finishing an activity.
 var _normal_time_speed := 1.0
+# Whether her clock has been put to the shared town's (see follow_world_clock()).
+var _clock_synced := false
 # When she fell asleep (as now() gives it), for the mosquitoes.
 var _asleep_since := 0.0
 # The current activity: when it ends, how long it lasts, and how much hunger
@@ -272,6 +290,32 @@ func advance(game_minutes: float) -> void:
 	_check_rent()
 
 
+## Puts her clock to the shared town's time of day (`world_minutes`). The
+## first time (when she joins the town, or after loading a game or starting a
+## new one), it moves forward to it: into the next day, if that's earlier.
+## After that it's only put right when it's more than a minute out (a menu
+## pauses her clock, but not the town's). Jumping ahead like this doesn't use
+## up her hunger or energy.
+func follow_world_clock(world_minutes: float) -> void:
+	var behind := fposmod(world_minutes - minutes, MINUTES_PER_DAY) # how far the town is ahead of her
+	var ahead_of_town := MINUTES_PER_DAY - behind
+	if _clock_synced and (behind <= CLOCK_SLACK or ahead_of_town <= CLOCK_SLACK):
+		return # close enough
+	if _clock_synced and ahead_of_town < CLOCK_NUDGE:
+		if minutes >= ahead_of_town: # a little ahead: back a little (but not back over midnight)
+			set_time(day, minutes - ahead_of_town)
+		return
+	var total := now() + behind
+	set_time(START_DAY + floori(total / MINUTES_PER_DAY), fposmod(total, MINUTES_PER_DAY))
+	_clock_synced = true
+
+
+## Whether her clock has been put to the shared town's since she joined it
+## (or since a game was loaded or started).
+func is_clock_synced() -> bool:
+	return _clock_synced
+
+
 ## Sets the clock to `new_minutes` past midnight on day `new_day`.
 func set_time(new_day: int, new_minutes: float) -> void:
 	day = new_day
@@ -340,6 +384,8 @@ func start_activity(activity_name: String, game_minutes: float, real_seconds: fl
 	if sleeping or activity != "":
 		return false
 	activity = activity_name
+	if shared_clock:
+		game_minutes = real_seconds # the town's clock doesn't speed up: it lasts its real seconds
 	_activity_minutes = maxf(game_minutes, 0.001)
 	_activity_end = now() + _activity_minutes
 	_activity_hunger = hunger_gain
@@ -607,6 +653,7 @@ func reset() -> void:
 	spot_loaded = false
 	_reminded_for = 0
 	time_speed = 1.0
+	_clock_synced = false
 	set_needs(FULL, FULL)
 	set_time(START_DAY, START_MINUTES)
 	earned_today = 0
@@ -616,6 +663,8 @@ func reset() -> void:
 func _update_needs(hours: float) -> void:
 	if hours <= 0.0:
 		return
+	if sleeping and shared_clock:
+		hours *= sleep_time_speed # a quick rest: the night doesn't pass, but she's as rested
 	if sleeping:
 		hunger -= hunger_per_hour * sleep_hunger_multiplier * hours
 		energy += (bed_energy_per_hour if in_bed else sleep_energy_per_hour) * hours
@@ -654,7 +703,8 @@ func _fall_asleep(from_exhaustion: bool, at_home := false) -> void:
 	is_walking = false
 	_asleep_since = now()
 	_normal_time_speed = time_speed
-	time_speed = sleep_time_speed
+	if not shared_clock:
+		time_speed = sleep_time_speed # the night goes by fast (online, she rests fast instead)
 	sleep_changed.emit(true)
 	if at_home and not _loading:
 		save_game() # her bed is where the game saves

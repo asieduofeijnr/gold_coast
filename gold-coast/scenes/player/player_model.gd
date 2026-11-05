@@ -27,6 +27,14 @@ extends Node3D
 @export var marker_height := 2.1
 @export var marker_height_carrying := 2.45
 
+## Whether she wears the gold star pin (only the player does; other players in
+## the shared town don't). Set it before she's added to the scene.
+var marked := true
+## Other colors for her clothes: a material's name ("cloth_cream" for her top,
+## "cloth_maroon" her slit, "cloth_ochre" its trim, "cloth_red" her duku) to a
+## Palette.ColorName. Other players in the shared town wear their own. Set it
+## before she's added to the scene.
+var outfit := {}
 ## How fast she's moving, in metres per second. The player script sets this.
 var move_speed := 0.0
 ## Whether she's asleep. The player script sets this.
@@ -89,6 +97,7 @@ func _ready() -> void:
 	animation_player.play("idle")
 	_meshes = _character.find_children("*", "MeshInstance3D")
 	for body: MeshInstance3D in _meshes:
+		_dress(body)
 		CharacterParts.merge(body) # one part instead of one per color: much quicker to draw
 	_zzz = Shapes.name_label("Z z z")
 	_zzz.position = Vector3(0.0, 0.9, 0.9)
@@ -101,11 +110,12 @@ func _ready() -> void:
 	_activity_bar.height = 2.25
 	_activity_bar.visible = false
 	layer.add_child(_activity_bar)
-	_marker = PlayerMarker.new()
-	_marker.anchor = self
-	_marker.height = marker_height
-	_marker.visible = false
-	layer.add_child(_marker)
+	if marked:
+		_marker = PlayerMarker.new()
+		_marker.anchor = self
+		_marker.height = marker_height
+		_marker.visible = false
+		layer.add_child(_marker)
 	# The headpan rides on her head bone, so it moves with her head as she walks.
 	var on_head := BoneAttachment3D.new()
 	on_head.bone_name = "Head"
@@ -150,7 +160,7 @@ func is_carrying() -> bool:
 
 ## Whether the pin over her head is showing.
 func is_marked() -> bool:
-	return _marker.is_showing()
+	return _marker != null and _marker.is_showing()
 
 
 ## The pin over her head (for tests).
@@ -161,6 +171,8 @@ func get_marker() -> PlayerMarker:
 # The pin shows whenever she's out and about: not while she's indoors, asleep
 # (the "Z z z" shows where she is), or busy (her activity bar is over her head).
 func _update_marker() -> void:
+	if _marker == null:
+		return
 	var wanted := not inside and not sleeping and activity == "" and faded() < 0.5
 	if wanted != _marker.is_showing():
 		if wanted:
@@ -168,6 +180,14 @@ func _update_marker() -> void:
 		else:
 			_marker.disappear()
 	_marker.height = marker_height_carrying if headload != null else marker_height
+
+
+# Her clothes in the outfit's colors (if it has any), before her parts are merged.
+func _dress(body: MeshInstance3D) -> void:
+	for i in body.mesh.get_surface_count():
+		var original := body.mesh.surface_get_material(i)
+		if original != null and outfit.has(original.resource_name):
+			body.set_surface_override_material(i, Palette.material(outfit[original.resource_name]))
 
 
 ## The text over her head while she's busy (for tests): "" when it's hidden.

@@ -99,7 +99,7 @@ func _check_presets() -> void:
 			check_build = section
 	check(found and web != "" and presets.get_value(web, "platform", "") == "Web"
 			and presets.get_value(web, "export_path", "") == "build/web/index.html"
-			and presets.get_value(web, "exclude_filter", "") == "tests/*"
+			and "tests/*" in String(presets.get_value(web, "exclude_filter", ""))
 			and presets.get_value(web + ".options", "variant/thread_support", true) == false,
 			"the Web export builds into build/web, without threads (so any web host works), and leaves the tests out")
 	check(check_build != "" and presets.get_value(check_build, "custom_features", "") == "web_check"

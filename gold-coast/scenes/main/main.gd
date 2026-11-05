@@ -4,6 +4,7 @@ extends Node3D
 ## saved game or start a new one. Loading the save or starting a new game from
 ## the phone's menu reloads this scene, and skips the title screen.
 ## The game saves when she goes to bed at home, or from the phone's menu.
+## Logged in, she shares the town with the other players online (TownPlayers).
 
 # Where she stands at the start of a new game.
 var _start_spot: Vector3
@@ -19,6 +20,10 @@ func _ready() -> void:
 	_start_facing = player.rotation.y
 	title_screen.started.connect(_on_title_screen_started)
 	pause_menu.restart_requested.connect(restart)
+	var town := TownPlayers.new()
+	town.name = "TownPlayers"
+	town.player = player
+	add_child(town)
 	# Only when this is the game itself: tests load this scene inside their own.
 	if get_tree().current_scene != self:
 		return

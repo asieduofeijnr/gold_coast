@@ -1,12 +1,16 @@
 class_name TitleScreen
 extends Control
 ## The title screen, when the game starts: GOLD COAST painted on a sign in
-## Ghana's colors, and her phone, held up, with the start menu:
+## Ghana's colors. First, if nobody's logged in, the account card
+## (AccountScreen) asks you to make an account, log in, or play offline; if you
+## logged in before, it logs you in again by itself. Then her phone, held up,
+## shows the start menu:
 ## - CONTINUE (only if there's a saved game): carries on from it. Under the
 ##   sign it says when it was saved, and how much money she had.
 ## - NEW GAME: a fresh start. If there's a saved game it asks first; the old
 ##   save stays until the new game saves over it.
 ## - HOW TO PLAY: the controls and the basics, a page at a time
+## - LOG OUT (or, playing offline, LOG IN): back to the account card
 ## The game waits, paused, until you choose. (In a web browser, choosing is also
 ## the click the browser waits for before the game may play sounds.)
 
@@ -15,6 +19,8 @@ extends Control
 signal started(continuing: bool)
 
 const SIGN := Rect2(430.0, 88.0, 650.0, 300.0)
+## Where the sign goes while the account card is showing: on the left.
+const ACCOUNT_SIGN := Rect2(40.0, 110.0, 570.0, 263.0)
 
 ## The phone the start menu is on.
 @export var phone: Phone
@@ -25,6 +31,8 @@ var _saved := {}
 # What the phone's page is for: "" (the menu), "new", or "help".
 var _page := ""
 var _help_page := 0
+var _account: AccountScreen
+var _logging_in := false
 
 
 func _ready() -> void:
@@ -33,6 +41,9 @@ func _ready() -> void:
 	phone.page_accepted.connect(_on_page_accepted)
 	phone.page_scrolled.connect(_on_page_scrolled)
 	phone.back_pressed.connect(_on_back_pressed)
+	_account = AccountScreen.new()
+	add_child(_account)
+	_account.done.connect(_on_account_done)
 
 
 ## Shows the title screen, and pauses the game until you choose how to start.
@@ -41,9 +52,29 @@ func open() -> void:
 	_open = true
 	visible = true
 	get_tree().paused = true
-	phone.hold_up(true)
-	_show_menu(0)
-	queue_redraw()
+	var problem := ""
+	if not Online.is_ready_to_play() and Online.has_saved_login():
+		_logging_in = true
+		phone.visible = false
+		queue_redraw()
+		problem = await Online.restore()
+		_logging_in = false
+	if Online.is_ready_to_play():
+		_show_start()
+	else:
+		_show_account()
+		if problem != "":
+			_account.say(problem, 1) # on Log in: she has an account
+
+
+## Whether the account card is showing (to make an account, log in, or play offline).
+func is_asking_for_account() -> bool:
+	return _account.is_open()
+
+
+## The account card (for tests).
+func get_account_screen() -> AccountScreen:
+	return _account
 
 
 ## Whether the title screen is showing.
@@ -66,7 +97,7 @@ func saved_game_line() -> String:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not _open:
+	if not _open or _account.is_open() or _logging_in:
 		return
 	var key := Phone.key_for(event)
 	if key != "":
@@ -90,6 +121,9 @@ func _on_item_chosen(index: int) -> void:
 			_page = "help"
 			_help_page = 0
 			_show_help()
+		"LOG OUT", "LOG IN":
+			Online.log_out()
+			_show_account()
 
 
 func _on_page_accepted() -> void:
@@ -117,10 +151,30 @@ func _on_back_pressed() -> void:
 		_show_menu(_items.find("NEW GAME" if _page == "new" else "HOW TO PLAY"))
 
 
+func _show_account() -> void:
+	phone.hold_up(false)
+	phone.visible = false
+	_account.open()
+	queue_redraw()
+
+
+func _on_account_done() -> void:
+	_account.close()
+	_show_start()
+
+
+func _show_start() -> void:
+	phone.visible = true
+	phone.hold_up(true)
+	_show_menu(0)
+	queue_redraw()
+
+
 func _show_menu(selected: int) -> void:
 	_page = ""
 	_items = PackedStringArray(["CONTINUE", "NEW GAME", "HOW TO PLAY"] if not _saved.is_empty()
 			else ["NEW GAME", "HOW TO PLAY"])
+	_items.append("LOG OUT" if Online.is_logged_in() else "LOG IN")
 	phone.show_menu("GOLD COAST", _items, selected)
 
 
@@ -143,36 +197,20 @@ func _start(continuing: bool) -> void:
 func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	var paper := Palette.color(Palette.ColorName.PAPER)
-	var ink := Palette.color(Palette.ColorName.DARK_BROWN)
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.07, 0.04, 0.02, 0.62)) # dim the town behind
-	# The sign: a wooden frame round Ghana's red, gold, and green.
-	var frame := StyleBoxFlat.new()
-	frame.bg_color = Palette.color(Palette.ColorName.WOOD_DARK)
-	frame.set_corner_radius_all(18)
-	frame.border_color = ink
-	frame.set_border_width_all(3)
-	frame.shadow_color = Color(0, 0, 0, 0.4)
-	frame.shadow_size = 14
-	frame.shadow_offset = Vector2(5, 7)
-	draw_style_box(frame, SIGN)
-	var inner := SIGN.grow(-14.0)
-	var band := inner.size.y / 3.0
-	var bands := [Palette.ColorName.TILE_RED, Palette.ColorName.KENTE_GOLD, Palette.ColorName.PALM_GREEN]
-	for i in 3:
-		draw_rect(Rect2(inner.position + Vector2(0.0, band * i), Vector2(inner.size.x, band)), Palette.color(bands[i]))
-	for corner in [Vector2(8, 8), Vector2(SIGN.size.x - 8, 8), Vector2(8, SIGN.size.y - 8), Vector2(SIGN.size.x - 8, SIGN.size.y - 8)]:
-		draw_circle(SIGN.position + corner, 3.0, Palette.color(Palette.ColorName.ALUMINIUM)) # nails
-	draw_string(font, inner.position + Vector2(0.0, band * 0.68), "AKWAABA!", HORIZONTAL_ALIGNMENT_CENTER, inner.size.x,
-			34, paper)
-	var title_at := inner.position + Vector2(0.0, band * 1.5 + 28.0)
-	draw_string_outline(font, title_at, "GOLD COAST", HORIZONTAL_ALIGNMENT_CENTER, inner.size.x, 80, 12, paper)
-	draw_string(font, title_at, "GOLD COAST", HORIZONTAL_ALIGNMENT_CENTER, inner.size.x, 80, ink)
-	for x in [inner.position.x + 34.0, inner.end.x - 34.0]:
-		_star(Vector2(x, inner.position.y + band * 1.5), 20.0, Palette.color(Palette.ColorName.SHITO_BLACK))
-	draw_string(font, inner.position + Vector2(0.0, band * 2.66), "HUSTLE  ·  LEARN  ·  RISE", HORIZONTAL_ALIGNMENT_CENTER,
-			inner.size.x, 26, paper)
-	# What's saved, and how to choose.
+	if _account.is_open():
+		_draw_sign(ACCOUNT_SIGN)
+		draw_string(font, Vector2(ACCOUNT_SIGN.position.x, ACCOUNT_SIGN.end.y + 40.0),
+				"Make an account to play online, in one town with everyone.", HORIZONTAL_ALIGNMENT_CENTER,
+				ACCOUNT_SIGN.size.x, 19, paper)
+		return
+	_draw_sign(SIGN)
+	# What's saved, who's playing, and how to choose.
 	var below := SIGN.end.y + 44.0
+	if _logging_in:
+		draw_string(font, Vector2(SIGN.position.x, below), "Logging in...", HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 20,
+				paper)
+		return
 	var saved := saved_game_line()
 	if saved == "":
 		draw_string(font, Vector2(SIGN.position.x, below), "No saved game yet. Start a new one!", HORIZONTAL_ALIGNMENT_CENTER,
@@ -182,6 +220,44 @@ func _draw() -> void:
 		CediText.draw(self, font, Vector2(SIGN.get_center().x - width / 2.0, below), saved, 20, paper)
 	draw_string(font, Vector2(SIGN.position.x, below + 34.0), "Choose on her phone: the arrow keys and Enter, or click its keys.",
 			HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 15, Palette.color(Palette.ColorName.PLINTH_LIGHT))
+	var who := "Logged in as @%s" % Online.username if Online.is_logged_in() else "Playing offline, without an account"
+	draw_string(font, Vector2(SIGN.position.x, below + 64.0), who, HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 15,
+			Palette.color(Palette.ColorName.KENTE_GOLD))
+
+
+# The sign in `rect`: a wooden frame round Ghana's red, gold, and green, with
+# AKWAABA!, GOLD COAST, and HUSTLE · LEARN · RISE. Its writing grows with it.
+func _draw_sign(rect: Rect2) -> void:
+	var font := ThemeDB.fallback_font
+	var paper := Palette.color(Palette.ColorName.PAPER)
+	var ink := Palette.color(Palette.ColorName.DARK_BROWN)
+	var grow := rect.size.x / SIGN.size.x
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Palette.color(Palette.ColorName.WOOD_DARK)
+	frame.set_corner_radius_all(18)
+	frame.border_color = ink
+	frame.set_border_width_all(3)
+	frame.shadow_color = Color(0, 0, 0, 0.4)
+	frame.shadow_size = 14
+	frame.shadow_offset = Vector2(5, 7)
+	draw_style_box(frame, rect)
+	var inner := rect.grow(-14.0)
+	var band := inner.size.y / 3.0
+	var bands := [Palette.ColorName.TILE_RED, Palette.ColorName.KENTE_GOLD, Palette.ColorName.PALM_GREEN]
+	for i in 3:
+		draw_rect(Rect2(inner.position + Vector2(0.0, band * i), Vector2(inner.size.x, band)), Palette.color(bands[i]))
+	for corner in [Vector2(8, 8), Vector2(rect.size.x - 8, 8), Vector2(8, rect.size.y - 8), Vector2(rect.size.x - 8, rect.size.y - 8)]:
+		draw_circle(rect.position + corner, 3.0, Palette.color(Palette.ColorName.ALUMINIUM)) # nails
+	draw_string(font, inner.position + Vector2(0.0, band * 0.68), "AKWAABA!", HORIZONTAL_ALIGNMENT_CENTER, inner.size.x,
+			int(34 * grow), paper)
+	var title_at := inner.position + Vector2(0.0, band * 1.5 + 28.0 * grow)
+	draw_string_outline(font, title_at, "GOLD COAST", HORIZONTAL_ALIGNMENT_CENTER, inner.size.x, int(80 * grow),
+			int(12 * grow), paper)
+	draw_string(font, title_at, "GOLD COAST", HORIZONTAL_ALIGNMENT_CENTER, inner.size.x, int(80 * grow), ink)
+	for x in [inner.position.x + 34.0 * grow, inner.end.x - 34.0 * grow]:
+		_star(Vector2(x, inner.position.y + band * 1.5), 20.0 * grow, Palette.color(Palette.ColorName.SHITO_BLACK))
+	draw_string(font, inner.position + Vector2(0.0, band * 2.66), "HUSTLE  ·  LEARN  ·  RISE", HORIZONTAL_ALIGNMENT_CENTER,
+			inner.size.x, int(26 * grow), paper)
 
 
 # A five-pointed star, like the black star on Ghana's flag.

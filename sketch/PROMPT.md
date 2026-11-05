@@ -1,8 +1,13 @@
 # Gold Coast: AI game dev prompt
 
-> **Current job: Job 17, "On itch.io"**, in phase two: online (details in
-> section 8). Phase one (Jobs 1–9 and skills), Job 15, and Job 16 are done.
-> The itch.io account and the first upload are done too.
+> **Current job: Job 18, "Accounts and one shared town, with Nakama"**, in
+> phase two: online (details in section 8). Phase one (Jobs 1–9 and skills),
+> Job 15, and Job 16 are done. Job 17's automatic uploads to itch.io work; its
+> password-protected page, screenshots, and test on another computer are left.
+> Job 18's first parts (the account card, the server on this computer, and a
+> shared town with one clock) are built; cloud saves are next.
+> **Planned next:** phase three, Coaster Life (Jobs 19 to 41), on the design
+> board's Build plan tab (section 7). It starts with Job 19 when I say so.
 
 **How to use this file:** start a fresh Codex session for each job and tell it
 to read this file and do the current job. The AI does only that job. When the
@@ -705,6 +710,73 @@ of peeling plaster. Flat colors, simple shapes.
     (`TrotroStation.ROOF`).
   - **The school:** the mango tree moved into the yard (local (10.4, 0, -0.5)),
     out of the line between the school's sign and the camera.
+- **Job 18, part 1: accounts, with Nakama** (cloud saves and the shared town
+  come next).
+  - **The server** (`server/`): Nakama 3.22.0 and PostgreSQL 16 in Docker
+    (`server/docker-compose.yml`), on this computer only (127.0.0.1:7350, its
+    console on 7351). `server/modules/gold_coast.lua` checks new accounts: a
+    username of 3 to 20 small letters, numbers, or underscores, a name, 18 or
+    older, and agreeing to the current terms. It keeps the name as the display
+    name, and the date of birth and agreement in the account's metadata.
+  - **The client:** Heroic Labs' Nakama client for Godot, in
+    `addons/com.heroiclabs.nakama/` (the `Nakama` autoload; Apache 2.0, see
+    `CREDITS.md`).
+  - **`Online`** (`autoload/online.gd`): signing up (`sign_up()`), logging in
+    and out, playing offline, and staying logged in (the login is kept in
+    `user://gold_coast_account.json`). `check_sign_up()` has the form's rules.
+    It reaches the server through a backend: `NakamaBackend`
+    (`scripts/nakama_backend.gd`, which also turns the server's errors into
+    plain words), or, in tests, `FakeBackend` (`tests/fake_backend.gd`). In a
+    browser it plays offline when it can't reach the server (`can_reach()`):
+    while the server is on this computer, that's the itch.io version.
+  - **The account card** (`scenes/ui/account_screen.gd`, `AccountScreen`, made
+    by the title screen): Create account (name, username, password with an
+    eye, email, date of birth, and the 18+ box with links to the five pages in
+    `scripts/legal.gd`) and Log in, mistakes in red under the fields, and
+    "Play offline" under the sign. The title screen shows it until you're
+    logged in or offline, and logs you in again by itself next time.
+  - The phone's menu gained ACCOUNT (log out, or go back to sign up), and its
+    font "@" and "_".
+  - The Web export presets leave out `art/branding/` (pictures for the itch.io
+    page, not the game).
+- **Job 18, part 2: one shared town** (a first version).
+  - **On the server:** `server/modules/town.lua` is a match everyone logged
+    in joins; the "town" function (in `gold_coast.lua`) finds it, or starts
+    it. Each game sends where she is (`OP_MOVE`, a little JSON) about 10
+    times a second, and the town passes it on to everyone else, and tells a
+    newcomer where everyone already is.
+  - **In the game:** `Online.join_town()` (when logged in), `send_move()`, and
+    the signals `town_player_moved` and `town_player_left`, through the
+    backend's live connection (a socket). `TownPlayers`
+    (`scenes/online/town_players.gd`, made by `main.gd`) sends her moves
+    (`move_of()`: x, y, z, facing, speed, pose, asleep, indoors) and keeps a
+    `RemotePlayer` (`scenes/online/remote_player.gd`) for everyone else: her
+    character in its own colors (`RemotePlayer.OUTFITS`, picked by username),
+    with no star pin and an @username overhead, walking smoothly to each new
+    spot (or jumping, if it's far).
+  - `PlayerModel` gained `marked` (the star pin) and `outfit` (other colors).
+  - Each player keeps their own money, progress, and townspeople (each game
+    still moves its own). The time of day is shared (part 3).
+- **Job 18, part 3: one clock for the shared town, and logging out.**
+  - **The town's clock:** `town.lua` keeps Gold Coast's time of day (a game
+    minute for each real second, from the server's own clock) and sends it
+    (`OP_CLOCK`) to each player who joins, and to everyone every 10 seconds.
+    `Online.world_minutes()` estimates it between times.
+  - **Following it:** in the town, `TownPlayers` sets `GameState.shared_clock`
+    and calls `GameState.follow_world_clock()`: her clock moves forward to the
+    town's when she joins (or after loading or a new game), without using up
+    her hunger or energy, and is put right when it's more than a minute out
+    (a menu pauses her clock, but not the town's).
+  - **No skipping time in a shared town:** sleeping is a quick rest (her
+    energy comes back 60 times faster, as fast as a night's sleep offline, but
+    the night doesn't pass), and an activity lasts its few real seconds on the
+    clock instead of speeding it up. Offline, all of it is as before.
+  - **The day number stays each player's own,** so weekly rent doesn't pile up
+    while she's away; the weekday (school days, rent day) can differ between
+    players for now.
+  - **Logging out:** the phone menu's LOG OUT (LOG IN, playing offline) saves
+    her game first if she's free, then goes back to the title screen; the
+    title screen's start menu has LOG OUT (or LOG IN) too, to switch accounts.
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports
@@ -788,8 +860,10 @@ of peeling plaster. Flat colors, simple shapes.
   the files named after `--`). `tests/test_case.gd` (`TestCase`) is the base
   class, with `check()`, `wait_physics_frames()`, `press_action()`,
   `teleport()`, `wait_until()`, `click_at()`, and `move_mouse_to()`. There are
-  404 checks so far, all passing. `tests/web_check.gd` is different: it runs
-  in a browser, in the "Web check" build (see Commands). The runner saves to `user://test_save.json`,
+  450 checks so far, all passing. `tests/web_check.gd` is different: it runs
+  in a browser, in the "Web check" build (see Commands). The runner gives
+  `Online` a pretend server (`tests/fake_backend.gd`) and plays offline,
+  unless a test logs in. The runner saves to `user://test_save.json`,
   never your real save. It also switches the townspeople off
   (`GameState.town_life = false`) so they don't get in the way;
   `test_town.gd` switches them back on. Tests that need exact times stop the clock with
@@ -824,6 +898,8 @@ was written, keep it working and build on it.
    model without changing code.
 7. **No addons or downloads** unless the job calls for them. Any third-party asset
    must be CC0 or CC-BY, with its source and license recorded in `CREDITS.md`.
+   Code from others (like the Nakama client) needs an open-source license
+   (like MIT or Apache 2.0), recorded there too.
 8. **Use Input Map actions** (`move_forward`, etc.) in code, never raw key codes.
 9. **Explain what you changed** using the report format in section 9, and add the
    "New concepts" part to `docs/learning-notes.md`.
@@ -849,6 +925,23 @@ sh tests/web_check.sh   # the web check in Chrome with no window (exit code 0 = 
 ```
 The AI's sandbox can't run the last two: it stops programs opening network
 connections, even on this computer. Run them in your own Terminal window.
+
+**The game's server** (Nakama, for accounts), on this computer, with Docker
+Desktop running (see `server/README.md`):
+```bash
+docker compose -f server/docker-compose.yml up -d     # start it (from kayayo/)
+docker compose -f server/docker-compose.yml down      # stop it (accounts stay)
+docker compose -f server/docker-compose.yml logs -f nakama   # watch what it's doing
+```
+Its console is at http://127.0.0.1:7351 (admin / password). The AI's sandbox
+can't run Docker (nor can commands typed with `!` in the AI's chat); start it
+in your own Terminal. Nakama reads `server/modules/` when it starts, so after
+changing them: `docker compose -f server/docker-compose.yml restart nakama`.
+
+**Two players on this computer:** each needs their own account, and a browser
+keeps one login, so use two browsers: run `sh gold-coast/tests/serve_web.sh`,
+then open http://127.0.0.1:8060/web/ in Chrome and in Safari (or a private
+window), or play one in the Godot editor and one in a browser.
 
 **Putting it online:** whenever main changes on GitHub, GitHub Actions runs
 `.github/workflows/itch.yml` on one of GitHub's computers: it runs every test,
@@ -1016,6 +1109,21 @@ marker, change the scripts that look for it (`Vehicle`, `Trotro`, `Car`).
   fit a board or a vehicle, measure the words with
   `ThemeDB.fallback_font.get_string_size()` (Label3D's own font), as
   `Signpost.board_width()` and `Vehicle._write()` do.
+- **Requests while paused:** the title screen pauses the game, and an
+  HTTPRequest only works while its node is processing. The `Nakama` autoload
+  sets itself to process always; anything else that talks to the server while
+  a menu is open must too (`test_account.gd` checks).
+- **Typing in tests:** setting a LineEdit's `text`, or `insert_text_at_caret()`,
+  doesn't send `text_changed`. A test that needs it sends it itself.
+- **A server on this computer** (127.0.0.1) can't be reached by the game on
+  itch.io: there, 127.0.0.1 is the player's own computer. `Online.can_reach()`
+  makes it play offline until the server is on the internet (with HTTPS).
+- **One login per browser:** the login is kept in the browser's storage, so
+  two windows of one browser (or two games run from the editor) are the same
+  player. To test two players, use two browsers.
+- **Everything in `gold-coast/` is exported,** pictures included: the four
+  branding pictures added 7 MB to the web build. Keep files the game doesn't
+  use out of `gold-coast/`, or add them to the presets' exclude filters.
 
 ## 6. Project structure
 This is the target layout. Create folders as jobs need them.
@@ -1023,6 +1131,7 @@ This is the target layout. Create folders as jobs need them.
 kayayo/                       repo root
   PROMPT.md                   this file
   .github/workflows/itch.yml  tests, builds, and uploads the game to itch.io when main changes
+  server/                     the game's server: docker-compose.yml (Nakama and PostgreSQL), modules/ (its rules, and the town), README.md
   CREDITS.md                  third-party assets and licenses (create when first needed)
   docs/
     learning-notes.md         plain-language notes on new concepts, added after every job
@@ -1033,7 +1142,8 @@ kayayo/                       repo root
     vehicles/                 vehicles.blend and vehicles_preview.png; the drawings they follow (not in git)
   gold-coast/                 the Godot project (res://)
     project.godot
-    autoload/                 global singletons, e.g. game_state.gd (money, time, needs, rent, saving)
+    addons/                   code from others: com.heroiclabs.nakama/ (the Nakama client)
+    autoload/                 global singletons, e.g. game_state.gd (money, time, needs, rent, saving), online.gd (accounts)
     scenes/
       main/                   main.tscn, the entry point that assembles the world
       player/                 player.tscn + player.gd
@@ -1046,7 +1156,8 @@ kayayo/                       repo root
       vehicles/               vehicle.gd (driving), trotro.gd, car.gd (the Uber), later taxis
       places/                 chop_bar_shop.tscn, home.tscn, market.tscn, trotro_station.gd, training_college.tscn,
                               school.tscn, momo_kiosk.tscn: what happens at each place
-      ui/                     hud.tscn, phone.tscn, menu_board.gd, floating labels, later more menus
+      ui/                     hud.tscn, phone.tscn, menu_board.gd, floating labels, account_screen.gd, later more menus
+      online/                 town_players.gd and remote_player.gd: the other players in the shared town
       effects/                move_marker.tscn (the ring where you click), later other effects
     scripts/                  shared helpers not tied to one scene, e.g. shapes.gd, format.gd, food.gd, delivery.gd, course.gd
     art/
@@ -1125,10 +1236,27 @@ that can follow them to any computer as a cloud save.
 - [ ] **Job 17: On itch.io.** A private, password-protected page first, with
   screenshots and the controls, and the steps for uploading new versions.
   *Test:* on another computer: play, save, close the browser, and continue.
-- [ ] **Job 18: Cloud saves.** Sign in, and your save follows you to any
-  computer: every save is also uploaded, and Continue offers the newer save. It
-  still works without the internet. Then the itch.io page goes public.
-  *Test:* save on one computer and continue on another.
+- [ ] **Job 18: Accounts and one shared town, with Nakama.** An account card
+  like a sign-up page (name, username, password, email, date of birth, 18+ and
+  the terms), cloud saves that follow you to any computer, and one shared Gold
+  Coast where everyone online sees each other. It still works without the
+  internet. *Test:* sign up, save on one computer, and continue on another;
+  two players see each other walk around.
+
+**Phase three: Coaster Life** (planned on 2026-10-30, with Job 18's cloud saves
+paused). The life design on the design board (`design/`, see its README) comes
+into the game one job at a time: all twelve needs and what she wants, what she
+can become (skills, people, a good name, papers, the life map, choices), a
+living world, and a whole life that can start from a toddler alone at the
+market. Today's game becomes the "New in town" start. A tutorial teaches as you
+play (a tip card the first time something matters, an arrow, and goals), and
+every job adds its own lessons.
+- [ ] **Jobs 19 to 41.** Each job's goal, steps, tutorial lessons, test, and
+  questions to ask first are on the board's Build plan tab (kept in
+  `design/coaster_life.json` under `jobs`, with the lessons under `tutorial`).
+  To do one: read its entry there, follow the rules in section 5, and mark it
+  done on the board. Job 19 moves the design file into the game, as
+  `gold-coast/data/coaster_life.json`.
 
 **Later: Make it look like Ghana**
 - [ ] **Job 10: Color bible.** Built from one reference image I choose, with a
@@ -1610,40 +1738,45 @@ doesn't need it) or mobile option. The page's tagline and description are in
 4. **Tests:** open the link on a different computer, play, save, close the
    browser, open it again, and continue.
 
+**Still to do:** the password-protected page, screenshots, and the test on
+another computer (left for later, as I moved on to Job 18).
+
 **Done when:** the private link works on another computer.
 
-### Job 18: Cloud saves
-**Goal:** sign in once, and carry on from any computer.
-1. **Decide together first:**
-   - the online service: Firebase or Supabase. Both have free plans.
-     Firebase's free projects keep running; Supabase's go to sleep after a
-     week with nobody using them, until you wake them in its dashboard.
-   - how players sign in: an email and a password (they can reset a
-     forgotten password), or a save code the game makes (no personal data,
-     but losing the code means losing the cloud save)
-2. **The service:** I make the free project, following the AI's steps. The game
-   only holds its public key. The service's rules make sure each player can
-   read and write only their own save.
-3. **In the game:**
-   - Sign up, Sign in, and Sign out on the title screen and in the pause menu
-   - a little cloud on the phone showing whether the save is up to date
-4. **Saving:** every save (the Save button and bed) also goes to the cloud.
-   Continue fetches the cloud save and uses the newer one, asking if they
-   differ.
-5. **Offline:** with no internet, the game carries on with the browser's save
-   and uploads it later.
-6. **Privacy:** only the email (if used) and the save are stored. There's a
-   button to delete your cloud save, and a short privacy note on the itch.io
-   page.
-7. **Tests:**
-   - automated, with a pretend service (no internet needed): signing in (and
-     failing), uploading, downloading, choosing the newer save, and working
-     offline
-   - a check on the real service from two computers
-8. **Then** the itch.io page goes public.
+### Job 18: Accounts and one shared town, with Nakama (current)
+**Goal:** an account, a save that follows you, and one Gold Coast for everyone
+online. Decided on 2026-10-30: Nakama (built for multiplayer, with an official
+Godot client) instead of Supabase or Firebase; an account card like the one in
+my "Lagos Life" picture; everyone who signs up lives in the same town.
+1. **The server on this computer** (done, part 1): Nakama and PostgreSQL in
+   Docker, with Gold Coast's rules for new accounts (`server/`).
+2. **The account card** (done, part 1): Create account (your name; a username,
+   her name in town; a password with an eye; an email that can't be changed;
+   your date of birth; "I'm 18+ and I agree to the Terms, Community
+   Guidelines, Privacy Policy and Disclaimer, Child safety"; "Sign up · it's
+   free") and Log in, with "Play offline" for single player in the browser.
+   The five pages are first drafts (`scripts/legal.gd`) to review before
+   going public.
+3. **Cloud saves, local first:** every save goes to the browser first, then a
+   copy to Nakama's storage in the background. Logging in on another computer
+   brings the save; if two saves differ, it asks which to keep. A little
+   cloud on the phone shows whether the save is up to date. With no internet,
+   it uploads later.
+4. **One shared town** (done, parts 2 and 3): everyone logged in is in the
+   same Gold Coast, at the same time of day. You see other players walking
+   around, in their own colors, with their usernames over their heads. Each
+   player keeps their own money and progress. Online, time never skips:
+   sleeping is a quick rest, and activities don't speed up the clock.
+5. **Tests:** automated, with a pretend server (no internet), and by hand with
+   the server on this computer and two browser windows.
 
-**Done when:** you can save on one computer and continue on another, and the
-tests pass.
+**Later (before the itch.io page goes public):** the server on the internet
+(a rented server, a domain, HTTPS, and its own passwords and server key);
+confirmation and password-reset emails (Nakama doesn't send emails, so the
+server needs code and an email sender); a lawyer's look at the five pages.
+
+**Done when:** you can sign up, save on one computer and continue on another,
+two players see each other walk around town, and the tests pass.
 
 ## 9. Report format (end of every job)
 1. **What I built:** 2–3 sentences

@@ -1,0 +1,2141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coaster Life · Gold Coast</title>
+<!--
+  Coaster Life: Gold Coast's design board. Everything on it comes from coaster_life.json (next to this file),
+  and every change made on it goes back into that file. See design/README.md for how to open it.
+-->
+<style>
+:root {
+  --paper: #faf4e8; --paper-2: #f2e7d2; --card: #fffcf6; --ink: #2b211a; --ink-2: #5c4b3d; --muted: #8a7766;
+  --line: #e8dcc6; --gold: #e3a21a; --gold-soft: #f8e6b8; --green: #1d6b3a; --green-soft: #dcefe0;
+  --red: #b23a2e; --red-soft: #f7dfda; --head-h: 112px;
+  --shadow: 0 1px 2px rgba(70, 45, 20, .07), 0 8px 24px rgba(70, 45, 20, .07);
+  --shadow-lift: 0 2px 4px rgba(70, 45, 20, .1), 0 16px 36px rgba(70, 45, 20, .14);
+  --r: 14px;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink); font: 15px/1.55 var(--sans);
+  background:
+    radial-gradient(1100px 520px at 105% -8%, rgba(227, 162, 26, .11), transparent 62%),
+    radial-gradient(900px 520px at -8% 108%, rgba(29, 107, 58, .08), transparent 62%),
+    var(--paper);
+  background-attachment: fixed;
+}
+h1, h2, h3 { font-family: var(--serif); margin: 0; line-height: 1.18; font-weight: 700; }
+h2 { font-size: 28px; }
+h3 { font-size: 18.5px; }
+h4 { margin: 16px 0 7px; font: 700 11.5px/1.3 var(--sans); text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+p { margin: 0 0 10px; }
+ul { margin: 0; padding-left: 18px; }
+code { font: 12.5px var(--mono); background: var(--paper-2); padding: 1px 5px; border-radius: 5px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+input, select, textarea { font: inherit; color: inherit; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.spacer { flex: 1; }
+[hidden] { display: none !important; }
+
+/* ---------- the top bar ---------- */
+header.top {
+  position: sticky; top: 0; z-index: 30; border-bottom: 1px solid var(--line);
+  background: rgba(250, 244, 232, .9); backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px);
+}
+.kente {
+  height: 12px; position: relative;
+  background: repeating-linear-gradient(90deg, #1c1a17 0 8px, #e3a21a 8px 30px, #1d6b3a 30px 38px, #e3a21a 38px 60px, #b23a2e 60px 68px, #e3a21a 68px 90px);
+}
+.kente::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .2) 0 2px, transparent 2px 4px); }
+.kente::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 88px, #1c1a17 88px 90px); }
+.bar { display: flex; align-items: center; gap: 10px; padding: 12px 24px 6px; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.logo { width: 42px; height: 42px; flex: none; filter: drop-shadow(0 2px 4px rgba(60, 40, 20, .18)); }
+.brand h1 { font-size: 23px; }
+.brand .sub { margin: 1px 0 0; font-size: 13px; color: var(--muted); max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tabs { display: flex; gap: 4px; padding: 4px 20px 10px; overflow-x: auto; scrollbar-width: none; }
+.tab { border: 0; background: none; padding: 7px 15px; border-radius: 999px; font-weight: 650; font-size: 14px; color: var(--ink-2); white-space: nowrap; transition: background .15s, color .15s; }
+.tab:hover { background: var(--paper-2); }
+.tab.on { background: var(--ink); color: #fff6df; }
+body.welcoming .tabs, body.welcoming .bar .status, body.welcoming .bar .btn { display: none; }
+
+/* ---------- buttons, chips, pills ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--card);
+  padding: 7px 13px; border-radius: 10px; font-size: 14px; font-weight: 650; color: var(--ink-2);
+  transition: transform .12s, box-shadow .12s, background .12s;
+}
+.btn:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.btn:disabled { opacity: .4; cursor: default; transform: none; box-shadow: none; }
+.btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+.btn.gold { background: var(--gold); border-color: #c98c10; color: var(--ink); }
+.btn.danger { color: var(--red); border-color: #ecc8c2; }
+.btn.small { padding: 4px 10px; font-size: 12.5px; border-radius: 8px; }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.ghost:hover { background: var(--paper-2); box-shadow: none; }
+.status { font-size: 12.5px; padding: 5px 11px; border-radius: 999px; background: var(--paper-2); color: var(--ink-2); font-weight: 650; white-space: nowrap; border: 0; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.status.ok { background: var(--green-soft); color: var(--green); }
+.status.dirty { background: var(--gold-soft); color: #845400; }
+.status.bad { background: var(--red-soft); color: var(--red); }
+button.status:hover { filter: brightness(.97); }
+.chip {
+  --c: #8a7766; display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 650; white-space: nowrap; line-height: 1.6;
+  background: color-mix(in srgb, var(--c) 13%, white); color: color-mix(in srgb, var(--c) 78%, black);
+  border: 1px solid color-mix(in srgb, var(--c) 26%, white);
+}
+button.chip { cursor: pointer; transition: transform .1s, box-shadow .1s; }
+button.chip:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(60, 40, 20, .12); }
+.chip.on, .chip.toggle.on { background: var(--c); color: #fff; border-color: var(--c); }
+.chip.toggle:not(.on) { --c: #8a7766; }
+.chip.bad { --c: var(--red); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pills { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: middle; }
+.pill { display: inline-block; padding: 1px 7px; border-radius: 6px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill.up { background: #dcefe0; color: #1d6b3a; }
+.pill.down { background: #f7dfda; color: #a3352a; }
+.pill.cedi { background: #f8e6b8; color: #7a5200; }
+.pill.cost { background: #efe6d6; color: #6b5640; }
+.pill i { font-style: normal; opacity: .65; font-weight: 600; margin-left: 3px; }
+.lock { border: 0; background: none; padding: 0; font-size: 12px; color: var(--muted); white-space: nowrap; }
+button.lock:hover { color: var(--green); text-decoration: underline; }
+.warn-note { font-size: 13px; background: #fbf0dd; border-radius: 9px; padding: 7px 10px; color: #7a4b00; margin: 8px 0; }
+.hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
+
+/* ---------- page layout ---------- */
+main { padding: 26px 28px 90px; max-width: 1440px; margin: 0 auto; }
+main.wide { max-width: none; padding: 0; }
+.section { margin: 0 0 38px; }
+.section-head { display: flex; align-items: flex-end; gap: 14px; margin: 0 0 14px; flex-wrap: wrap; }
+.section-head p { margin: 4px 0 0; color: var(--muted); max-width: 820px; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(var(--min, 280px), 1fr)); }
+.card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; box-shadow: var(--shadow); }
+.card.accent { border-top: 4px solid var(--c, var(--gold)); }
+.card h3 { margin: 0 0 6px; padding-right: 26px; }
+.card.mini { padding: 12px 14px; }
+.card.mini p { margin: 4px 0 0; }
+.edit { position: absolute; top: 8px; right: 8px; opacity: 0; transition: opacity .15s; z-index: 2; }
+.card:hover > .edit, .stage:hover > .edit, .edit:focus { opacity: 1; }
+.flash { animation: flash 1.6s ease; }
+@keyframes flash { 0%, 40% { box-shadow: 0 0 0 4px var(--gold), var(--shadow-lift); } 100% { box-shadow: var(--shadow); } }
+.lead { font-size: 16.5px; color: var(--ink-2); max-width: 680px; }
+.eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+
+/* ---------- overview ---------- */
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 30px; align-items: center; margin-bottom: 30px; }
+.hero h2 { font-size: 44px; margin-bottom: 10px; }
+.proverb { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink-2); border-left: 4px solid var(--gold); padding: 4px 0 4px 16px; margin: 18px 0 0; }
+.proverb small { display: block; font: 13px/1.4 var(--sans); color: var(--muted); margin-top: 4px; }
+.loop svg { display: block; width: 100%; height: auto; }
+.systems { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 38px; }
+.system { cursor: pointer; transition: transform .15s, box-shadow .15s; padding-bottom: 46px; }
+.system:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+.system .q { font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--ink-2); margin: 4px 0 10px; }
+.sys-n { position: absolute; top: 14px; right: 16px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: #fff; font-weight: 800; }
+.stats { display: flex; gap: 20px; margin-top: 12px; }
+.stat b { display: block; font: 700 24px/1 var(--serif); }
+.stat span { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.system .go { position: absolute; bottom: 14px; right: 18px; font-weight: 700; color: var(--c); font-size: 14px; }
+.dim-icon { font-size: 26px; line-height: 1; margin-bottom: 8px; }
+.stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
+.stage { position: relative; padding: 16px; color: #fff; background: var(--c); min-height: 150px; }
+.stage b { display: block; font: 700 19px/1.2 var(--serif); }
+.stage .ages { font-size: 12px; opacity: .85; }
+.stage p { font-size: 13px; margin: 8px 0 0; opacity: .95; }
+.stage .edit { color: #fff; }
+.help p { margin: 0 0 8px; }
+
+/* ---------- needs and the simulator ---------- */
+.tier { margin-bottom: 26px; }
+.tier-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.tier-head .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); align-self: center; }
+.need { border-top: 4px solid var(--c); }
+.need-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.need-top .icon, .trait-top .icon { font-size: 28px; line-height: 1; }
+.need-top h3 { margin: 0; }
+.local { font: italic 14px var(--serif); color: var(--muted); }
+.decay { display: flex; align-items: flex-end; gap: 3px; height: 34px; margin: 10px 0 4px; }
+.decay i { flex: 1; min-height: 2px; border-radius: 3px 3px 0 0; background: color-mix(in srgb, var(--c) 28%, white); }
+.decay i.on { background: var(--c); }
+.ways { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+.ways li { display: flex; gap: 7px; align-items: center; padding: 4px 0; border-top: 1px dashed var(--line); }
+.ways li .lock { margin-left: auto; }
+.trait-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.trait-top h3 { margin: 0; }
+.sim { display: grid; grid-template-columns: minmax(300px, 360px) 1fr; gap: 16px; align-items: start; }
+.sim-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; font-size: 13px; }
+.sim-row label { font-weight: 650; color: var(--ink-2); }
+.sim-row input.num { width: 76px; }
+.sim input[type=number], .sim input[type=time], .sim select, .filters select {
+  border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 4px 8px; font-size: 13px;
+}
+.sliders { display: grid; gap: 2px; margin: 6px 0 4px; }
+.slider { display: grid; grid-template-columns: 22px 84px 1fr 30px; align-items: center; gap: 6px; font-size: 13px; }
+.slider input { width: 100%; accent-color: var(--c); }
+.slider b { text-align: right; font-variant-numeric: tabular-nums; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+.sim-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.sim-head .clock { font: 700 18px var(--serif); }
+.choice { display: grid; grid-template-columns: 26px 1fr 130px; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; border: 1px solid transparent; }
+.choice + .choice { margin-top: 2px; }
+.choice.top { background: #fdf3da; border-color: #f2dda4; }
+.choice.locked { opacity: .6; }
+.choice .rank { font: 700 15px var(--serif); color: var(--muted); text-align: center; }
+.choice .parts { margin-top: 3px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.score { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; }
+.score .bar { flex: 1; height: 8px; border-radius: 4px; background: var(--paper-2); overflow: hidden; }
+.score .bar i { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--gold), var(--green)); }
+details.more { margin-top: 10px; }
+details.more summary { cursor: pointer; font-size: 13px; color: var(--muted); font-weight: 650; padding: 6px 2px; }
+.log { list-style: none; margin: 0; padding: 0; max-height: 340px; overflow: auto; font-size: 13px; border-top: 1px solid var(--line); }
+.log li { display: grid; grid-template-columns: 74px 1fr; gap: 8px; padding: 6px 2px; border-bottom: 1px solid var(--line); }
+.log time { font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.log .empty { color: var(--red); font-weight: 650; }
+.routine ol { list-style: none; margin: 8px 0 0; padding: 0; border-left: 2px solid color-mix(in srgb, var(--c) 40%, white); }
+.routine li { position: relative; padding: 3px 0 3px 14px; font-size: 13px; }
+.routine li::before { content: ""; position: absolute; left: -5px; top: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.routine li b { font-variant-numeric: tabular-nums; margin-right: 6px; }
+.mood { display: flex; gap: 10px; align-items: flex-start; }
+.mood .v { font: 700 15px var(--serif); min-width: 38px; text-align: center; padding: 2px 0; border-radius: 8px; }
+.mood .v.up { background: var(--green-soft); color: var(--green); }
+.mood .v.down { background: var(--red-soft); color: var(--red); }
+.numbers { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; font-size: 13px; }
+.numbers b { font-variant-numeric: tabular-nums; }
+</style>
+<style>
+/* ---------- the life map ---------- */
+.map-tools {
+  position: sticky; top: var(--head-h); z-index: 12; display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 10px 22px; background: rgba(250, 244, 232, .96); border-bottom: 1px solid var(--line);
+}
+.map-tools .search { border: 1px solid var(--line); background: #fff; border-radius: 9px; padding: 5px 10px; width: 190px; font-size: 13px; }
+.moneycheck { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+.moneycheck.ok { background: var(--green-soft); color: var(--green); }
+.moneycheck.bad { background: var(--red-soft); color: var(--red); }
+.zoom { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+.zoom span { min-width: 42px; text-align: center; }
+.map-scroll { position: relative; overflow: auto; cursor: grab; height: 70vh; background: #fbf7ee; }
+.map-scroll.panning { cursor: grabbing; user-select: none; }
+.map { position: relative; transform-origin: 0 0; }
+.map > svg { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.band { position: absolute; top: 0; background: color-mix(in srgb, var(--c) 6%, transparent); border-left: 1px dashed color-mix(in srgb, var(--c) 35%, transparent); }
+.col-head { position: absolute; top: 12px; padding: 4px 18px; }
+.col-head b { display: block; font: 700 19px/1.2 var(--serif); color: color-mix(in srgb, var(--c) 82%, black); }
+.col-head span { font-size: 12px; color: var(--muted); }
+.col-head::after { content: ""; display: block; width: 46px; height: 4px; border-radius: 2px; background: var(--c); margin-top: 6px; }
+.row-line { position: absolute; left: 0; border-top: 1px solid rgba(120, 90, 50, .13); }
+.row-label { position: absolute; left: 0; width: 150px; display: flex; align-items: center; padding: 0 12px 0 16px; }
+.row-label span { font-weight: 750; font-size: 13px; line-height: 1.25; padding-left: 9px; border-left: 4px solid var(--c); color: color-mix(in srgb, var(--c) 78%, black); }
+.node {
+  --c: #8a7766; position: absolute; width: 184px; height: 66px; display: flex; flex-direction: column; justify-content: space-between;
+  padding: 7px 10px 6px 11px; border-radius: 11px; cursor: pointer; background: #fffdf8;
+  border: 1.5px solid color-mix(in srgb, var(--c) 40%, white); border-left: 6px solid var(--c);
+  box-shadow: 0 1px 2px rgba(60, 40, 20, .08); transition: box-shadow .15s, transform .15s, opacity .2s;
+}
+.node:hover { box-shadow: var(--shadow-lift); transform: translateY(-1px); z-index: 3; }
+.node .nm { font-weight: 680; font-size: 13px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.node .req { display: flex; gap: 3px; font-size: 11.5px; line-height: 1; }
+.node .req span { opacity: .16; filter: grayscale(1); }
+.node .req span.on { opacity: 1; filter: none; }
+.node .tag { position: absolute; top: -9px; right: 8px; font-size: 10px; font-weight: 800; letter-spacing: .06em; padding: 1px 7px; border-radius: 999px; background: var(--gold); color: var(--ink); }
+.node .tag.warn { background: var(--red); color: #fff; }
+.node .tag.age { background: #efe4cf; color: #6b5640; }
+.node.start { background: linear-gradient(135deg, #fff3d2, #fffdf8 70%); border-color: var(--gold); }
+.node.sel { box-shadow: 0 0 0 3px var(--gold), var(--shadow-lift); z-index: 4; }
+.node.path { box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 65%, white); }
+.node.dim { opacity: .25; }
+.edge { fill: none; stroke: #cdb995; stroke-width: 1.7; transition: opacity .2s; }
+.edge.any { stroke-dasharray: 5 5; }
+.edge.hot { stroke: var(--gold); stroke-width: 2.8; }
+.edge.dim { opacity: .15; }
+.below { padding: 30px 28px 90px; max-width: 1440px; margin: 0 auto; }
+.ladder { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.rung { padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 13.5px; color: #fff; background: color-mix(in srgb, #c2507a calc(35% + var(--i) * 16%), #e9c9b0); }
+.ladder .arrow { color: var(--muted); }
+
+/* ---------- the drawer (one step, or its form) ---------- */
+.drawer {
+  position: fixed; top: var(--head-h); right: 0; bottom: 0; width: 440px; max-width: 94vw; z-index: 40; overflow-y: auto;
+  padding: 18px 24px 40px; background: var(--card); border-left: 1px solid var(--line); box-shadow: -12px 0 40px rgba(60, 40, 20, .13);
+  transform: translateX(105%); transition: transform .25s ease;
+}
+.drawer.open { transform: none; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.d-title { font-size: 26px; margin: 10px 0 8px; }
+.d-summary { font: 16px/1.5 var(--serif); color: var(--ink-2); }
+.req-group { display: grid; grid-template-columns: 30px 1fr; gap: 4px 6px; padding: 8px 10px; margin: 6px 0; border-radius: 10px; background: color-mix(in srgb, var(--c) 8%, white); }
+.req-group .ri { font-size: 18px; line-height: 1.3; }
+.req-group b { font-size: 13px; color: color-mix(in srgb, var(--c) 80%, black); }
+.req-group ul { font-size: 14px; }
+.drawer-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 12px; }
+.unlocks li { margin: 2px 0; }
+.form label { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink-2); margin: 13px 0 4px; }
+.form label.check { display: flex; font-weight: 500; margin-top: 8px; }
+.form input[type=text], .form select, .form textarea {
+  width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 9px; padding: 7px 10px; font-size: 14px;
+}
+.form textarea { resize: vertical; min-height: 64px; }
+.form input:focus, .form select:focus, .form textarea:focus, .search:focus { outline: 2px solid var(--gold); outline-offset: 0; border-color: var(--gold); }
+.req-row { display: grid; grid-template-columns: 150px 1fr 30px; gap: 6px; margin-bottom: 6px; }
+.mix { display: flex; align-items: center; gap: 4px; margin: 8px 0 0; font-size: 15px; }
+.mix span { opacity: .18; filter: grayscale(1); }
+.mix span.on { opacity: 1; filter: none; }
+.mix .small { opacity: 1; filter: none; margin-left: 6px; }
+.form-error { color: var(--red); font-weight: 650; font-size: 13.5px; min-height: 1px; margin: 10px 0 0; }
+
+/* ---------- modal and toast ---------- */
+.modal-back { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; background: rgba(43, 33, 26, .38); backdrop-filter: blur(3px); }
+.modal { width: min(740px, 100%); max-height: calc(100vh - 48px); overflow: auto; padding: 22px 24px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow-lift); }
+.modal h3 { font-size: 22px; margin-bottom: 8px; }
+.modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+textarea.json { width: 100%; min-height: 380px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fffef9; font: 13px/1.5 var(--mono); tab-size: 2; resize: vertical; }
+textarea.json.big { min-height: 70vh; }
+ul.checks { list-style: none; padding: 0; margin: 10px 0 0; }
+ul.checks li { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.toast { position: fixed; left: 50%; bottom: 22px; z-index: 70; padding: 9px 18px; border-radius: 999px; background: var(--ink); color: #fff6df; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transform: translate(-50%, 16px); transition: .25s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- world ---------- */
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.links div { padding: 4px 0 4px 14px; border-left: 3px solid var(--c); font-size: 14px; }
+.place-top { display: flex; flex-direction: column; margin-bottom: 8px; }
+.acts { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+.acts li { padding: 5px 0; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+table.t { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); font-size: 13.5px; }
+.t th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); background: var(--paper-2); padding: 9px 12px; }
+.t td { padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+.t tr:hover td { background: #fffaf0; }
+.t .risk { color: #9a5b00; margin-top: 3px; }
+.who { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.avatar { width: 46px; height: 46px; flex: none; border-radius: 50%; display: grid; place-items: center; font: 700 16px var(--serif); color: #fff; background: conic-gradient(#e3a21a 0 25%, #1d6b3a 0 50%, #b23a2e 0 75%, #1c1a17 0); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .85); text-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
+.who h3 { margin: 0; }
+.line { font: italic 15px var(--serif); color: var(--ink-2); margin: 6px 0 8px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; padding: 8px 0; border-top: 1px dashed var(--line); font-size: 13.5px; }
+.odds { flex: none; font-size: 11.5px; font-weight: 750; padding: 2px 8px; border-radius: 999px; max-width: 46%; text-align: right; }
+.odds.safe { background: var(--green-soft); color: var(--green); }
+.odds.risky { background: var(--gold-soft); color: #845400; }
+.odds.gated { background: #f4dde6; color: #8d2f57; }
+.rhythm .when { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+
+/* ---------- story ---------- */
+.chapters { position: relative; padding-left: 40px; max-width: 980px; }
+.chapters::before { content: ""; position: absolute; left: 15px; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: linear-gradient(var(--gold), var(--green)); }
+.chapter { position: relative; margin-bottom: 14px; }
+.ch-dot { position: absolute; left: -40px; top: 16px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: #fff; font-weight: 800; box-shadow: 0 0 0 4px var(--paper); }
+.beats { margin: 4px 0 0; font-size: 14px; }
+.beats li { margin: 3px 0; }
+textarea.notes { width: 100%; min-height: 220px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); font: 16px/1.6 var(--serif); resize: vertical; }
+
+/* ---------- data and the welcome screen ---------- */
+.data-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
+.data-grid .side h3 { margin-top: 4px; }
+.sections { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+.sections li { padding: 4px 0; border-top: 1px dashed var(--line); }
+pre.sample { font: 12px/1.5 var(--mono); background: #2b211a; color: #f8e6b8; padding: 12px 14px; border-radius: 10px; overflow: auto; }
+.welcome { max-width: 760px; margin: 30px auto; padding: 30px 34px; }
+.welcome h2 { font-size: 36px; }
+.way { display: grid; grid-template-columns: 40px 1fr; gap: 12px; margin: 18px 0; }
+.way > b { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); font: 700 16px var(--serif); }
+code.cmd { display: block; margin: 6px 0; padding: 10px 14px; border-radius: 10px; background: #2b211a; color: #f8e6b8; font: 13px/1.5 var(--mono); user-select: all; }
+.loading { text-align: center; color: var(--muted); margin-top: 80px; font: italic 18px var(--serif); }
+
+@media (max-width: 1100px) {
+  .hero, .data-grid, .sim { grid-template-columns: 1fr; }
+  .systems { grid-template-columns: 1fr; }
+}
+</style>
+<style>
+/* ---------- the build plan and the tutorial ---------- */
+.plan-top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.progress { flex: 1; min-width: 200px; height: 10px; border-radius: 5px; background: var(--paper-2); overflow: hidden; }
+.progress i { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--gold), var(--green)); }
+.job { display: flex; flex-direction: column; gap: 9px; border-left: 5px solid var(--jc, #d8c8a8); }
+.job.done { --jc: var(--green); }
+.job.doing { --jc: var(--gold); box-shadow: 0 0 0 2px var(--gold-soft), var(--shadow); }
+.job.later { --jc: #b9a587; }
+.job-head { display: flex; gap: 12px; align-items: flex-start; }
+.job-head p { margin: 2px 0 0; color: var(--ink-2); }
+.job-n { flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font: 700 18px var(--serif); background: var(--paper-2); color: var(--ink-2); }
+.job.done .job-n { background: var(--green-soft); color: var(--green); }
+.job.doing .job-n { background: var(--gold-soft); color: #845400; }
+.job-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.status-chip { border: 0; border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 750; background: var(--paper-2); color: var(--ink-2); }
+.status-chip.done { background: var(--green); color: #fff; }
+.status-chip.doing { background: var(--gold); color: var(--ink); }
+.status-chip.later { background: #e9dfcc; color: #6b5640; }
+.uses { display: grid; grid-template-columns: 92px 1fr; gap: 6px; align-items: start; }
+.uses > .small { padding-top: 3px; }
+ol.builds { margin: 6px 0 2px; padding-left: 20px; font-size: 13.5px; }
+ol.builds li { margin: 5px 0; }
+.ask { margin: 0; padding: 7px 10px; border-radius: 9px; background: #f1eaff; color: #4b2f8a; }
+.job-chip.done { --c: #1d6b3a; }
+.job-chip.doing { --c: #b07a08; }
+.job-chip.todo { --c: #7a4fd0; }
+.job-chip.later { --c: #8a7766; }
+.lessons { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.lesson { display: flex; flex-direction: column; gap: 8px; }
+.tip { position: relative; display: flex; gap: 12px; padding: 14px 40px 14px 14px; border-radius: 14px; background: linear-gradient(#fff9e8, #fbeed0);
+  border: 2px solid #5a3220; box-shadow: 0 3px 0 #5a3220, var(--shadow); }
+.tip b { font: 700 17px var(--serif); }
+.tip p { margin: 4px 0 0; font-size: 14px; color: var(--ink-2); }
+.tip-n { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); font-weight: 800; font-size: 13px; }
+.tip:hover > .edit { opacity: 1; }
+</style>
+</head>
+<body class="welcoming">
+<header class="top" id="top">
+  <div class="kente"></div>
+  <div class="bar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="21" fill="#1d6b3a"/>
+        <path d="M8 25 a14 14 0 0 1 28 0 z" fill="#e3a21a"/>
+        <path d="M6 30 q4 -3 8 0 t8 0 t8 0 t8 0" fill="none" stroke="#fff6df" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M9 35.5 q3.25 -2.4 6.5 0 t6.5 0 t6.5 0 t6.5 0" fill="none" stroke="#fff6df" stroke-width="1.8" stroke-linecap="round" opacity=".7"/>
+      </svg>
+      <div><h1>Coaster Life</h1><p class="sub" id="subtitle">Gold Coast's life design</p></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="status" id="checks" data-act="checks" title="Checks every link in the design" hidden></button>
+    <span class="status" id="status"></span>
+    <button class="btn small" id="undoBtn" data-act="undo" title="Undo (⌘Z)">↶ Undo</button>
+    <button class="btn small" id="redoBtn" data-act="redo" title="Redo (⇧⌘Z)">↷</button>
+    <button class="btn small primary" id="saveBtn" data-act="save" title="Save (⌘S)">Save</button>
+  </div>
+  <nav class="tabs">
+    <button class="tab" data-act="tab" data-tab="overview">Overview</button>
+    <button class="tab" data-act="tab" data-tab="needs">Needs &amp; behaviour</button>
+    <button class="tab" data-act="tab" data-tab="progress">Life progression</button>
+    <button class="tab" data-act="tab" data-tab="world">World</button>
+    <button class="tab" data-act="tab" data-tab="story">Story</button>
+    <button class="tab" data-act="tab" data-tab="tutorial">Tutorial</button>
+    <button class="tab" data-act="tab" data-tab="plan">Build plan</button>
+    <button class="tab" data-act="tab" data-tab="data">Data</button>
+  </nav>
+</header>
+<main id="main"><p class="loading">Opening the design…</p></main>
+<aside class="drawer" id="drawer" aria-label="One step in life"></aside>
+<div id="modal"></div>
+<div class="toast" id="toast" role="status"></div>
+<input type="file" id="fileInput" accept=".json,application/json" hidden data-change="file-input">
+<script>
+'use strict';
+const FILE = 'coaster_life.json';
+const BACKUP_KEY = 'coaster-life-backup';
+const WIDTH = 100;                                  // pretty() keeps a [...] or {...} on one line if it fits in this
+const NODE_W = 184, NODE_H = 66, GAP_X = 34, GAP_Y = 14; // the life map's steps, and the space between them
+const LEFT = 172, TOP = 80, STAGE_PAD = 24, ROW_PAD = 16;
+
+/* ================= The logic: nothing here touches the page ================= */
+
+const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function byId(list) {
+  const m = Object.create(null);
+  for (const x of list || []) if (x && x.id !== undefined && !(x.id in m)) m[x.id] = x;
+  return m;
+}
+const slug = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
+function uniqueId(base, taken) {
+  base = base || 'new';
+  let id = base, n = 2;
+  while (taken.has(id)) id = `${base}_${n++}`;
+  return id;
+}
+const hhmm = m => {
+  m = ((Math.round(m) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+};
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+// The JSON file's layout: short lists and objects on one line, long ones one item a line.
+function inline(v) {
+  if (Array.isArray(v)) return '[' + v.map(x => x === undefined ? 'null' : inline(x)).join(', ') + ']';
+  if (v && typeof v === 'object') {
+    const keys = Object.keys(v).filter(k => v[k] !== undefined);
+    return keys.length ? '{' + keys.map(k => JSON.stringify(k) + ': ' + inline(v[k])).join(', ') + '}' : '{}';
+  }
+  return JSON.stringify(v) ?? 'null';
+}
+function pretty(v, indent = '', used = 0) {
+  const one = inline(v);
+  if (!v || typeof v !== 'object' || indent.length + used + one.length <= WIDTH) return one;
+  const inner = indent + '  ';
+  const items = Array.isArray(v)
+    ? v.map(x => inner + (x === undefined ? 'null' : pretty(x, inner)))
+    : Object.keys(v).filter(k => v[k] !== undefined).map(k => {
+        const key = JSON.stringify(k) + ': ';
+        return inner + key + pretty(v[k], inner, key.length);
+      });
+  if (!items.length) return one;
+  return (Array.isArray(v) ? '[' : '{') + '\n' + items.join(',\n') + '\n' + indent + (Array.isArray(v) ? ']' : '}');
+}
+
+// ---- the life map's links ----
+const isMoneyOnly = o => {
+  const kinds = (o.requires || []).map(r => r.kind);
+  return kinds.length > 0 && kinds.every(k => k === 'resources');
+};
+const reqsOf = a => [].concat(a.requires || []).filter(Boolean); // the step that opens an action (any one, if there are several)
+const childrenOf = (d, id) => d.opportunities.filter(o => (o.after || []).includes(id));
+function ancestors(d, id) {
+  const m = byId(d.opportunities), seen = new Set(), todo = [id];
+  while (todo.length) {
+    const o = m[todo.pop()];
+    for (const p of (o && o.after) || []) if (!seen.has(p)) { seen.add(p); todo.push(p); }
+  }
+  seen.delete(id);
+  return seen;
+}
+function descendants(d, id) {
+  const kids = {};
+  for (const o of d.opportunities) for (const p of o.after || []) (kids[p] = kids[p] || []).push(o.id);
+  const seen = new Set(), todo = [id];
+  while (todo.length) for (const k of kids[todo.pop()] || []) if (!seen.has(k)) { seen.add(k); todo.push(k); }
+  seen.delete(id);
+  return seen;
+}
+// A branch: the step, and every step after it that would have nothing left before it.
+function branchOf(d, id) {
+  const gone = new Set([id]);
+  for (let grew = true; grew;) {
+    grew = false;
+    for (const o of d.opportunities) {
+      const after = o.after || [];
+      if (!gone.has(o.id) && after.length && after.every(p => gone.has(p))) { gone.add(o.id); grew = true; }
+    }
+  }
+  return gone;
+}
+// Takes steps out of the design, and every link to them.
+function removeOpps(d, ids) {
+  const gone = new Set(ids);
+  d.opportunities = d.opportunities.filter(o => !gone.has(o.id));
+  for (const o of d.opportunities) if (o.after) o.after = o.after.filter(p => !gone.has(p));
+  for (const a of d.achievements || []) a.unlocks = (a.unlocks || []).filter(x => !gone.has(x));
+  for (const c of d.story?.chapters || []) c.goals = (c.goals || []).filter(x => !gone.has(x));
+  for (const s of d.story?.origins || []) {
+    s.firstGoals = (s.firstGoals || []).filter(x => !gone.has(x));
+    if (gone.has(s.start)) s.start = '';
+  }
+  for (const a of d.actions || []) {
+    if (Array.isArray(a.requires)) a.requires = a.requires.filter(x => !gone.has(x));
+    else if (gone.has(a.requires)) a.requires = '';
+    if (gone.has(a.until)) a.until = '';
+  }
+  for (const s of d.story?.origins || []) if (s.alreadyDone) s.alreadyDone = s.alreadyDone.filter(x => !gone.has(x));
+  for (const j of d.jobs || []) if (j.uses?.steps) j.uses.steps = j.uses.steps.filter(x => !gone.has(x));
+}
+// Gives a step a new id, and every link to it.
+function renameOpp(d, from, to) {
+  if (from === to) return;
+  const swap = x => x === from ? to : x;
+  for (const o of d.opportunities) { if (o.id === from) o.id = to; if (o.after) o.after = o.after.map(swap); }
+  for (const a of d.achievements || []) a.unlocks = (a.unlocks || []).map(swap);
+  for (const c of d.story?.chapters || []) c.goals = (c.goals || []).map(swap);
+  for (const s of d.story?.origins || []) { s.firstGoals = (s.firstGoals || []).map(swap); if (s.start === from) s.start = to; }
+  for (const a of d.actions || []) {
+    if (Array.isArray(a.requires)) a.requires = a.requires.map(swap); else if (a.requires === from) a.requires = to;
+    if (a.until === from) a.until = to;
+  }
+  for (const s of d.story?.origins || []) if (s.alreadyDone) s.alreadyDone = s.alreadyDone.map(swap);
+  for (const j of d.jobs || []) if (j.uses?.steps) j.uses.steps = j.uses.steps.map(swap);
+}
+
+// Where each step goes on the map: life stages are columns, tracks are rows. Inside a stage, a step
+// that comes after another step of the same stage goes one place to the right of it.
+function layoutMap(d) {
+  const stages = d.lifeStages.map(s => s.id), tracks = d.tracks.map(t => t.id);
+  const opps = d.opportunities, n = opps.length, idx = {};
+  opps.forEach((o, i) => { if (!(o.id in idx)) idx[o.id] = i; });
+  const col = opps.map(o => { const i = stages.indexOf(o.stage); return i < 0 ? stages.length : i; });
+  const row = opps.map(o => { const i = tracks.indexOf(o.track); return i < 0 ? tracks.length : i; });
+  const sub = new Array(n).fill(-1), busy = new Array(n).fill(false);
+  const depth = i => {
+    if (sub[i] >= 0) return sub[i];
+    if (busy[i]) return 0; // a loop: the checks report it
+    busy[i] = true;
+    let k = 0;
+    for (const p of opps[i].after || []) {
+      const j = idx[p];
+      if (j !== undefined && j !== i && col[j] === col[i]) k = Math.max(k, depth(j) + 1);
+    }
+    busy[i] = false;
+    return (sub[i] = k);
+  };
+  for (let i = 0; i < n; i++) depth(i);
+  const nCols = stages.length + (col.includes(stages.length) ? 1 : 0);
+  const nRows = tracks.length + (row.includes(tracks.length) ? 1 : 0);
+  const subs = Array.from({ length: nCols }, (_, c) => 1 + Math.max(0, ...sub.filter((_, i) => col[i] === c)));
+  const colX = [], colW = [];
+  let x = LEFT;
+  for (let c = 0; c < nCols; c++) { colX.push(x); colW.push(subs[c] * (NODE_W + GAP_X) - GAP_X + STAGE_PAD * 2); x += colW[c]; }
+  const slots = {};
+  for (let i = 0; i < n; i++) (slots[`${col[i]},${row[i]},${sub[i]}`] ||= []).push(i);
+  const rowCount = new Array(nRows).fill(1);
+  for (const key in slots) { const r = +key.split(',')[1]; rowCount[r] = Math.max(rowCount[r], slots[key].length); }
+  const rowY = [], rowH = [];
+  let y = TOP;
+  for (let r = 0; r < nRows; r++) { rowY.push(y); rowH.push(rowCount[r] * (NODE_H + GAP_Y) - GAP_Y + ROW_PAD * 2); y += rowH[r]; }
+  // Fill the slots left to right; in each, the steps whose parents sit higher go first.
+  const px = new Array(n), py = new Array(n);
+  const keys = Object.keys(slots).map(k => k.split(',').map(Number)).sort((a, b) => a[0] - b[0] || a[2] - b[2] || a[1] - b[1]);
+  for (const [c, r, s] of keys) {
+    const list = slots[`${c},${r},${s}`];
+    const weight = i => {
+      const ys = (opps[i].after || []).map(p => idx[p]).filter(j => j !== undefined && py[j] !== undefined).map(j => py[j]);
+      return ys.length ? ys.reduce((a, b) => a + b, 0) / ys.length : -1;
+    };
+    const w = new Map(list.map(i => [i, weight(i)]));
+    list.sort((a, b) => w.get(a) - w.get(b) || a - b);
+    list.forEach((i, k) => { px[i] = colX[c] + STAGE_PAD + s * (NODE_W + GAP_X); py[i] = rowY[r] + ROW_PAD + k * (NODE_H + GAP_Y); });
+  }
+  const edges = [];
+  opps.forEach((o, i) => (o.after || []).forEach(p => {
+    const j = idx[p];
+    if (j !== undefined && j !== i) edges.push({ from: j, to: i, any: !!o.afterAny });
+  }));
+  return { px, py, idx, edges, colX, colW, rowY, rowH, nCols, nRows, width: x + 30, height: y + 30 };
+}
+function edgePath(x1, y1, x2, y2) {
+  if (x2 > x1 + 12) {
+    const dx = Math.max(28, (x2 - x1) / 2);
+    return `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`;
+  }
+  return `M${x1},${y1} C${x1 + 90},${y1 - 50} ${x2 - 90},${y2 - 50} ${x2},${y2}`; // drawn backwards: the checks say why
+}
+
+// ---- the checks: every link points somewhere, nothing loops, money alone opens nothing ----
+function lint(d) {
+  const out = [];
+  const add = (level, text, go) => out.push({ level, text, go });
+  const ids = (list, what) => {
+    const seen = new Set();
+    for (const x of list || []) {
+      if (!x || x.id === undefined || x.id === '') add('error', `A ${what} has no id.`);
+      else if (seen.has(x.id)) add('error', `Two ${what}s share the id "${x.id}".`);
+      else seen.add(x.id);
+    }
+    return seen;
+  };
+  const stages = ids(d.lifeStages, 'life stage'), tracks = ids(d.tracks, 'track'), dims = ids(d.dimensions, 'dimension');
+  const places = ids(d.places, 'place'), actions = ids(d.actions, 'action'), needs = ids(d.needs, 'need');
+  const traits = ids(d.traits, 'trait'), tiers = ids(d.needTiers, 'need tier');
+  ids(d.opportunities, 'step');
+  const achievements = ids(d.achievements, 'achievement'), events = ids(d.events, 'event'), coasters = ids(d.coasters, 'Coaster');
+  const skills = ids(d.skills, 'skill'), moodlets = ids(d.moodlets, 'moodlet');
+  const jobs = ids(d.jobs, 'job'), parts = ids(d.buildParts, 'part of the plan'), lessons = ids(d.tutorial, 'lesson');
+  const rels = new Set((d.relationshipTypes || []).map(r => r.id));
+  const order = Object.fromEntries((d.lifeStages || []).map((s, i) => [s.id, i]));
+  const m = byId(d.opportunities);
+  for (const o of d.opportunities || []) {
+    const go = { tab: 'progress', id: o.id }, nm = `"${o.name || o.id}"`;
+    if (!stages.has(o.stage)) add('error', `${nm} has a life stage that doesn't exist ("${o.stage}").`, go);
+    if (!tracks.has(o.track)) add('error', `${nm} has a track that doesn't exist ("${o.track}").`, go);
+    for (const p of o.after || []) {
+      if (p === o.id) add('error', `${nm} comes after itself.`, go);
+      else if (!m[p]) add('error', `${nm} comes after "${p}", and no step has that id.`, go);
+      else if (order[m[p].stage] > order[o.stage]) add('warn', `${nm} is ${o.stage}, but comes after "${m[p].name}", which is later in life (${m[p].stage}).`, go);
+    }
+    const kinds = new Set((o.requires || []).map(r => r.kind));
+    for (const k of kinds) if (!dims.has(k)) add('error', `${nm} asks for a kind of thing that doesn't exist ("${k}").`, go);
+    if (!o.start && kinds.size === 0) add('warn', `${nm} asks for nothing. What does it take?`, go);
+    if (isMoneyOnly(o)) add('warn', `Only money opens ${nm}. Add a skill, an education, a relationship, a reputation, or a choice.`, go);
+    if (o.where && !places.has(o.where)) add('error', `${nm} happens at "${o.where}", and no place has that id.`, go);
+  }
+  const state = {};
+  const visit = id => {
+    state[id] = 1;
+    for (const p of m[id]?.after || []) {
+      if (!m[p] || p === id) continue;
+      if (state[p] === 1) add('error', `"${m[id].name}" and "${m[p].name}" come after each other (a loop).`, { tab: 'progress', id });
+      else if (!state[p]) visit(p);
+    }
+    state[id] = 2;
+  };
+  for (const o of d.opportunities || []) if (!state[o.id]) visit(o.id);
+  for (const a of d.achievements || []) for (const u of a.unlocks || [])
+    if (!m[u]) add('error', `The achievement "${a.name}" helps open "${u}", and no step has that id.`, { tab: 'progress', id: 'achievements' });
+  for (const c of d.story?.chapters || []) {
+    if (!stages.has(c.stage)) add('error', `Chapter "${c.name}" has a life stage that doesn't exist ("${c.stage}").`, { tab: 'story', id: `chapter-${c.id}` });
+    for (const g of c.goals || []) if (!m[g]) add('error', `Chapter "${c.name}" has the goal "${g}", and no step has that id.`, { tab: 'story', id: `chapter-${c.id}` });
+  }
+  for (const s of d.story?.origins || []) {
+    if (s.start && !m[s.start]) add('error', `The start "${s.name}" begins at "${s.start}", and no step has that id.`, { tab: 'story', id: `origin-${s.id}` });
+    for (const g of s.firstGoals || []) if (!m[g]) add('error', `The start "${s.name}" has the goal "${g}", and no step has that id.`, { tab: 'story', id: `origin-${s.id}` });
+    for (const g of s.alreadyDone || []) if (!m[g]) add('error', `The start "${s.name}" begins with "${g}" done, and no step has that id.`, { tab: 'story', id: `origin-${s.id}` });
+  }
+  for (const a of d.actions || []) {
+    const go = { tab: 'world', id: `action-${a.id}` }, nm = `The action "${a.name || a.id}"`;
+    if (!places.has(a.place)) add('error', `${nm} happens at "${a.place}", and no place has that id.`, go);
+    for (const s of a.stages || []) if (!stages.has(s)) add('error', `${nm} lists a life stage that doesn't exist ("${s}").`, go);
+    for (const k of Object.keys(a.needs || {})) if (!needs.has(k)) add('error', `${nm} changes a need that doesn't exist ("${k}").`, go);
+    for (const x of reqsOf(a)) if (!m[x]) add('error', `${nm} opens with "${x}", and no step has that id.`, go);
+    if (a.until && !m[a.until]) add('error', `${nm} stops with "${a.until}", and no step has that id.`, go);
+    for (const x of a.days || []) if (!DAYS.includes(x)) add('error', `${nm} has a day the simulator doesn't know ("${x}"). Use ${DAYS.join(', ')}.`, go);
+    if (a.trait && !traits.has(a.trait)) add('error', `${nm} is for a trait that doesn't exist ("${a.trait}").`, go);
+    if (a.hours && !parseHours(a.hours)) add('warn', `${nm} has hours the simulator can't read ("${a.hours}"). Write them like "07:00 to 12:00".`, go);
+    if (a.earns && !(Array.isArray(a.earns) && a.earns.length === 2)) add('error', `${nm} earns something that isn't [least, most].`, go);
+  }
+  for (const t of d.traits || []) for (const l of t.likes || [])
+    if (!actions.has(l)) add('error', `The trait "${t.name}" likes "${l}", and no action has that id.`, { tab: 'needs', id: `trait-${t.id}` });
+  for (const p of d.places || []) for (const s of p.stages || [])
+    if (!stages.has(s)) add('error', `The place "${p.name}" lists a life stage that doesn't exist ("${s}").`, { tab: 'world', id: `place-${p.id}` });
+  for (const e of d.events || []) if (e.place && !places.has(e.place))
+    add('error', `The event "${e.name}" happens at "${e.place}", and no place has that id.`, { tab: 'world', id: `event-${e.id}` });
+  for (const c of d.coasters || []) {
+    const go = { tab: 'world', id: `coaster-${c.id}` };
+    if (c.place && !places.has(c.place)) add('error', `${c.name} lives at "${c.place}", and no place has that id.`, go);
+    for (const t of c.traits || []) if (!traits.has(t)) add('error', `${c.name} has a trait that doesn't exist ("${t}").`, go);
+    if (c.becomes && !rels.has(c.becomes)) add('error', `${c.name} can become "${c.becomes}", which isn't a kind of relationship.`, go);
+  }
+  const curves = d.decisionModel?.curves || {};
+  for (const n of d.needs || []) {
+    const go = { tab: 'needs', id: `need-${n.id}` };
+    if (!tiers.has(n.tier)) add('error', `The need "${n.name}" is in a tier that doesn't exist ("${n.tier}").`, go);
+    for (const s of Object.keys(n.decay || {})) if (!stages.has(s)) add('error', `The need "${n.name}" has a decay for a life stage that doesn't exist ("${s}").`, go);
+    if (!(n.curve in curves)) add('warn', `The need "${n.name}" has the curve "${n.curve}", which the decision model doesn't have.`, go);
+  }
+  for (const r of d.routines || []) {
+    const go = { tab: 'needs', id: `routine-${r.id}` };
+    if (!stages.has(r.stage)) add('error', `The routine "${r.name}" has a life stage that doesn't exist ("${r.stage}").`, go);
+    for (const e of r.schedule || []) for (const x of e.actions || [])
+      if (!actions.has(x)) add('error', `The routine "${r.name}" says "${x}" at ${e.time}, and no action has that id.`, go);
+  }
+  const kinds = { needs, steps: new Set(Object.keys(m)), actions, places, coasters, events, achievements, skills, moodlets };
+  for (const j of d.jobs || []) {
+    const go = { tab: 'plan', id: `job-${j.id}` }, nm = j.number ? `Job ${j.number}` : `"${j.title || j.id}"`;
+    if (!parts.has(j.part)) add('error', `${nm} is in a part of the plan that doesn't exist ("${j.part}").`, go);
+    for (const a of j.after || []) if (!jobs.has(a)) add('error', `${nm} comes after "${a}", and no job has that id.`, go);
+    for (const [kind, list] of Object.entries(j.uses || {})) {
+      if (!kinds[kind]) { add('error', `${nm} brings in a kind of thing the board doesn't know ("${kind}").`, go); continue; }
+      for (const x of list) if (!kinds[kind].has(x)) add('error', `${nm} brings in ${kind} "${x}", and nothing has that id.`, go);
+    }
+  }
+  const origins = new Set((d.story?.origins || []).map(o => o.id));
+  for (const l of d.tutorial || []) {
+    const go = { tab: 'tutorial', id: `lesson-${l.id}` }, nm = `The lesson "${l.title || l.id}"`;
+    if (l.origin && !origins.has(l.origin)) add('error', `${nm} is for a start that doesn't exist ("${l.origin}").`, go);
+    if (l.job && !jobs.has(l.job)) add('error', `${nm} comes with a job that doesn't exist ("${l.job}").`, go);
+    const [kind, rest = ''] = String(l.when || '').split(/:(.*)/s);
+    if (kind === 'after' && !lessons.has(rest.trim())) add('error', `${nm} comes after "${rest}", and no lesson has that id.`, go);
+    if (kind === 'need below' && !needs.has(rest.trim().split(/\s+/)[0])) add('error', `${nm} waits for a need that doesn't exist ("${rest}").`, go);
+    if (kind === 'arrive' && !places.has(rest.trim())) add('error', `${nm} waits for a place that doesn't exist ("${rest}").`, go);
+    const p = /^place:(.+)$/.exec(l.point || '');
+    if (p && !places.has(p[1])) add('error', `${nm} points at a place that doesn't exist ("${p[1]}").`, go);
+  }
+  return out;
+}
+
+// ---- needs and behaviour: how a Coaster decides what to do next ----
+function parseHours(s) {
+  const m = /(\d{1,2}):(\d{2})\s*(?:to|-|–)\s*(\d{1,2}):(\d{2})/.exec(s || '');
+  return m ? [m[1] * 60 + +m[2], m[3] * 60 + +m[4]] : null;
+}
+function isOpen(range, t) {
+  if (!range) return true;
+  const [a, b] = range;
+  t = ((t % 1440) + 1440) % 1440;
+  return a <= b ? t >= a && t < b : t >= a || t < b;
+}
+const comfortable = (model, stage) => {
+  const c = model.comfortableCedis;
+  return typeof c === 'number' ? c : (c && c[stage]) || 50;
+};
+const cedis = x => 5 * Math.log2(1 + Math.max(0, x) / 5); // what money is worth: more is better, but less and less so
+const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const dayOf = t => DAYS[((Math.floor(t / 1440) % 7) + 7) % 7]; // the simulator's day 1 is a Monday
+const isSleep = a => (a?.needs?.energy || 0) >= 40;
+// Sleep lasts until the Coaster is rested: the share of a sleep action they need now (a quarter at least).
+const restOf = (a, s) => isSleep(a) ? clamp((100 - (s.needs.energy ?? 100)) / a.needs.energy, 0.25, 1) : 1;
+// The line of the Coaster's routine for now (before the first line of the day, it's still last night's).
+function routineNow(d, s) {
+  const r = (d.routines || []).find(x => x.id === s.routine);
+  const mins = e => { const m = /^(\d{1,2}):(\d{2})/.exec(e.time || ''); return m ? m[1] * 60 + +m[2] : -1; };
+  const now = ((s.time % 1440) + 1440) % 1440;
+  let cur = null, last = null;
+  for (const e of r?.schedule || []) {
+    const m = mins(e);
+    if (m < 0) continue;
+    if (!last || m > mins(last)) last = e;
+    if (m <= now && (!cur || m > mins(cur))) cur = e;
+  }
+  return cur || last;
+}
+
+// Scores everything the Coaster could do now, best first (and what they can't do yet, after).
+// s = { stage, needs: {id: 0..100}, money, traits: [ids], has: [step ids done], routine (id), time (minutes since Monday 00:00),
+//       clock (mind opening hours and days), recent: {action id: when it was last done} }
+function scoreActions(d, s) {
+  const M = d.decisionModel || {};
+  const needs = byId(d.needs), places = byId(d.places), opps = byId(d.opportunities), traits = byId(d.traits);
+  const curves = M.curves || {}, weights = M.tierWeights || {};
+  const upper = M.maslowTiers || ['heart', 'spirit'], floor = M.maslowFloor ?? 0.3;
+  const body = (d.needs || []).filter(n => n.tier === 'survival');
+  const fed = body.length ? body.reduce((t, n) => t + (s.needs[n.id] ?? 100) / 100, 0) / body.length : 1;
+  const maslow = floor + (1 - floor) * fed; // the heart and the spirit count for more once the body is looked after
+  const pressure = clamp(1 - s.money / comfortable(M, s.stage), 0, 1);
+  const hurt = (n, v) => 100 * Math.pow(1 - clamp(v, 0, 100) / 100, curves[n.curve] ?? 1.5);
+  const plan = routineNow(d, s), planned = new Set(plan?.actions || []);
+  const rows = [];
+  for (const a of d.actions || []) {
+    if (!(a.stages || []).includes(s.stage)) continue;
+    const rest = restOf(a, s);
+    const r = { a, score: 0, parts: [], lock: '', minutes: Math.max(5, Math.round((a.minutes || 30) * rest)) };
+    if (a.trait && !s.traits.includes(a.trait)) r.lock = `Only for ${traits[a.trait]?.name || a.trait} Coasters`;
+    else if (reqsOf(a).length && !reqsOf(a).some(x => s.has.includes(x))) r.lock = `Opens with: ${reqsOf(a).map(x => opps[x]?.name || x).join(' or ')}`;
+    else if (a.until && s.has.includes(a.until)) r.lock = `Not any more, since: ${opps[a.until]?.name || a.until}`;
+    else if ((a.cost || 0) > s.money) r.lock = `Costs GH₵ ${a.cost}`;
+    else if (s.clock && !isOpen(parseHours(a.hours) || parseHours(places[a.place]?.hours), s.time)) r.lock = `Not at ${hhmm(s.time)}`;
+    else if (s.clock && a.days && !a.days.includes(dayOf(s.time))) r.lock = `Only on ${a.days.map(x => DAY_NAMES[DAYS.indexOf(x)] || x).join(', ')}`;
+    for (const [id, full] of Object.entries(a.needs || {})) {
+      const n = needs[id], delta = Math.round(full * rest);
+      if (!n || !delta) continue;
+      const v = s.needs[id] ?? 100;
+      const w = (weights[n.tier] ?? 1) * (upper.includes(n.tier) ? maslow : 1);
+      const pts = delta > 0 ? w * (hurt(n, v) - hurt(n, v + delta)) : -w * (M.lossWeight ?? 0.6) * (hurt(n, v + delta) - hurt(n, v));
+      r.score += pts;
+      r.parts.push({ text: `${delta > 0 ? '+' : ''}${delta} ${n.name}`, pts, up: delta > 0 });
+    }
+    if (a.earns) {
+      const pts = (M.earnWeight ?? 2) * cedis((a.earns[0] + a.earns[1]) / 2) * pressure;
+      r.score += pts;
+      r.parts.push({ text: `Earns GH₵ ${a.earns[0]}${a.earns[1] !== a.earns[0] ? '–' + a.earns[1] : ''}`, pts, up: true });
+    }
+    if (a.cost) {
+      const pts = -(M.costWeight ?? 1.5) * cedis(a.cost) * Math.max(pressure, 0.1);
+      r.score += pts;
+      r.parts.push({ text: `Costs GH₵ ${a.cost}`, pts, up: false });
+    }
+    const fan = s.traits.map(t => traits[t]).find(t => t && (t.likes || []).includes(a.id));
+    if (fan) {
+      const pts = r.score > 0 ? r.score * ((M.traitLikeBonus ?? 1.5) - 1) : 4;
+      r.score += pts;
+      r.parts.push({ text: `${fan.name}: likes this`, pts, up: true });
+    }
+    const last = s.recent?.[a.id];
+    if (last !== undefined && !isSleep(a) && s.time - last < (M.repeatMinutes ?? 120) && r.score > 0) {
+      const pts = -r.score * (1 - (M.repeatFactor ?? 0.5));
+      r.score += pts;
+      r.parts.push({ text: 'Did this a moment ago', pts, up: false });
+    }
+    if (planned.has(a.id)) {
+      const pts = M.routineBonus ?? 20;
+      r.score += pts;
+      r.parts.push({ text: `Routine: ${plan.do}`, pts, up: true });
+    }
+    rows.push(r);
+  }
+  rows.sort((x, y) => (!!x.lock - !!y.lock) || y.score - x.score);
+  return rows;
+}
+// Picks one of the best few (the better, the likelier), so a Coaster never feels like a robot.
+function pickAction(rows, model, rand = Math.random) {
+  const open = rows.filter(r => !r.lock && r.score > 0.5).slice(0, Math.max(1, model.pickFromTop || 3));
+  if (!open.length) return null;
+  let x = rand() * open.reduce((t, r) => t + r.score, 0);
+  for (const r of open) if ((x -= r.score) <= 0) return r;
+  return open[open.length - 1];
+}
+// Lives through an action (or 30 minutes of nothing): needs fall while it lasts, then it gives what it gives.
+// Sleep lasts until the Coaster is rested, and gives that share of what it gives.
+function liveThrough(d, s, a, rand = Math.random) {
+  const M = d.decisionModel || {};
+  const rest = a ? restOf(a, s) : 1;
+  const minutes = Math.max(5, Math.round((a ? a.minutes || 30 : 30) * rest));
+  const asleep = isSleep(a);
+  const before = { ...s.needs };
+  for (const n of d.needs || []) {
+    const delta = Math.round(((a && a.needs?.[n.id]) || 0) * rest);
+    let v = s.needs[n.id] ?? 100;
+    if (delta <= 0) v -= (n.decay?.[s.stage] || 0) * (minutes / 60) * (asleep ? M.sleepDecay ?? 0.5 : 1);
+    s.needs[n.id] = clamp(v + delta, 0, 100);
+  }
+  let earned = 0;
+  if (a) {
+    (s.recent ||= {})[a.id] = s.time;
+    if (a.earns) earned = Math.round((a.earns[0] + rand() * (a.earns[1] - a.earns[0])) * 2) / 2;
+    s.money = Math.max(0, Math.round((s.money + earned - (a.cost || 0)) * 100) / 100);
+  }
+  s.time += minutes;
+  return { before, earned };
+}
+
+/* ================= The page ================= */
+
+let D = null;                         // the design: coaster_life.json
+let undo = [], redo = [];
+let dirty = false, saving = false, saveTimer = 0, saveError = '', savedAt = null;
+let mode = 'download';                // where Save goes: 'server' (serve.py), 'file' (picked in Chrome), or 'download'
+let handle = null;                    // the picked file, in 'file' mode
+let tab = 'overview';
+let selected = '';                    // the step in the drawer
+let editing = null;                   // a draft of the step being edited
+let zoom = 0.85, focusDim = '', query = '';
+let layout = null;                    // the life map, as last drawn
+let sim = null;                       // the "what will the Coaster do next?" simulator
+let worldStage = '', worldNeed = '';
+let notesSnap = false, pendingBackup = null, modalState = null;
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+const LISTS = ['dimensions', 'lifeStages', 'needTiers', 'needs', 'moodlets', 'traits', 'routines', 'skills', 'relationshipLadder',
+  'relationshipTypes', 'reputationCircles', 'resourceTypes', 'tracks', 'opportunities', 'achievements', 'coasters', 'places',
+  'actions', 'events', 'worldRhythms', 'buildParts', 'jobs', 'tutorial'];
+function normalise(d) {
+  for (const k of LISTS) if (!Array.isArray(d[k])) d[k] = [];
+  d.meta = d.meta && typeof d.meta === 'object' ? d.meta : {};
+  d.story = d.story && typeof d.story === 'object' ? d.story : {};
+  if (!Array.isArray(d.story.origins)) d.story.origins = [];
+  if (!Array.isArray(d.story.chapters)) d.story.chapters = [];
+  d.decisionModel = d.decisionModel && typeof d.decisionModel === 'object' ? d.decisionModel : {};
+  return d;
+}
+
+// ---- opening ----
+async function start() {
+  bindEvents();
+  const asked = location.hash.slice(1);
+  if (TABS[asked]) tab = asked;
+  if (location.protocol.startsWith('http')) {
+    try {
+      const r = await fetch(FILE, { cache: 'no-store' });
+      if (r.ok) {
+        mode = r.headers.get('X-Coaster-Save') ? 'server' : 'download';
+        return open(await r.text());
+      }
+    } catch (e) { /* not served next to the file: show the ways in */ }
+  }
+  welcome();
+}
+function open(text) {
+  let data;
+  try { data = JSON.parse(text); } catch (e) { return welcome(`That file isn't valid JSON: ${e.message}`); }
+  if (!data || !Array.isArray(data.opportunities)) return welcome("That file doesn't look like the Coaster Life design (it has no \"opportunities\").");
+  D = normalise(data);
+  undo = []; redo = []; dirty = false; saveError = ''; selected = ''; editing = null;
+  sim = newSim();
+  render();
+  const b = readBackup();
+  if (b && b.dirty && b.text !== text && b.text !== pretty(D) + '\n') offerRestore(b);
+  else writeBackup(false);
+}
+function welcome(problem = '') {
+  document.body.classList.add('welcoming');
+  const b = readBackup();
+  const main = $('#main');
+  main.className = '';
+  main.innerHTML = `
+  <section class="card welcome">
+    <div class="eyebrow">Gold Coast · life design</div>
+    <h2>Coaster Life</h2>
+    <p class="lead">What a Coaster needs, what they can become, and the world they live it in.</p>
+    ${problem ? `<p class="warn-note">${esc(problem)}</p>` : ''}
+    <div class="way"><b>1</b><div>
+      <p><b>Best: open it with saving switched on.</b> In Terminal, in the <code>kayayo</code> folder, run:</p>
+      <code class="cmd">python3 design/serve.py</code>
+      <p class="small muted">It opens this board in your browser, and every change saves straight into <b>design/coaster_life.json</b> (with backups in design/backups).</p>
+    </div></div>
+    <div class="way"><b>2</b><div>
+      <p><b>Or open the file here.</b> In Chrome or Edge, changes save straight into it; other browsers download it when you press Save.</p>
+      <button class="btn primary" data-act="pick">Open coaster_life.json…</button>
+    </div></div>
+    ${b ? `<div class="way"><b>3</b><div>
+      <p><b>Or carry on with the copy kept in this browser</b> (${esc(new Date(b.at).toLocaleString())}).</p>
+      <button class="btn" data-act="use-backup">Use this browser's copy</button>
+    </div></div>` : ''}
+  </section>`;
+}
+async function pickFile() {
+  if (!window.showOpenFilePicker) return $('#fileInput').click();
+  try {
+    const [h] = await window.showOpenFilePicker({ types: [{ description: 'Coaster Life design', accept: { 'application/json': ['.json'] } }] });
+    if (h.requestPermission && (await h.requestPermission({ mode: 'readwrite' })) !== 'granted') toast('Without permission to change the file, Save downloads it instead.');
+    const text = await (await h.getFile()).text();
+    handle = h;
+    mode = (await h.queryPermission?.({ mode: 'readwrite' })) === 'granted' ? 'file' : 'download';
+    open(text);
+  } catch (e) {
+    if (e.name !== 'AbortError') toast(e.message);
+  }
+}
+function readPicked(input) {
+  const f = input.files[0];
+  input.value = '';
+  if (f) f.text().then(text => { mode = 'download'; handle = null; open(text); });
+}
+
+// ---- saving ----
+function readBackup() {
+  try { return JSON.parse(localStorage.getItem(BACKUP_KEY) || 'null'); } catch (e) { return null; }
+}
+function writeBackup(isDirty) {
+  try { localStorage.setItem(BACKUP_KEY, JSON.stringify({ text: pretty(D) + '\n', at: new Date().toISOString(), dirty: isDirty })); } catch (e) { /* private mode */ }
+}
+function offerRestore(b) {
+  pendingBackup = b;
+  modal(`<h3>Changes that weren't saved</h3>
+    <p>This browser kept changes from ${esc(new Date(b.at).toLocaleString())} that aren't in the file.</p>
+    <div class="modal-actions">
+      <button class="btn primary" data-act="restore">Bring them back</button>
+      <button class="btn" data-act="discard-backup">Keep the file as it is</button>
+    </div>`);
+}
+// Every change goes through here, so it can be undone.
+function change(fn) {
+  undo.push(JSON.stringify(D));
+  if (undo.length > 80) undo.shift();
+  redo = [];
+  fn(D);
+  touched();
+}
+function touched(rerender = true) {
+  dirty = true;
+  writeBackup(true);
+  if (mode !== 'download') { clearTimeout(saveTimer); saveTimer = setTimeout(save, 700); }
+  if (rerender) render(); else showStatus();
+}
+function step(from, to) {
+  if (!from.length) return;
+  to.push(JSON.stringify(D));
+  D = normalise(JSON.parse(from.pop()));
+  if (selected && !byId(D.opportunities)[selected]) selected = '';
+  editing = null;
+  touched();
+}
+async function save() {
+  clearTimeout(saveTimer);
+  if (!D) return;
+  if (saving) { saveTimer = setTimeout(save, 400); return; }
+  D.meta.updated = today();
+  const text = pretty(D) + '\n';
+  if (mode === 'download') {
+    download(text);
+    dirty = false; saveError = ''; savedAt = new Date(); writeBackup(false); showStatus();
+    toast('Downloaded coaster_life.json: put it in the design folder');
+    return;
+  }
+  saving = true; showStatus();
+  try {
+    if (mode === 'server') {
+      const r = await fetch(FILE, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: text });
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `the server answered ${r.status}`);
+    } else {
+      const w = await handle.createWritable();
+      await w.write(text);
+      await w.close();
+    }
+    saveError = ''; savedAt = new Date();
+    if (pretty(D) + '\n' === text) { dirty = false; writeBackup(false); } // nothing changed while it saved
+  } catch (e) {
+    saveError = e.message || String(e);
+  }
+  saving = false;
+  showStatus();
+}
+function download(text) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = FILE;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+const whereSaves = () => mode === 'server' ? 'Every change saves straight into design/coaster_life.json (serve.py keeps backups in design/backups).'
+  : mode === 'file' ? `Every change saves straight into ${handle?.name || 'the file you opened'}.`
+  : "This browser can't change the file by itself: Save downloads coaster_life.json, to put in the design folder. Changes are kept in this browser until then.";
+function showStatus() {
+  const el = $('#status');
+  if (!el || !D) return;
+  let text, cls;
+  if (saveError) { text = `⚠ Not saved: ${saveError}`; cls = 'bad'; }
+  else if (saving) { text = 'Saving…'; cls = ''; }
+  else if (dirty) { text = mode === 'download' ? '● Not in the file yet: press Save' : '● Saving soon…'; cls = 'dirty'; }
+  else if (savedAt) { text = `✓ Saved ${savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`; cls = 'ok'; }
+  else { text = mode === 'download' ? 'Save downloads the file' : '✓ Up to date'; cls = mode === 'download' ? '' : 'ok'; }
+  el.textContent = text;
+  el.className = `status ${cls}`;
+  el.title = whereSaves();
+  $('#undoBtn').disabled = !undo.length;
+  $('#redoBtn').disabled = !redo.length;
+  const problems = lint(D), c = $('#checks');
+  c.hidden = false;
+  c.textContent = problems.length ? `⚠ ${problems.length} to check` : '✓ All links good';
+  c.className = `status ${problems.some(p => p.level === 'error') ? 'bad' : problems.length ? 'dirty' : 'ok'}`;
+}
+function toast(text) {
+  const t = $('#toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function modal(html) {
+  $('#modal').innerHTML = `<div class="modal-back" data-act="modal-bg"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;
+  setTimeout(() => $('#modal textarea, #modal .btn.primary')?.focus(), 30);
+}
+function closeModal() { $('#modal').innerHTML = ''; modalState = null; }
+
+// ---- names and little pieces of page ----
+const stageOf = id => byId(D.lifeStages)[id];
+const oppName = id => byId(D.opportunities)[id]?.name || id;
+const traitName = id => byId(D.traits)[id]?.name || id;
+const placeName = id => byId(D.places)[id]?.name || id;
+const aOrAn = w => (/^[aeiou]/i.test(w || '') ? 'an ' : 'a ') + String(w || '').toLowerCase();
+const editBtn = (path, i) => `<button class="btn small ghost edit" data-act="edit-item" data-path="${path}" data-i="${i}" title="Change this">✎</button>`;
+const addBtn = (path, label = 'Add') => `<button class="btn small" data-act="add-item" data-path="${path}">＋ ${label}</button>`;
+const stageChip = id => { const s = stageOf(id); return `<span class="chip" style="--c:${esc(s?.color || '#8a7766')}">${esc(s?.name || id)}</span>`; };
+function oppChip(id) {
+  const o = byId(D.opportunities)[id];
+  if (!o) return `<span class="chip bad" title="No step has this id">${esc(id)} ?</span>`;
+  return `<button class="chip" style="--c:${esc(byId(D.tracks)[o.track]?.color || '#8a7766')}" data-act="select" data-id="${esc(o.id)}">${esc(o.name)}</button>`;
+}
+function needPills(a) {
+  const needs = byId(D.needs);
+  let h = Object.entries(a.needs || {}).filter(([, v]) => v).map(([k, v]) =>
+    `<span class="pill ${v > 0 ? 'up' : 'down'}" title="${esc(needs[k]?.name || k)}">${esc(needs[k]?.icon || k)} ${v > 0 ? '+' : ''}${v}</span>`).join('');
+  if (a.earns) h += `<span class="pill cedi">+GH₵ ${a.earns[0]}${a.earns[1] !== a.earns[0] ? '–' + a.earns[1] : ''}</span>`;
+  if (a.cost) h += `<span class="pill cost">−GH₵ ${a.cost}</span>`;
+  return `<span class="pills">${h}</span>`;
+}
+function lockNote(a) {
+  let h = '';
+  if (reqsOf(a).length) h += reqsOf(a).map(x => `<button class="lock" data-act="select" data-id="${esc(x)}" title="Opens with this step in life">🔒 ${esc(oppName(x))}</button>`).join('<span class="lock"> or </span>');
+  else if (a.trait) h += `<span class="lock" title="Only Coasters with this trait">✦ ${esc(traitName(a.trait))}</span>`;
+  if (a.until) h += ` <button class="lock" data-act="select" data-id="${esc(a.until)}" title="The Coaster stops doing this after this step">⤳ until ${esc(oppName(a.until))}</button>`;
+  return h;
+}
+const options = (list, value, label = x => x.name) =>
+  (list || []).map(x => `<option value="${esc(x.id)}" ${x.id === value ? 'selected' : ''}>${esc(label(x))}</option>`).join('');
+
+// ---- drawing the tabs ----
+const TABS = {
+  overview: () => renderOverview(), needs: () => renderNeeds(), progress: () => renderProgress(),
+  world: () => renderWorld(), story: () => renderStory(), tutorial: () => renderTutorial(), plan: () => renderPlan(), data: () => renderData()
+};
+function render() {
+  if (!D) return;
+  document.body.classList.remove('welcoming');
+  for (const b of $$('.tab')) b.classList.toggle('on', b.dataset.tab === tab);
+  $('#subtitle').textContent = D.meta.subtitle || '';
+  document.documentElement.style.setProperty('--head-h', $('#top').offsetHeight + 'px');
+  const box = $('.map-scroll');
+  const keep = tab === 'progress' && box ? [box.scrollLeft, box.scrollTop] : null;
+  const main = $('#main');
+  main.className = tab === 'progress' ? 'wide' : '';
+  main.innerHTML = TABS[tab]();
+  if (tab === 'progress') afterMap(keep);
+  if (tab === 'needs') drawSim();
+  renderDrawer();
+  showStatus();
+}
+function setTab(t) {
+  if (!TABS[t] || (editing && !leaveEdit())) return;
+  editing = null;
+  if (t !== 'progress') selected = '';
+  tab = t;
+  history.replaceState(null, '', '#' + t);
+  window.scrollTo(0, 0);
+  render();
+}
+function goTo(where, id) {
+  if (where === 'progress' && id && byId(D.opportunities)[id]) return select(id);
+  setTab(where);
+  const el = id && document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 1700);
+  }
+}
+
+// ---- overview ----
+function loopDiagram() {
+  const circle = (x, y, c, a, b) => `<g><circle cx="${x}" cy="${y}" r="58" fill="${c}" fill-opacity=".12" stroke="${c}" stroke-width="2.5"/>
+    <text x="${x}" y="${y - 3}" text-anchor="middle" class="lc" fill="${c}">${a}</text><text x="${x}" y="${y + 17}" text-anchor="middle" class="lc" fill="${c}">${b}</text></g>`;
+  return `<svg viewBox="0 0 460 362" role="img" aria-label="How the three systems feed each other">
+    <style>.lc{font:700 17px 'Iowan Old Style',Georgia,serif}.ll{font:12.5px -apple-system,system-ui,sans-serif;fill:#5c4b3d}</style>
+    <defs><marker id="la" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a8916d"/></marker></defs>
+    <g fill="none" stroke="#c4ae8a" stroke-width="2.2" marker-end="url(#la)">
+      <path d="M288,98 Q360,120 368,200"/><path d="M310,292 Q230,336 150,292"/><path d="M92,200 Q100,120 172,98"/>
+    </g>
+    <text class="ll" x="404" y="134" text-anchor="middle">they act to</text><text class="ll" x="404" y="150" text-anchor="middle">meet them</text>
+    <text class="ll" x="230" y="338" text-anchor="middle">acting builds skills, friends,</text><text class="ll" x="230" y="354" text-anchor="middle">a good name, and money</text>
+    <text class="ll" x="50" y="134" text-anchor="middle">new steps</text><text class="ll" x="50" y="150" text-anchor="middle">change needs</text>
+    ${circle(230, 70, '#b23a2e', 'Needs &amp;', 'behaviour')}${circle(372, 262, '#1d6b3a', 'World', 'interaction')}${circle(88, 262, '#b07a08', 'Life', 'progression')}
+    <text x="230" y="206" text-anchor="middle" style="font:italic 17px 'Iowan Old Style',Georgia,serif;fill:#8a7766">a Coaster's life</text>
+  </svg>`;
+}
+function systemCard(go, n, title, question, stats, text, color) {
+  return `<div class="card accent system" style="--c:${color}" data-act="tab" data-tab="${go}">
+    <div class="sys-n">${n}</div><h3>${title}</h3><p class="q">“${question}”</p><p class="small">${text}</p>
+    <div class="stats">${stats.map(([v, l]) => `<span class="stat"><b>${v}</b><span>${l}</span></span>`).join('')}</div>
+    <span class="go">Open →</span></div>`;
+}
+function renderOverview() {
+  const m = D.meta, pv = (m.proverbs || [])[0];
+  const asks = id => D.opportunities.filter(o => (o.requires || []).some(r => r.kind === id)).length;
+  return `
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Gold Coast · life design</div>
+      <h2>${esc(m.title || 'Coaster Life')}</h2>
+      <p class="lead">${esc(m.notes || '')}</p>
+      ${pv ? `<blockquote class="proverb">${esc(pv.twi)}<small>${esc(pv.english)}</small></blockquote>` : ''}
+    </div>
+    <div class="card loop">${loopDiagram()}</div>
+  </section>
+  <section class="systems">
+    ${systemCard('needs', 1, 'Needs &amp; behaviour', 'What does the Coaster need now?',
+      [[D.needs.length, 'needs'], [D.traits.length, 'traits'], [D.routines.length, 'routines']],
+      'Needs fall hour by hour. The Coaster weighs everything the world offers by how badly they need it.', '#b23a2e')}
+    ${systemCard('progress', 2, 'Life progression', 'What can the Coaster become, achieve, or reach?',
+      [[D.opportunities.length, 'steps'], [D.achievements.length, 'achievements'], [D.lifeStages.length, 'life stages']],
+      'A map of opportunities from toddler to elder. Every step asks for a mix of the six things below, never money alone.', '#b07a08')}
+    ${systemCard('world', 3, 'World interaction', 'Where, and with whom, do they live it?',
+      [[D.places.length, 'places'], [D.actions.length, 'actions'], [D.events.length, 'events']],
+      "Places offer things to do, people offer relationships, and the town's rhythms and surprises push back.", '#1d6b3a')}
+  </section>
+  <section class="section">
+    <div class="section-head"><div><h3>Principles</h3></div><div class="spacer"></div>${addBtn('meta.principles')}</div>
+    <div class="grid" style="--min:290px">${(m.principles || []).map((p, i) => `<div class="card">${editBtn('meta.principles', i)}<h3>${esc(p.name)}</h3><p class="small">${esc(p.text)}</p></div>`).join('')}</div>
+  </section>
+  <section class="section">
+    <div class="section-head"><div><h3>The six things that open doors</h3><p>Every step in life asks for a mix of these. Money is only one of them.</p></div><div class="spacer"></div>${addBtn('dimensions')}</div>
+    <div class="grid" style="--min:210px">${D.dimensions.map((x, i) => `<div class="card accent" style="--c:${esc(x.color)}">${editBtn('dimensions', i)}
+      <div class="dim-icon">${esc(x.icon)}</div><h3>${esc(x.name)}</h3><p class="small">${esc(x.text)}</p><p class="small muted">${asks(x.id)} steps ask for it</p></div>`).join('')}</div>
+  </section>
+  <section class="section">
+    <div class="section-head"><div><h3>Life stages</h3><p>A Coaster starts as a toddler and can live to be an elder.</p></div><div class="spacer"></div>${addBtn('lifeStages')}</div>
+    <div class="stages">${D.lifeStages.map((s, i) => `<div class="stage" style="--c:${esc(s.color)}">${editBtn('lifeStages', i)}<b>${esc(s.name)}</b><span class="ages">${esc(s.ages)}</span><p>${esc(s.text)}</p></div>`).join('')}</div>
+  </section>
+  <section class="section">
+    <div class="section-head"><h3>How to change things</h3></div>
+    <div class="card help">
+      <p><b>Add a branch:</b> open <i>Life progression</i>, click a step, and press <i>＋ Add a step after this</i>, or press <i>＋ New branch</i> at the top of the map.</p>
+      <p><b>Remove a branch:</b> click a step and press <i>Remove…</i>. You can take out just that step, or the steps that only come after it too.</p>
+      <p><b>Change anything else:</b> move over a card and press ✎. Or edit <code>design/coaster_life.json</code> in any text editor: the <i>Data</i> tab says what's in it.</p>
+      <p><b>Saving:</b> ${esc(whereSaves())} ⌘Z undoes.</p>
+    </div>
+  </section>`;
+}
+
+// ---- needs and behaviour ----
+function stageSelect(act, value) {
+  return `<select data-change="${act}">${options(D.lifeStages, value, s => `${s.name} (${s.ages})`)}</select>`;
+}
+function needCard(n, i, st) {
+  const tier = byId(D.needTiers)[n.tier] || {};
+  const rate = n.decay?.[st] || 0;
+  const most = Math.max(0.0001, ...D.lifeStages.map(s => n.decay?.[s.id] || 0));
+  const ways = D.actions.filter(a => (a.needs?.[n.id] || 0) > 0 && (a.stages || []).includes(st)).sort((a, b) => b.needs[n.id] - a.needs[n.id]);
+  const stage = stageOf(st);
+  return `<div class="card need" id="need-${esc(n.id)}" style="--c:${esc(tier.color || '#8a7766')}">${editBtn('needs', i)}
+    <div class="need-top"><span class="icon">${esc(n.icon)}</span><div><h3>${esc(n.name)}</h3>${n.local ? `<span class="local">${esc(n.local)}</span>` : ''}</div></div>
+    <p class="small">${esc(n.text)}</p>${jobChip('needs', n.id) ? `<div class="chips">${jobChip('needs', n.id)}</div>` : ''}
+    <div class="decay" title="How fast it falls at each life stage">${D.lifeStages.map(s =>
+      `<i class="${s.id === st ? 'on' : ''}" style="height:${(n.decay?.[s.id] || 0) / most * 100}%" title="${esc(s.name)}: falls ${n.decay?.[s.id] || 0} an hour"></i>`).join('')}</div>
+    <div class="small muted">${rate ? `Falls ${rate} an hour for ${esc(aOrAn(stage?.name))}: from full to empty in about ${Math.round(100 / rate)} hours.` : 'It doesn\'t fall by itself: events and choices move it.'}</div>
+    ${n.whenLow ? `<p class="warn-note">${esc(n.whenLow)}</p>` : ''}
+    <h4>Ways to fill it</h4>
+    <ul class="ways">${ways.slice(0, 6).map(a => `<li><span class="pill up">+${a.needs[n.id]}</span><span>${esc(a.name)}${a.cost ? ` <span class="muted">· GH₵ ${a.cost}</span>` : ''}</span>${lockNote(a)}</li>`).join('') || '<li class="muted">Nothing at this stage yet.</li>'}</ul>
+    ${ways.length > 6 ? `<p class="small muted" style="margin-top:4px">…and ${ways.length - 6} more</p>` : ''}
+  </div>`;
+}
+function renderNeeds() {
+  const st = sim.stage, M = D.decisionModel, explain = M.explain || {};
+  return `
+  <section class="section">
+    <div class="section-head"><div><h2>Needs &amp; behaviour</h2><p>What does the Coaster need now? Every need falls hour by hour, faster for small children, and the world offers ways to fill it. The better ways open up as life goes on (🔒).</p></div>
+      <div class="spacer"></div><label class="small muted">Life stage ${stageSelect('sim-stage', st)}</label></div>
+    ${D.needTiers.map(t => `<div class="tier"><div class="tier-head" style="--c:${esc(t.color)}"><span class="dot"></span><h3>${esc(t.name)}</h3><span class="small muted">${esc(t.text)}</span></div>
+      <div class="grid" style="--min:270px">${D.needs.map((n, i) => n.tier === t.id ? needCard(n, i, st) : '').join('')}</div></div>`).join('')}
+    <div>${addBtn('needs', 'Add a need')}</div>
+  </section>
+  <section class="section" id="simulator">
+    <div class="section-head"><div><h2>What will the Coaster do next?</h2><p>${esc(M.text || '')}</p></div></div>
+    <div class="sim" id="simBox"></div>
+  </section>
+  <section class="section">
+    <div class="section-head"><div><h3>Traits</h3><p>Personality: what each trait changes, and the things it likes doing (they score higher).</p></div><div class="spacer"></div>${addBtn('traits')}</div>
+    <div class="grid" style="--min:260px">${D.traits.map((t, i) => `<div class="card" id="trait-${esc(t.id)}">${editBtn('traits', i)}
+      <div class="trait-top"><span class="icon">${esc(t.icon)}</span><h3>${esc(t.name)}</h3></div><p class="small">${esc(t.text)}</p>
+      <p class="small"><b>Changes:</b> ${esc(t.effects)}</p><p class="small"><b>Wants to:</b> ${esc(t.motive)}</p>
+      <div class="chips">${(t.likes || []).map(id => `<span class="chip" style="--c:#1d6b3a">${esc(byId(D.actions)[id]?.name || id)}</span>`).join('')}</div></div>`).join('')}</div>
+  </section>
+  <section class="section" id="moodlets">
+    <div class="section-head"><div><h3>Moodlets</h3><p>Short feelings that lift or sink the mood for a while.</p></div><div class="spacer"></div>${addBtn('moodlets')}</div>
+    <div class="grid" style="--min:250px">${D.moodlets.map((x, i) => `<div class="card mini mood">${editBtn('moodlets', i)}<span class="v ${x.mood >= 0 ? 'up' : 'down'}">${x.mood > 0 ? '+' : ''}${x.mood}</span><div><b>${esc(x.name)}</b><p class="small muted">${esc(x.text)}</p></div></div>`).join('')}</div>
+  </section>
+  <section class="section">
+    <div class="section-head"><div><h3>Routines</h3><p>A typical day at each life stage: what the Coaster does when nothing is urgent.</p></div><div class="spacer"></div>${addBtn('routines')}</div>
+    <div class="grid" style="--min:260px">${D.routines.map((r, i) => `<div class="card routine" id="routine-${esc(r.id)}" style="--c:${esc(stageOf(r.stage)?.color || '#8a7766')}">${editBtn('routines', i)}
+      ${stageChip(r.stage)}<h3 style="margin-top:8px">${esc(r.name)}</h3><ol>${(r.schedule || []).map(x => `<li><b>${esc(x.time)}</b>${esc(x.do)}</li>`).join('')}</ol></div>`).join('')}</div>
+  </section>
+  <section class="section">
+    <div class="section-head"><div><h3>The numbers behind the choices</h3><p>Change these to change how Coasters decide.</p></div><div class="spacer"></div>
+      <button class="btn small" data-act="edit-value" data-path="decisionModel">✎ Change the numbers</button></div>
+    <div class="card"><div class="numbers">${Object.entries(M).filter(([k]) => k !== 'text' && k !== 'explain').map(([k, v]) =>
+      `<b>${esc(k)}</b><span>${esc(typeof v === 'object' ? inline(v) : v)}${explain[k] ? ` <span class="muted">· ${esc(explain[k])}</span>` : ''}</span>`).join('')}</div></div>
+  </section>`;
+}
+
+// ---- the simulator ----
+function newSim(stage) {
+  const origin = D.story.origins.find(o => o.startNeeds) || {};
+  const needs = {};
+  for (const n of D.needs) needs[n.id] = origin.startNeeds?.[n.id] ?? 70;
+  stage = stage || origin.stage || D.lifeStages[0]?.id;
+  return { stage, routine: firstRoutine(stage), needs, money: origin.startMoney ?? 0, traits: [], has: [], time: 6 * 60, clock: true, log: [], recent: {} };
+}
+const firstRoutine = stage => D.routines.find(r => r.stage === stage)?.id || '';
+const dayAndTime = t => `Day ${Math.floor(t / 1440) + 1}, ${DAY_NAMES[DAYS.indexOf(dayOf(t))]} · ${hhmm(t)}`;
+function drawSim() {
+  const box = $('#simBox');
+  if (!box) return;
+  const tiers = byId(D.needTiers), stages = Object.fromEntries(D.lifeStages.map((s, i) => [s.id, i]));
+  const opens = [...new Set(D.actions.flatMap(reqsOf))].map(id => byId(D.opportunities)[id]).filter(Boolean)
+    .sort((a, b) => (stages[a.stage] ?? 99) - (stages[b.stage] ?? 99));
+  box.innerHTML = `
+  <div class="card">
+    <div class="sim-row"><label>Life stage</label>${stageSelect('sim-stage', sim.stage)}</div>
+    <div class="sim-row"><label>Routine</label><select data-change="sim-routine"><option value="">None</option>${options(D.routines.filter(r => r.stage === sim.stage), sim.routine)}</select>
+      <select data-change="sim-weekday" title="The day of the week">${DAY_NAMES.map((n, i) => `<option value="${i}" ${DAYS[i] === dayOf(sim.time) ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+    <div class="sim-row"><label>Cedis</label><input class="num" type="number" min="0" step="1" value="${sim.money}" data-input="sim-money">
+      <label class="check"><input type="checkbox" ${sim.clock ? 'checked' : ''} data-change="sim-clock"> Opening hours, at</label>
+      <input type="time" value="${hhmm(sim.time)}" data-change="sim-time"></div>
+    <div class="sliders">${D.needs.map(n => `<label class="slider" style="--c:${esc(tiers[n.tier]?.color || '#8a7766')}"><span>${esc(n.icon)}</span><span>${esc(n.name)}</span>
+      <input type="range" min="0" max="100" value="${Math.round(sim.needs[n.id] ?? 100)}" data-input="sim-need" data-id="${esc(n.id)}"><b>${Math.round(sim.needs[n.id] ?? 100)}</b></label>`).join('')}</div>
+    <h4>Personality</h4>
+    <div class="chips">${D.traits.map(t => `<button class="chip toggle ${sim.traits.includes(t.id) ? 'on' : ''}" style="--c:#7a4fd0" data-act="sim-trait" data-id="${esc(t.id)}" title="${esc(t.effects)}">${esc(t.icon)} ${esc(t.name)}</button>`).join('')}</div>
+    <h4>Steps in life done so far</h4>
+    <div class="chips">${opens.map(o => `<button class="chip toggle ${sim.has.includes(o.id) ? 'on' : ''}" style="--c:#1d6b3a" data-act="sim-has" data-id="${esc(o.id)}">${esc(o.name)}</button>`).join('')}</div>
+    <p class="hint">Each one opens new things to do.</p>
+  </div>
+  <div class="card">
+    <div class="sim-head"><span class="clock" id="simClock">${dayAndTime(sim.time)}</span><span class="pill cedi" id="simMoney">GH₵ ${sim.money}</span><div class="spacer"></div>
+      <button class="btn small" data-act="sim-step">Let the Coaster choose</button>
+      <button class="btn small gold" data-act="sim-day">Live a whole day</button>
+      <button class="btn small ghost" data-act="sim-reset">Start again</button></div>
+    <div id="simChoices"></div>
+    <h4>What happened</h4>
+    <ol class="log" id="simLog">${sim.log.length ? sim.log.slice().reverse().map(e => `<li><time>${esc(e.when)}</time><div><b>${esc(e.text)}</b>${e.place ? ` <span class="muted">· ${esc(e.place)}</span>` : ''}
+      <div class="small muted">${esc(e.changes)}${e.money ? ` · ${esc(e.money)}` : ''}</div>${e.empties.length ? `<div class="small empty">Empty: ${esc(e.empties.join(', '))}</div>` : ''}</div></li>`).join('')
+      : '<li class="muted"><span></span><span>Press "Let the Coaster choose" or "Live a whole day".</span></li>'}</ol>
+  </div>`;
+  drawChoices();
+}
+function drawChoices() {
+  const el = $('#simChoices');
+  if (!el) return;
+  const rows = scoreActions(D, sim), open = rows.filter(r => !r.lock), shut = rows.filter(r => r.lock);
+  const top = Math.max(1, D.decisionModel.pickFromTop || 3), best = Math.max(1, ...open.map(r => r.score));
+  const row = (r, i) => `<div class="choice ${i >= 0 && i < top && r.score > 0.5 ? 'top' : ''} ${r.lock ? 'locked' : ''}">
+    <span class="rank">${i >= 0 ? i + 1 : '🔒'}</span>
+    <div><b>${esc(r.a.name)}</b> <span class="small muted">· ${esc(placeName(r.a.place))} · ${r.minutes} min</span>
+      <div class="parts">${r.parts.map(p => `<span class="pill ${p.up ? 'up' : 'down'}">${esc(p.text)}<i>${p.pts >= 0 ? '+' : ''}${p.pts.toFixed(0)}</i></span>`).join('')}${r.lock ? `<span class="lock">${esc(r.lock)}</span>` : ''}</div></div>
+    <div class="score"><div class="bar"><i style="width:${clamp(r.score / best * 100, 0, 100)}%"></i></div><span>${r.score.toFixed(0)}</span></div></div>`;
+  el.innerHTML = (open.length ? open.slice(0, 10).map(row).join('') : '<p class="muted">Nothing they can do right now.</p>')
+    + (open.length > 10 ? `<details class="more"><summary>${open.length - 10} more they could do</summary>${open.slice(10).map((r, i) => row(r, i + 10)).join('')}</details>` : '')
+    + (shut.length ? `<details class="more"><summary>${shut.length} they can't do yet, and why</summary>${shut.map(r => row(r, -1)).join('')}</details>` : '');
+}
+function simStep() {
+  const pick = pickAction(scoreActions(D, sim), D.decisionModel);
+  const when = dayAndTime(sim.time);
+  const { before, earned } = liveThrough(D, sim, pick?.a || null);
+  const changes = D.needs.map(n => {
+    const d = Math.round(sim.needs[n.id] - before[n.id]);
+    return d ? `${n.icon} ${d > 0 ? '+' : ''}${d}` : '';
+  }).filter(Boolean).join('  ');
+  sim.log.push({
+    when, text: pick ? pick.a.name : 'Wanders about: nothing seems worth doing', place: pick ? placeName(pick.a.place) : '', changes,
+    money: earned ? `earned GH₵ ${earned}` : pick?.a.cost ? `spent GH₵ ${pick.a.cost}` : '',
+    empties: D.needs.filter(n => sim.needs[n.id] <= 0 && before[n.id] > 0).map(n => n.name)
+  });
+  if (sim.log.length > 120) sim.log.shift();
+}
+function simDay() {
+  const end = sim.time + 1440;
+  for (let n = 0; sim.time < end && n < 90; n++) simStep();
+}
+
+// ---- life progression: the map ----
+function renderProgress() {
+  const L = layout = layoutMap(D), tracks = byId(D.tracks);
+  const asks = id => D.opportunities.filter(o => (o.requires || []).some(r => r.kind === id)).length;
+  const moneyOnly = D.opportunities.filter(isMoneyOnly).length;
+  let bands = '';
+  for (let c = 0; c < L.nCols; c++) {
+    const s = D.lifeStages[c] || { name: 'No stage', ages: 'unknown life stage', color: '#999999' };
+    bands += `<div class="band" style="left:${L.colX[c]}px;width:${L.colW[c]}px;height:${L.height}px;--c:${esc(s.color)}"></div>
+      <div class="col-head" style="left:${L.colX[c]}px;--c:${esc(s.color)}"><b>${esc(s.name)}</b><span>${esc(s.ages)}</span></div>`;
+  }
+  for (let r = 0; r < L.nRows; r++) {
+    const t = D.tracks[r] || { name: 'No track', color: '#999999' };
+    bands += `<div class="row-line" style="top:${L.rowY[r]}px;width:${L.width}px"></div>
+      <div class="row-label" style="top:${L.rowY[r]}px;height:${L.rowH[r]}px;--c:${esc(t.color)}"><span>${esc(t.name)}</span></div>`;
+  }
+  const opps = D.opportunities;
+  const edges = L.edges.map(e => {
+    const x1 = L.px[e.from] + NODE_W, y1 = L.py[e.from] + NODE_H / 2, x2 = L.px[e.to] - 4, y2 = L.py[e.to] + NODE_H / 2;
+    return `<path class="edge ${e.any ? 'any' : ''}" data-from="${esc(opps[e.from].id)}" data-to="${esc(opps[e.to].id)}" d="${edgePath(x1, y1, x2, y2)}" marker-end="url(#arrow)"/>`;
+  }).join('');
+  const nodes = opps.map((o, i) => {
+    const kinds = new Set((o.requires || []).map(r => r.kind));
+    const tag = o.start ? '<span class="tag">START</span>'
+      : isMoneyOnly(o) ? '<span class="tag warn">MONEY ONLY</span>'
+      : !(o.after || []).length ? '<span class="tag age" title="Opens when the Coaster reaches this life stage">BY AGE</span>' : '';
+    return `<div class="node ${o.start ? 'start' : ''}" data-act="select" data-id="${esc(o.id)}" title="${esc(o.summary || '')}"
+      style="left:${L.px[i]}px;top:${L.py[i]}px;--c:${esc(tracks[o.track]?.color || '#8a7766')}">${tag}
+      <div class="nm">${esc(o.name || o.id)}</div>
+      <div class="req">${D.dimensions.map(x => `<span class="${kinds.has(x.id) ? 'on' : ''}" title="${esc(x.name)}">${esc(x.icon)}</span>`).join('')}</div></div>`;
+  }).join('');
+  const arrow = (id, color) => `<marker id="${id}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${color}"/></marker>`;
+  return `
+  <div class="map-tools">
+    <button class="btn primary small" data-act="new-branch">＋ New branch</button>
+    <input type="search" class="search" placeholder="Find a step…" value="${esc(query)}" data-input="map-search">
+    <div class="chips dims">${D.dimensions.map(x => `<button class="chip ${focusDim === x.id ? 'on' : ''}" style="--c:${esc(x.color)}" data-act="dim" data-id="${esc(x.id)}"
+      title="Light up the steps that ask for ${esc(x.name.toLowerCase())}">${esc(x.icon)} ${esc(x.name)} ${asks(x.id)}</button>`).join('')}</div>
+    <span class="moneycheck ${moneyOnly ? 'bad' : 'ok'}">${moneyOnly ? `⚠ ${moneyOnly} opened by money alone` : '✓ Money alone opens nothing'}</span>
+    <div class="spacer"></div>
+    <button class="btn small ghost" data-act="map-help">How to read it</button>
+    <div class="zoom"><button class="btn small" data-act="zoom-out" title="Zoom out (or ⌘ + scroll)">−</button><span id="zoomLabel">${Math.round(zoom * 100)}%</span>
+      <button class="btn small" data-act="zoom-in" title="Zoom in">＋</button><button class="btn small" data-act="zoom-fit">Fit</button></div>
+  </div>
+  <div class="map-scroll"><div class="map-size" style="width:${L.width * zoom}px;height:${L.height * zoom}px">
+    <div class="map" style="width:${L.width}px;height:${L.height}px;transform:scale(${zoom})">
+      ${bands}
+      <svg width="${L.width}" height="${L.height}"><defs>${arrow('arrow', '#cdb995')}${arrow('arrowHot', '#e3a21a')}</defs>${edges}</svg>
+      ${nodes}
+    </div></div></div>
+  ${progressLists()}`;
+}
+function afterMap(keep) {
+  const box = $('.map-scroll');
+  box.style.height = `calc(100vh - ${$('#top').offsetHeight + $('.map-tools').offsetHeight}px)`;
+  if (keep) { box.scrollLeft = keep[0]; box.scrollTop = keep[1]; }
+  let drag = null;
+  box.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || e.target.closest('.node')) return;
+    drag = { x: e.clientX, y: e.clientY, l: box.scrollLeft, t: box.scrollTop, moved: false };
+    box.setPointerCapture(e.pointerId);
+    box.classList.add('panning');
+  });
+  box.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+    box.scrollLeft = drag.l - dx;
+    box.scrollTop = drag.t - dy;
+  });
+  const end = () => {
+    if (!drag) return;
+    const clicked = !drag.moved;
+    drag = null;
+    box.classList.remove('panning');
+    if (clicked && selected && !editing) { selected = ''; refreshMarks(); renderDrawer(); } // a click on the empty map
+  };
+  box.addEventListener('pointerup', end);
+  box.addEventListener('pointercancel', end);
+  box.addEventListener('wheel', e => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    setZoom(zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), e);
+  }, { passive: false });
+  refreshMarks();
+}
+function setZoom(z, e) {
+  const box = $('.map-scroll');
+  if (!box || !layout) return;
+  z = clamp(z, 0.3, 1.6);
+  const r = box.getBoundingClientRect();
+  const cx = e ? e.clientX - r.left : box.clientWidth / 2, cy = e ? e.clientY - r.top : box.clientHeight / 2;
+  const mx = (box.scrollLeft + cx) / zoom, my = (box.scrollTop + cy) / zoom;
+  zoom = z;
+  $('.map-size').style.width = `${layout.width * zoom}px`;
+  $('.map-size').style.height = `${layout.height * zoom}px`;
+  $('.map').style.transform = `scale(${zoom})`;
+  $('#zoomLabel').textContent = `${Math.round(zoom * 100)}%`;
+  box.scrollLeft = mx * zoom - cx;
+  box.scrollTop = my * zoom - cy;
+}
+// Lights up the chosen step with everything before and after it, what the search finds, or one of the six kinds.
+function refreshMarks() {
+  const map = $('.map');
+  if (!map) return;
+  const before = selected ? ancestors(D, selected) : null, after = selected ? descendants(D, selected) : null;
+  const q = query.trim().toLowerCase();
+  const found = q ? new Set(D.opportunities.filter(o => [o.name, o.id, o.summary, o.cost, ...(o.requires || []).map(r => r.what), ...(o.unlocks || [])]
+    .join(' ').toLowerCase().includes(q)).map(o => o.id)) : null;
+  const kind = focusDim ? new Set(D.opportunities.filter(o => (o.requires || []).some(r => r.kind === focusDim)).map(o => o.id)) : null;
+  const family = id => id === selected || before.has(id) || after.has(id);
+  const lit = id => (!selected || family(id)) && (!found || found.has(id)) && (!kind || kind.has(id));
+  for (const el of $$('.node', map)) {
+    const id = el.dataset.id;
+    el.classList.toggle('sel', id === selected);
+    el.classList.toggle('path', !!selected && id !== selected && family(id));
+    el.classList.toggle('dim', !lit(id));
+  }
+  const filtering = !!(selected || found || kind);
+  for (const el of $$('.edge', map)) {
+    const a = el.dataset.from, b = el.dataset.to;
+    const hot = !!selected && (((before.has(a)) && (before.has(b) || b === selected)) || ((a === selected || after.has(a)) && after.has(b)));
+    el.classList.toggle('hot', hot);
+    el.classList.toggle('dim', filtering && !hot && !(!selected && lit(a) && lit(b)));
+    el.setAttribute('marker-end', hot ? 'url(#arrowHot)' : 'url(#arrow)');
+  }
+}
+function scrollToNode(id) {
+  const box = $('.map-scroll'), i = layout?.idx[id];
+  if (!box || i === undefined) return;
+  const drawer = $('#drawer').classList.contains('open') ? $('#drawer').offsetWidth : 0;
+  const x = (layout.px[i] + NODE_W / 2) * zoom, y = (layout.py[i] + NODE_H / 2) * zoom;
+  box.scrollTo({ left: x - (box.clientWidth - drawer) / 2, top: y - box.clientHeight / 2, behavior: 'smooth' });
+}
+function progressLists() {
+  const mini = path => (x, i) => `<div class="card mini">${editBtn(path, i)}<b>${esc(x.icon || '')} ${esc(x.name)}</b><p class="small muted">${esc(x.text || '')}</p></div>`;
+  const head = (title, text, path) => `<div class="section-head"><div><h3>${title}</h3><p>${text}</p></div><div class="spacer"></div>${path ? addBtn(path) : ''}</div>`;
+  return `<div class="below">
+  <section class="section" id="achievements">${head('Achievements', 'Milestones the game notices. Each one helps open the steps it names.', 'achievements')}
+    <div class="grid" style="--min:260px">${D.achievements.map((a, i) => `<div class="card">${editBtn('achievements', i)}<h3>🏅 ${esc(a.name)}</h3>
+      <p class="small">${esc(a.text)}</p><div class="chips">${(a.unlocks || []).map(oppChip).join('')}</div></div>`).join('')}</div></section>
+  <section class="section" id="skills">${head('Skills', "From 0 to 10. They grow by doing, and slowly rust when they're not used.", 'skills')}
+    <div class="grid" style="--min:220px">${D.skills.map(mini('skills')).join('')}</div></section>
+  <section class="section">${head('Relationships', 'Everyone a Coaster knows is somewhere on this ladder.', 'relationshipTypes')}
+    <div class="ladder">${D.relationshipLadder.map((r, i) => `<span class="rung" style="--i:${i}">${esc(r)}</span>`).join('<span class="arrow">→</span>')}
+      <button class="btn small ghost" data-act="edit-value" data-path="relationshipLadder" title="Change the ladder">✎</button></div>
+    <div class="grid" style="--min:240px">${D.relationshipTypes.map(mini('relationshipTypes')).join('')}</div></section>
+  <section class="section">${head('Reputation', "A Coaster's name, circle by circle. A good name opens doors money can't.", 'reputationCircles')}
+    <div class="grid" style="--min:240px">${D.reputationCircles.map(mini('reputationCircles')).join('')}</div></section>
+  <section class="section">${head('Resources', 'What a Coaster has: money is only one kind.', 'resourceTypes')}
+    <div class="grid" style="--min:240px">${D.resourceTypes.map(mini('resourceTypes')).join('')}</div></section>
+  <section class="section">${head('Tracks', 'The rows of the map.', 'tracks')}
+    <div class="chips">${D.tracks.map((t, i) => `<button class="chip" style="--c:${esc(t.color)}" data-act="edit-item" data-path="tracks" data-i="${i}">${esc(t.name)} ✎</button>`).join('')}</div></section>
+  </div>`;
+}
+
+// ---- the drawer: one step, and its form ----
+function renderDrawer() {
+  const dr = $('#drawer'), o = editing || (selected && byId(D.opportunities)[selected]);
+  if (!o) { dr.classList.remove('open'); dr.innerHTML = ''; return; }
+  const top = dr.scrollTop;
+  dr.innerHTML = editing ? oppForm(editing) : oppDetails(o);
+  dr.classList.add('open');
+  dr.scrollTop = editing ? top : 0;
+}
+function oppDetails(o) {
+  const st = stageOf(o.stage), tr = byId(D.tracks)[o.track], dims = byId(D.dimensions);
+  const groups = D.dimensions.map(x => ({ x, items: (o.requires || []).filter(r => r.kind === x.id) })).filter(g => g.items.length);
+  const odd = (o.requires || []).filter(r => !dims[r.kind]);
+  const kids = childrenOf(D, o.id), place = byId(D.places)[o.where];
+  const acts = D.actions.filter(a => reqsOf(a).includes(o.id));
+  const achs = D.achievements.filter(a => (a.unlocks || []).includes(o.id));
+  const chapters = D.story.chapters.filter(c => (c.goals || []).includes(o.id));
+  return `
+  <div class="drawer-head"><div class="chips"><span class="chip" style="--c:${esc(st?.color || '#8a7766')}">${esc(st?.name || o.stage)} · ${esc(st?.ages || '')}</span>
+    <span class="chip" style="--c:${esc(tr?.color || '#8a7766')}">${esc(tr?.name || o.track)}</span>${jobChip('steps', o.id)}</div>
+    <button class="btn small ghost" data-act="close-drawer" title="Close (Esc)">✕</button></div>
+  <h2 class="d-title">${esc(o.name)}</h2>
+  ${o.summary ? `<p class="d-summary">${esc(o.summary)}</p>` : ''}
+  ${isMoneyOnly(o) ? '<p class="warn-note">Only money opens this. Money alone shouldn\'t open anything: add a skill, an education, a relationship, a reputation, or a choice.</p>' : ''}
+  <h4>What it takes</h4>
+  ${groups.map(g => `<div class="req-group" style="--c:${esc(g.x.color)}"><span class="ri">${esc(g.x.icon)}</span><div><b>${esc(g.x.name)}</b>
+    <ul>${g.items.map(r => `<li>${esc(r.what)}</li>`).join('')}</ul></div></div>`).join('')}
+  ${odd.map(r => `<p class="warn-note">"${esc(r.what)}" is a kind of thing that doesn't exist (${esc(r.kind)}).</p>`).join('')}
+  ${!groups.length && !odd.length ? `<p class="muted">${o.start ? 'Nothing: this is where a life starts.' : 'Nothing yet.'}</p>` : ''}
+  <h4>Comes after</h4>
+  ${(o.after || []).length ? `${o.after.length > 1 ? `<p class="small muted">${o.afterAny ? 'Any one of these:' : 'All of these:'}</p>` : ''}<div class="chips">${o.after.map(oppChip).join('')}</div>`
+    : `<p class="small">${o.start ? "Nothing: it's where a Coaster's life starts." : `Nothing: it opens when the Coaster becomes ${esc(aOrAn(st?.name))} (${esc(st?.ages || '')}).`}</p>`}
+  <h4>Leads to</h4>
+  ${kids.length ? `<div class="chips">${kids.map(k => oppChip(k.id)).join('')}</div>` : '<p class="small muted">Nothing yet. Add a step after this one.</p>'}
+  ${o.cost ? `<h4>Costs</h4><p>${esc(o.cost)}</p>` : ''}
+  ${(o.unlocks || []).length ? `<h4>Opens up</h4><ul class="unlocks">${o.unlocks.map(u => `<li>${esc(u)}</li>`).join('')}</ul>` : ''}
+  ${place ? `<h4>Where</h4><button class="chip" style="--c:#1d6b3a" data-act="go" data-tab="world" data-id="place-${esc(place.id)}">📍 ${esc(place.name)}</button>` : ''}
+  ${acts.length ? `<h4>New things to do</h4><div class="chips">${acts.map(a => `<button class="chip" style="--c:#1d6b3a" data-act="go" data-tab="world" data-id="action-${esc(a.id)}">${esc(a.name)}</button>`).join('')}</div>` : ''}
+  ${achs.length ? `<h4>Achievements that help</h4><div class="chips">${achs.map(a => `<span class="chip" style="--c:#b38600">🏅 ${esc(a.name)}</span>`).join('')}</div>` : ''}
+  ${chapters.length ? `<h4>In the story</h4><div class="chips">${chapters.map(c => `<button class="chip" style="--c:#7a4fd0" data-act="go" data-tab="story" data-id="chapter-${esc(c.id)}">${esc(c.name)}</button>`).join('')}</div>` : ''}
+  <div class="drawer-actions">
+    <button class="btn primary" data-act="edit-opp">✎ Edit</button>
+    <button class="btn" data-act="add-after">＋ Add a step after this</button>
+    <button class="btn danger" data-act="remove-opp">Remove…</button>
+  </div>
+  <p class="small muted">Its id is <code>${esc(o.id)}</code>: other steps use it to say they come after this one.</p>`;
+}
+const PLACEHOLDER = { choices: 'Choose to…', education: 'Pass the… / A certificate in…', skills: 'Sewing 5',
+  relationships: 'Someone who…', reputation: 'Market: known as…', resources: 'GH₵ 100, or a head pan' };
+function mixNote(e) {
+  const kinds = new Set(e.requires.filter(r => r.what.trim()).map(r => r.kind));
+  const only = kinds.size > 0 && [...kinds].every(k => k === 'resources');
+  return `<div class="mix">${D.dimensions.map(x => `<span class="${kinds.has(x.id) ? 'on' : ''}" title="${esc(x.name)}">${esc(x.icon)}</span>`).join('')}
+    <span class="small muted">${kinds.size} of the ${D.dimensions.length} kinds</span></div>
+    ${only ? '<p class="warn-note">Only money opens this. Add a skill, an education, a relationship, a reputation, or a choice.</p>' : ''}`;
+}
+function oppForm(e) {
+  const others = D.opportunities.filter(o => o.id !== e._origId && !e.after.includes(o.id));
+  return `
+  <div class="drawer-head"><b>${e._isNew ? 'A new step' : 'Change this step'}</b><button class="btn small ghost" data-act="cancel-edit" title="Close without saving">✕</button></div>
+  <div class="form">
+    <label>Name</label><input type="text" value="${esc(e.name)}" data-input="f" data-k="name" placeholder="Learn to drive">
+    <label>Life stage</label><select data-change="f" data-k="stage">${options(D.lifeStages, e.stage, s => `${s.name} (${s.ages})`)}</select>
+    <label>Track (the row on the map)</label><select data-change="f" data-k="track">${options(D.tracks, e.track)}</select>
+    <label>What happens</label><textarea rows="3" data-input="f" data-k="summary" placeholder="A sentence or two, in the story's voice.">${esc(e.summary)}</textarea>
+    <label>What it takes</label>
+    ${e.requires.map((r, i) => `<div class="req-row"><select data-change="req-kind" data-i="${i}">${D.dimensions.map(x =>
+      `<option value="${esc(x.id)}" ${x.id === r.kind ? 'selected' : ''}>${esc(x.icon)} ${esc(x.name)}</option>`).join('')}</select>
+      <input type="text" value="${esc(r.what)}" data-input="req" data-i="${i}" placeholder="${esc(PLACEHOLDER[r.kind] || 'What exactly?')}">
+      <button class="btn small ghost" data-act="req-del" data-i="${i}" title="Take this out">✕</button></div>`).join('')}
+    <button class="btn small" data-act="req-add">＋ Something else it takes</button>
+    <div id="mixNote">${mixNote(e)}</div>
+    <label>Comes after</label>
+    <div class="chips">${e.after.map(id => `<span class="chip">${esc(oppName(id))} <button class="btn small ghost" style="padding:0 4px" data-act="after-del" data-id="${esc(id)}" title="Take this out">✕</button></span>`).join('') || '<span class="small muted">Nothing: it opens by age.</span>'}</div>
+    <select data-change="after-add" style="margin-top:8px"><option value="">＋ A step that must come first…</option>${D.lifeStages.map(s =>
+      `<optgroup label="${esc(s.name)}">${others.filter(o => o.stage === s.id).map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('')}</optgroup>`).join('')}</select>
+    ${e.after.length > 1 ? `<label class="check"><input type="checkbox" ${e.afterAny ? 'checked' : ''} data-change="f-any"> Any one of these is enough</label>` : ''}
+    <p class="hint">With nothing here, the step opens when the Coaster reaches its life stage.</p>
+    <label>Where it happens</label><select data-change="f" data-k="where"><option value="">Anywhere</option>${options(D.places, e.where)}</select>
+    <label>Costs</label><input type="text" value="${esc(e.cost)}" data-input="f" data-k="cost" placeholder="GH₵ 100, or a day in the queue">
+    <label>Opens up (one a line)</label><textarea rows="3" data-input="f-lines" data-k="unlocks">${esc(e.unlocks.join('\n'))}</textarea>
+    <label>Id <span class="muted">(small letters, numbers and _; other steps use it)</span></label>
+    <input type="text" id="idBox" value="${esc(e.id)}" data-input="f-id">
+    <p class="form-error" id="formError"></p>
+    <div class="drawer-actions"><button class="btn primary" data-act="save-opp">${e._isNew ? 'Add it' : 'Save'}</button><button class="btn" data-act="cancel-edit">Cancel</button></div>
+  </div>`;
+}
+function select(id) {
+  if (editing && !leaveEdit()) return;
+  editing = null;
+  selected = id;
+  if (tab !== 'progress') { tab = 'progress'; history.replaceState(null, '', '#progress'); window.scrollTo(0, 0); render(); }
+  else { refreshMarks(); renderDrawer(); }
+  scrollToNode(id);
+}
+const leaveEdit = () => confirm('Leave this step without saving it?');
+function startEdit(o) {
+  editing = JSON.parse(JSON.stringify(o));
+  Object.assign(editing, { _origId: o.id, requires: editing.requires || [], after: editing.after || [], unlocks: editing.unlocks || [] });
+  editing.summary ??= ''; editing.cost ??= '';
+  renderDrawer();
+}
+function newDraft(parentId) {
+  const p = parentId && byId(D.opportunities)[parentId];
+  editing = { _isNew: true, _origId: null, id: '', name: '', stage: p?.stage || D.lifeStages[0]?.id, track: p?.track || D.tracks[0]?.id,
+    where: p?.where || '', summary: '', requires: [{ kind: 'choices', what: '' }, { kind: 'skills', what: '' }], after: p ? [p.id] : [], cost: '', unlocks: [] };
+  if (tab !== 'progress') { tab = 'progress'; history.replaceState(null, '', '#progress'); render(); } else renderDrawer();
+  setTimeout(() => $('#drawer input')?.focus(), 60);
+}
+function saveOpp() {
+  const e = editing, fail = text => { $('#formError').textContent = text; };
+  const name = (e.name || '').trim(), id = (e.id || '').trim();
+  if (!name) return fail('Give it a name.');
+  if (!/^[a-z0-9_]+$/.test(id)) return fail('The id can only have small letters, numbers and _.');
+  if (D.opportunities.some(o => o.id === id && o.id !== e._origId)) return fail(`Another step already has the id "${id}".`);
+  const out = {};
+  for (const k of Object.keys(e)) if (!k.startsWith('_')) out[k] = e[k];
+  Object.assign(out, { id, name, summary: (e.summary || '').trim(), cost: (e.cost || '').trim(),
+    requires: e.requires.filter(r => r.what.trim()).map(r => ({ kind: r.kind, what: r.what.trim() })),
+    unlocks: e.unlocks.map(s => s.trim()).filter(Boolean) });
+  if (!out.where) delete out.where;
+  if (!(out.afterAny && out.after.length > 1)) delete out.afterAny;
+  const ordered = e._isNew ? { id, name, stage: out.stage, track: out.track, ...out } : out;
+  change(d => {
+    if (e._isNew) d.opportunities.push(ordered);
+    else {
+      d.opportunities[d.opportunities.findIndex(o => o.id === e._origId)] = ordered;
+      if (e._origId !== id) renameOpp(d, e._origId, id);
+    }
+    editing = null;
+    selected = id;
+  });
+  toast(e._isNew ? `Added "${name}"` : `Saved "${name}"`);
+  scrollToNode(id);
+}
+function askRemove() {
+  const o = byId(D.opportunities)[selected];
+  if (!o) return;
+  const after = [...branchOf(D, o.id)].filter(id => id !== o.id), m = byId(D.opportunities);
+  modalState = { id: o.id };
+  modal(`<h3>Remove "${esc(o.name)}"?</h3>
+    <p>Links to it, in other steps, achievements and the story, come out too. ⌘Z brings it all back.</p>
+    ${after.length ? `<p>${after.length === 1 ? 'This step comes' : `These ${after.length} steps come`} only after it:</p><div class="chips">${after.map(id => `<span class="chip">${esc(m[id].name)}</span>`).join('')}</div>` : ''}
+    <div class="modal-actions">
+      ${after.length ? `<button class="btn danger" data-act="remove-branch">Remove it and the ${after.length} after it</button>` : ''}
+      <button class="btn danger" data-act="remove-one">Remove only this step</button>
+      <button class="btn" data-act="modal-close">Keep it</button>
+    </div>`);
+}
+function removeSteps(ids) {
+  closeModal();
+  change(d => { removeOpps(d, ids); selected = ''; });
+  toast(ids.length === 1 ? 'Removed 1 step' : `Removed ${ids.length} steps`);
+}
+
+// ---- world ----
+function placeCard(p, i) {
+  const acts = D.actions.filter(a => a.place === p.id), steps = D.opportunities.filter(o => o.where === p.id);
+  const evs = D.events.filter(e => e.place === p.id), people = D.coasters.filter(c => c.place === p.id);
+  return `<div class="card place" id="place-${esc(p.id)}">${editBtn('places', i)}
+    <div class="place-top"><h3>${esc(p.name)}</h3><span class="small muted">${esc(p.area || '')}${p.hours ? ` · ${esc(p.hours)}` : ''}</span></div>
+    <p class="small">${esc(p.text)}</p>
+    <div class="chips">${(p.stages || []).map(stageChip).join('')}${jobChip('places', p.id)}</div>
+    ${people.length || (p.people || []).length ? `<h4>Who's here</h4><p class="small">${[...people.map(c => `<b>${esc(c.name)}</b>`), ...(p.people || []).map(esc)].join(' · ')}</p>` : ''}
+    ${acts.length ? `<h4>Things to do</h4><ul class="acts">${acts.map(a => `<li><span>${esc(a.name)}</span>${needPills(a)}${lockNote(a)}</li>`).join('')}</ul>` : ''}
+    ${steps.length ? `<h4>Steps in life here</h4><div class="chips">${steps.map(o => oppChip(o.id)).join('')}</div>` : ''}
+    ${evs.length ? `<h4>Can happen here</h4><div class="chips">${evs.map(e => `<span class="chip" style="--c:#b23a2e">⚡ ${esc(e.name)}</span>`).join('')}</div>` : ''}
+  </div>`;
+}
+function actionsTable() {
+  const rows = D.actions.map((a, i) => ({ a, i })).filter(({ a }) =>
+    (!worldStage || (a.stages || []).includes(worldStage)) && (!worldNeed || (a.needs?.[worldNeed] || 0) > 0));
+  if (!rows.length) return '<p class="muted">Nothing matches.</p>';
+  return `<table class="t"><thead><tr><th>Action</th><th>Where and who</th><th>Gives and takes</th><th>Time</th><th>Opens with</th><th>Builds</th><th></th></tr></thead><tbody>
+  ${rows.map(({ a, i }) => `<tr id="action-${esc(a.id)}">
+    <td><b>${esc(a.name)}</b><div class="small muted">${esc(a.flavor || '')}</div>${a.risk ? `<div class="small risk">⚠ ${esc(a.risk)}</div>` : ''}</td>
+    <td class="small">${esc(placeName(a.place))}${a.hours ? `<div class="muted">${esc(a.hours)}</div>` : ''}<div class="muted">${(a.stages || []).map(s => esc(stageOf(s)?.name || s)).join(', ')}</div></td>
+    <td>${needPills(a)}</td><td class="small">${a.minutes || 30} min</td>
+    <td class="small">${lockNote(a) || '<span class="muted">Anyone</span>'}</td>
+    <td class="small">${(a.builds || []).map(esc).join('<br>')}</td>
+    <td><button class="btn small ghost" data-act="edit-item" data-path="actions" data-i="${i}" title="Change this">✎</button></td></tr>`).join('')}
+  </tbody></table>`;
+}
+function coasterCard(c, i) {
+  const traits = byId(D.traits), rel = byId(D.relationshipTypes)[c.becomes];
+  const initials = String(c.name || '?').replace(/^(Auntie|Madam|Mama|Maame|Mrs\.?|Pastor|Coach|Uncle|Nana)\s+/i, '')
+    .split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
+  return `<div class="card" id="coaster-${esc(c.id)}">${editBtn('coasters', i)}
+    <div class="who"><div class="avatar">${esc(initials)}</div><div><h3>${esc(c.name)}</h3><div class="small muted">${esc(c.role || '')}${c.place ? ` · ${esc(placeName(c.place))}` : ''}</div></div></div>
+    <p class="small">${esc(c.text || '')}</p>
+    ${c.line ? `<p class="line">“${esc(c.line)}”</p>` : ''}
+    <div class="chips">${(c.traits || []).map(t => `<span class="chip" style="--c:#7a4fd0" title="${esc(traits[t]?.text || '')}">${esc(traits[t]?.icon || '')} ${esc(traits[t]?.name || t)}</span>`).join('')}</div>
+    ${rel ? `<p class="small" style="margin-top:8px"><b>Can become:</b> ${esc(rel.name.toLowerCase())}</p>` : ''}
+    ${c.routine ? `<p class="small muted">${esc(c.routine)}</p>` : ''}
+  </div>`;
+}
+function eventCard(e, i) {
+  return `<div class="card" id="event-${esc(e.id)}">${editBtn('events', i)}
+    <h3>⚡ ${esc(e.name)}</h3>
+    <p class="small muted">${e.place ? esc(placeName(e.place)) : 'Anywhere'} · ${(e.stages || []).map(s => esc(stageOf(s)?.name || s)).join(', ')}</p>
+    <p>${esc(e.text)}</p>
+    ${(e.options || []).map(o => `<div class="opt"><div><b>${esc(o.label)}</b><div class="small muted">${esc(o.outcome)}</div></div>
+      <span class="odds ${/^safe/i.test(o.check) ? 'safe' : /%/.test(o.check) ? 'risky' : 'gated'}">${esc(o.check)}</span></div>`).join('')}
+  </div>`;
+}
+function renderWorld() {
+  const links = [
+    ['#b23a2e', '<b>Needs → the world.</b> A hungry Coaster looks for food: every action says what it gives (+25 hunger) and takes (−20 hygiene).'],
+    ['#1d6b3a', '<b>The world → life progression.</b> Doing things builds skills, relationships and a name, and earns money: what the steps ask for.'],
+    ['#b07a08', '<b>Life progression → the world.</b> Each step opens new things to do (🔒), like a mat to sleep on once someone takes you in.'],
+    ['#7a4fd0', '<b>The world pushes back.</b> Rhythms (night, rain, dumsor) and events (city guards, funerals) change needs and test skills.']
+  ];
+  return `
+  <section class="section"><div class="section-head"><div><h2>World interaction</h2><p>Where, and with whom, a Coaster lives it all: places offer things to do, people offer relationships, and the town's rhythms and surprises push back.</p></div></div>
+    <div class="card links">${links.map(([c, t]) => `<div style="--c:${c}">${t}</div>`).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><h3>Places</h3><p>Where things happen.</p></div><div class="spacer"></div>${addBtn('places')}</div>
+    <div class="grid" style="--min:330px">${D.places.map(placeCard).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><h3>Things to do</h3><p>Every action says what it gives and takes: the numbers the Coaster decides with.</p></div><div class="spacer"></div>
+    <div class="filters"><select data-change="world-stage"><option value="">Every life stage</option>${options(D.lifeStages, worldStage)}</select>
+      <select data-change="world-need"><option value="">Any need</option>${options(D.needs, worldNeed, n => `Fills ${n.name.toLowerCase()}`)}</select>${addBtn('actions')}</div></div>
+    ${actionsTable()}</section>
+  <section class="section"><div class="section-head"><div><h3>People of Gold Coast</h3><p>Coasters too: each has a personality, a place, a day, and what they can become to the player.</p></div><div class="spacer"></div>${addBtn('coasters')}</div>
+    <div class="grid" style="--min:280px">${D.coasters.map(coasterCard).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><h3>Street events</h3><p>Surprises. There's always a safe way out that costs something, and chancier ways that depend on skills and people.</p></div><div class="spacer"></div>${addBtn('events')}</div>
+    <div class="grid" style="--min:330px">${D.events.map(eventCard).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><h3>The town's rhythms</h3><p>Days, weeks and seasons that change what everyone needs and does.</p></div><div class="spacer"></div>${addBtn('worldRhythms')}</div>
+    <div class="grid" style="--min:250px">${D.worldRhythms.map((r, i) => `<div class="card rhythm">${editBtn('worldRhythms', i)}<div class="when">${esc(r.when)}</div><h3>${esc(r.name)}</h3><p class="small">${esc(r.text)}</p></div>`).join('')}</div></section>`;
+}
+
+// ---- story ----
+function renderStory() {
+  const S = D.story;
+  return `
+  <section class="section"><div class="section-head"><div><h2>Story</h2><p>Where a Coaster's life starts, and its chapters. The story's goals are steps on the life map, so the story and the systems stay one thing.</p></div></div></section>
+  <section class="section"><div class="section-head"><div><h3>Where a Coaster starts</h3></div><div class="spacer"></div>${addBtn('story.origins')}</div>
+    <div class="grid" style="--min:290px">${S.origins.map((o, i) => `<div class="card accent" style="--c:${esc(stageOf(o.stage)?.color || '#e3a21a')}" id="origin-${esc(o.id)}">${editBtn('story.origins', i)}
+      <div class="chips">${stageChip(o.stage)}${o.inGame ? '<span class="chip" style="--c:#1d6b3a">In the game now</span>' : o.start ? '<span class="chip" style="--c:#2e5aa6">On the map</span>' : '<span class="chip">An idea</span>'}</div>
+      <h3 style="margin-top:10px">${esc(o.name)}</h3><p>${esc(o.text)}</p>
+      ${o.start ? `<p class="small"><b>Starts at</b> ${oppChip(o.start)}</p>` : ''}
+      ${(o.alreadyDone || []).length ? `<h4>Already done at the start</h4><div class="chips">${o.alreadyDone.map(oppChip).join('')}</div>` : ''}
+      ${(o.firstGoals || []).length ? `<h4>First goals</h4><div class="chips">${o.firstGoals.map(oppChip).join('')}</div>` : ''}</div>`).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><h3>Chapters</h3><p>One for each life stage, for now.</p></div><div class="spacer"></div>${addBtn('story.chapters')}</div>
+    <div class="chapters">${S.chapters.map((c, i) => { const s = stageOf(c.stage); return `<div class="chapter" style="--c:${esc(s?.color || '#e3a21a')}" id="chapter-${esc(c.id)}">
+      <div class="ch-dot">${i + 1}</div><div class="card">${editBtn('story.chapters', i)}
+        <div class="small muted">Chapter ${i + 1} · ${esc(s?.name || c.stage)}</div><h3>${esc(c.name)}</h3>
+        <ul class="beats">${(c.beats || []).map(b => `<li>${esc(b)}</li>`).join('')}</ul>
+        <h4>Goals</h4><div class="chips">${(c.goals || []).map(oppChip).join('')}</div></div></div>`; }).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><h3>Proverbs</h3></div><div class="spacer"></div>${addBtn('meta.proverbs')}</div>
+    <div class="grid" style="--min:300px">${(D.meta.proverbs || []).map((p, i) => `<div class="card">${editBtn('meta.proverbs', i)}<blockquote class="proverb" style="margin:0">${esc(p.twi)}<small>${esc(p.english)}</small></blockquote></div>`).join('')}</div></section>
+  <section class="section"><div class="section-head"><div><h3>Writer's notes</h3><p>Anything for the story. It's saved with the design.</p></div></div>
+    <textarea class="notes" data-input="notes" placeholder="Write the story here…">${esc(S.notes || '')}</textarea></section>`;
+}
+
+// ---- data ----
+const SECTIONS = {
+  meta: 'The title, notes, principles, proverbs, and how to edit.', dimensions: 'The six kinds of things a step can ask for.',
+  lifeStages: 'Toddler to elder: the columns of the life map.', needTiers: 'Survival, comfort, heart, spirit.',
+  needs: 'Each need: how fast it falls at each life stage (decay, an hour) and how urgent it gets (curve).',
+  moodlets: 'Short feelings that lift or sink the mood.', traits: 'Personality: effects, and the actions each trait likes.',
+  decisionModel: 'The numbers the simulator decides with.', routines: 'Typical days.', skills: 'What a Coaster can learn, 0 to 10.',
+  relationshipLadder: 'From stranger to family.', relationshipTypes: 'The people who can matter in a life.',
+  reputationCircles: "Where a Coaster's name counts.", resourceTypes: 'Money, things, papers, property.', tracks: 'The rows of the life map.',
+  opportunities: 'The steps of the life map: the branches.', achievements: 'Milestones, and the steps they help open.',
+  coasters: 'The named people of Gold Coast.', places: 'Where things happen.',
+  actions: 'What a Coaster can do: needs it changes, costs, earnings, hours, and the step that opens it (requires).',
+  events: 'Surprises with choices.', worldRhythms: "The town's days, weeks and seasons.", story: 'Starts, chapters, and the notes.',
+  buildParts: 'The parts of the build plan.', jobs: 'The build plan: one job at a time, and what each brings into the game (uses).',
+  tutorial: 'The lessons the game teaches as you play: when each shows, what it points at, and what ticks it off.'
+};
+function renderData() {
+  const problems = lint(D);
+  return `
+  <section class="section"><div class="section-head"><div><h2>The design, as JSON</h2><p>This is exactly what goes into <b>design/coaster_life.json</b>. Change it here, or in any text editor.</p></div></div>
+    <div class="data-grid">
+      <div class="card"><textarea class="json big" id="allJson" spellcheck="false">${esc(pretty(D))}</textarea>
+        <p class="form-error" id="allError"></p>
+        <div class="modal-actions"><button class="btn primary" data-act="apply-json">Use these changes</button><button class="btn" data-act="reset-json">Put the box back</button></div></div>
+      <div class="card side">
+        <h3>Saving</h3><p class="small">${esc(whereSaves())}</p>
+        <div class="chips"><button class="btn small" data-act="save">Save now</button><button class="btn small" data-act="download">Download a copy</button><button class="btn small" data-act="pick">Open another file…</button></div>
+        <h3 style="margin-top:20px">Checks</h3>
+        ${problems.length ? `<p class="small">${problems.length} thing${problems.length > 1 ? 's' : ''} to look at. <button class="btn small" data-act="checks">See them</button></p>` : '<p class="small">✓ Every link points somewhere, nothing loops, and money alone opens no step.</p>'}
+        <h3 style="margin-top:20px">What's in it</h3>
+        <ul class="sections">${Object.entries(SECTIONS).map(([k, t]) => `<li><code>${k}</code> ${esc(t)}${Array.isArray(D[k]) ? ` <span class="muted">(${D[k].length})</span>` : ''}</li>`).join('')}</ul>
+        <h3 style="margin-top:20px">A new branch, by hand</h3>
+        <p class="small">Add one of these to <code>opportunities</code>. Its <code>after</code> names the step it grows from.</p>
+        <pre class="sample">${esc(pretty({ id: 'kente_weaving', name: 'Learn kente weaving', stage: 'teen', track: 'trade', summary: 'A master weaver takes you on.',
+          requires: [{ kind: 'relationships', what: 'A master weaver' }, { kind: 'choices', what: 'Move to the village' }], after: ['errands'], cost: '', unlocks: ['Weaving'] }))}</pre>
+        ${(D.meta.howToEdit || []).length ? `<ul class="small">${D.meta.howToEdit.map(h => `<li>${esc(h)}</li>`).join('')}</ul>` : ''}
+      </div>
+    </div></section>`;
+}
+
+// ---- the build plan ----
+const STATUS = { todo: 'To do', doing: 'Doing now', done: 'Done', later: 'Later' };
+const NEXT_STATUS = { todo: 'doing', doing: 'done', done: 'todo', later: 'todo' };
+// What a job can bring into the game: its key in "uses", the design's list, a label, and a color.
+const USE_KINDS = [['needs', 'needs', 'Needs', '#b23a2e'], ['steps', 'opportunities', 'Steps', '#b07a08'], ['actions', 'actions', 'Actions', '#1d6b3a'],
+  ['places', 'places', 'Places', '#3f7a3a'], ['coasters', 'coasters', 'People', '#7a4fd0'], ['events', 'events', 'Events', '#b23a2e'],
+  ['achievements', 'achievements', 'Achievements', '#b38600'], ['skills', 'skills', 'Skills', '#d27f1f'], ['moodlets', 'moodlets', 'Moodlets', '#c2507a']];
+const jobOf = (kind, id) => D.jobs.find(j => (j.uses?.[kind] || []).includes(id));
+function jobChip(kind, id) {
+  const j = jobOf(kind, id);
+  if (!j) return '';
+  const label = j.number ? `Job ${j.number}` : j.status === 'done' ? 'In the game' : 'Later';
+  return `<button class="chip job-chip ${esc(j.status)}" data-act="go" data-tab="plan" data-id="job-${esc(j.id)}" title="${esc(j.title)}">${esc(label)}</button>`;
+}
+function moveJob(i, step) {
+  const part = D.jobs[i].part;
+  let j = i + step;
+  while (j >= 0 && j < D.jobs.length && D.jobs[j].part !== part) j += step; // stays within its part
+  if (j < 0 || j >= D.jobs.length) return;
+  change(d => { [d.jobs[i], d.jobs[j]] = [d.jobs[j], d.jobs[i]]; });
+}
+function usesChips(uses, kinds = USE_KINDS) {
+  return kinds.map(([kind, list, label, color]) => {
+    const ids = uses[kind] || [];
+    if (!ids.length) return '';
+    const names = byId(D[list]);
+    return `<div class="uses"><span class="small muted">${label}</span><div class="chips">${ids.map(x =>
+      `<button class="chip" style="--c:${color}" data-act="use-go" data-kind="${kind}" data-id="${esc(x)}">${esc(names[x]?.name || x)}</button>`).join('')}</div></div>`;
+  }).join('');
+}
+function jobCard(j, i) {
+  const jobs = byId(D.jobs), lessons = D.tutorial.filter(l => l.job === j.id);
+  const after = (j.after || []).filter(a => a !== 'built').map(a => `after ${jobs[a]?.number ? 'Job ' + jobs[a].number : esc(a)}`).join(', ');
+  return `<div class="card job ${esc(j.status)}" id="job-${esc(j.id)}">${editBtn('jobs', i)}
+    <div class="job-head"><span class="job-n">${j.number ?? (j.status === 'done' ? '✓' : '…')}</span><div><h3>${esc(j.title)}</h3><p class="small">${esc(j.goal)}</p></div></div>
+    <div class="job-bar"><button class="status-chip ${esc(j.status)}" data-act="job-status" data-i="${i}" title="Move it on">${esc(STATUS[j.status] || j.status)}</button>
+      ${after ? `<span class="small muted">${after}</span>` : ''}<span class="spacer"></span>
+      <button class="btn small ghost" data-act="job-up" data-i="${i}" title="Earlier">↑</button><button class="btn small ghost" data-act="job-down" data-i="${i}" title="Later">↓</button></div>
+    ${(j.builds || []).length ? `<details class="more"><summary>What it builds (${j.builds.length})</summary><ol class="builds">${j.builds.map(b => `<li>${esc(b)}</li>`).join('')}</ol></details>` : ''}
+    ${lessons.length ? `<details class="more"><summary>Tutorial lessons it adds (${lessons.length})</summary><div class="chips">${lessons.map(l =>
+      `<button class="chip" style="--c:#7a4fd0" data-act="go" data-tab="tutorial" data-id="lesson-${esc(l.id)}">${esc(l.title)}</button>`).join('')}</div></details>` : ''}
+    ${usesChips(j.uses || {})}
+    ${j.test ? `<p class="small"><b>Test:</b> ${esc(j.test)}</p>` : ''}
+    ${j.doneWhen ? `<p class="small"><b>Done when:</b> ${esc(j.doneWhen)}</p>` : ''}
+    ${(j.ask || []).length ? `<p class="ask small"><b>Ask first:</b> ${j.ask.map(esc).join(' ')}</p>` : ''}
+  </div>`;
+}
+function renderPlan() {
+  const numbered = D.jobs.filter(j => j.number), count = s => numbered.filter(j => j.status === s).length;
+  const parts = new Set(D.buildParts.map(p => p.id));
+  const section = (name, text, list) => list.length ? `<section class="section"><div class="section-head"><div><h3>${esc(name)}</h3><p>${esc(text)}</p></div></div>
+    <div class="grid" style="--min:400px">${list.map(([j, i]) => jobCard(j, i)).join('')}</div></section>` : '';
+  const all = D.jobs.map((j, i) => [j, i]);
+  const left = USE_KINDS.map(([kind, list, label, color]) => {
+    const used = new Set(D.jobs.flatMap(j => j.uses?.[kind] || []));
+    return [kind, D[list].filter(x => x.id && !used.has(x.id)).map(x => x.id), label, color];
+  });
+  const leftOver = Object.fromEntries(left.map(([kind, ids]) => [kind, ids]));
+  const nothingLeft = left.every(([, ids]) => !ids.length);
+  return `
+  <section class="section"><div class="section-head"><div><h2>Build plan</h2><p>The design, brought into the game one job at a time. Each job is one session, ends with a test, and leaves the game playable. Click a job's status to move it on; ↑ and ↓ change the order within its part.</p></div>
+    <div class="spacer"></div>${addBtn('jobs', 'Add a job')}</div>
+    <div class="card plan-top"><div class="progress"><i style="width:${numbered.length ? count('done') / numbered.length * 100 : 0}%"></i></div>
+      <span><b>${count('done')}</b> of ${numbered.length} jobs done</span><span class="muted small">${count('doing')} doing now · ${count('todo')} to do</span></div></section>
+  ${D.buildParts.map(p => section(p.name, p.text, all.filter(([j]) => j.part === p.id))).join('')}
+  ${section('Not in a part', 'Jobs whose part is missing (see the checks).', all.filter(([j]) => !parts.has(j.part)))}
+  <section class="section" id="unplanned"><div class="section-head"><div><h3>Not in any job yet</h3><p>Parts of the design no job brings into the game. Add them to a job's "uses" to plan them.</p></div></div>
+    <div class="card">${nothingLeft ? '<p>✓ Every part of the design is in a job.</p>' : usesChips(leftOver)}</div></section>`;
+}
+
+// ---- the tutorial ----
+function whenText(w) {
+  const [kind, rest = ''] = String(w || '').split(/:(.*)/s), r = rest.trim();
+  if (kind === 'start') return 'A new game';
+  if (kind === 'after') return `After “${byId(D.tutorial)[r]?.title || r}”`;
+  if (kind === 'need below') { const [n, v] = r.split(/\s+/); return `${byId(D.needs)[n]?.name || n} below ${v}`; }
+  if (kind === 'first') return `The first time: ${r}`;
+  if (kind === 'arrive') return `Arriving at ${placeName(r)}`;
+  if (kind === 'time') return `At ${r}`;
+  if (kind === 'day') return `On day ${r}`;
+  if (kind === 'money above') return `Over GH₵${r}`;
+  if (kind === 'money below') return `Under GH₵${r}`;
+  return w || 'Any time';
+}
+function pointText(p) {
+  const [kind, rest = ''] = String(p || '').split(/:(.*)/s);
+  return kind === 'place' ? `📍 ${placeName(rest)}` : kind === 'ui' ? `👆 the ${rest}` : '';
+}
+function renderTutorial() {
+  const jobs = byId(D.jobs);
+  const groups = [['', 'Every start', 'Lessons for any start, as each system comes into the game.'], ...D.story.origins.map(o => [o.id, o.name, o.text])];
+  const lesson = ([l, i], k) => `<div class="lesson" id="lesson-${esc(l.id)}">
+    <div class="tip"><span class="tip-n">${k + 1}</span><div><b>${esc(l.title)}</b><p>${esc(l.text)}</p></div>${editBtn('tutorial', i)}</div>
+    <div class="chips"><span class="chip" style="--c:#2e5aa6" title="When it shows">⏱ ${esc(whenText(l.when))}</span>
+      ${l.point ? `<span class="chip" style="--c:#1d6b3a" title="What it points at">${esc(pointText(l.point))}</span>` : ''}
+      <span class="chip" style="--c:#b07a08" title="What ticks it off">✓ ${esc(l.doneWhen || 'got it')}</span>
+      ${jobs[l.job] ? `<button class="chip" style="--c:#7a4fd0" data-act="go" data-tab="plan" data-id="job-${esc(l.job)}">${esc(jobs[l.job].number ? 'Job ' + jobs[l.job].number : jobs[l.job].title)}</button>` : ''}</div>
+  </div>`;
+  return `
+  <section class="section"><div class="section-head"><div><h2>Tutorial</h2><p>How the game teaches as you play. The first time something matters, a tip card says what to do and an arrow shows the way, and the goals say what to do now. Each lesson comes into the game with its job.</p></div>
+    <div class="spacer"></div>${addBtn('tutorial', 'Add a lesson')}</div>
+    <div class="card small"><b>How a lesson works.</b> <i>When</i> it shows: a new game, after another lesson, a need getting low, the first time something happens, arriving somewhere, a time or a day, or money going over or under an amount. <i>Points at</i>: a place (the arrow shows the way) or a part of the screen. <i>Done when</i>: what she does to tick it off ("got it" is a button).</div></section>
+  ${groups.map(([id, name, text]) => {
+    const list = D.tutorial.map((l, i) => [l, i]).filter(([l]) => (l.origin || '') === id);
+    return list.length ? `<section class="section"><div class="section-head"><div><h3>${esc(name)}</h3><p>${esc(text || '')}</p></div></div>
+      <div class="lessons">${list.map(lesson).join('')}</div></section>` : '';
+  }).join('')}`;
+}
+
+// ---- changing anything else: one item (or one value) as JSON ----
+const at = (path, d = D) => path.split('.').reduce((o, k) => o?.[k], d);
+function setAt(path, value, d = D) {
+  const keys = path.split('.'), last = keys.pop();
+  const parent = keys.reduce((o, k) => (o[k] ??= {}), d);
+  parent[last] = value;
+}
+function blank(v) {
+  if (Array.isArray(v)) return v.length && v[0] && typeof v[0] === 'object' ? [blank(v[0])] : v.slice();
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, blank(x)]));
+  return typeof v === 'number' ? 0 : typeof v === 'boolean' ? false : '';
+}
+function editItem(path, i) {
+  if (!Array.isArray(at(path))) setAt(path, []);
+  const list = at(path), isNew = i === undefined;
+  let item = list[i];
+  if (isNew) {
+    item = list[0] ? blank(list[0]) : { id: '', name: '' };
+    if ('id' in item || !list.length) item.id = uniqueId('new', new Set(list.map(x => x.id)));
+    if ('name' in item) item.name = 'New';
+  }
+  modalState = { path, i, isNew };
+  modal(`<h3>${isNew ? 'Add' : 'Change'}: ${esc(path)}</h3>
+    <p class="small muted">Change the words between the quotes, and keep the commas and brackets. Ids link things together, so if you change one, change the links to it too (the checks will tell you).</p>
+    <textarea class="json" id="itemJson" spellcheck="false">${esc(pretty(item))}</textarea>
+    <p class="form-error" id="itemError"></p>
+    <div class="modal-actions"><button class="btn primary" data-act="item-save">${isNew ? 'Add it' : 'Save'}</button>
+      ${isNew ? '' : '<button class="btn" data-act="item-dup">Make a copy</button><button class="btn danger" data-act="item-del">Delete</button>'}
+      <button class="btn" data-act="modal-close">Cancel</button></div>`);
+}
+function readItem() {
+  try {
+    const v = JSON.parse($('#itemJson').value);
+    if (modalState.value) {
+      if (Array.isArray(v) !== Array.isArray(at(modalState.path)) || typeof v !== 'object' || v === null) throw new Error('Keep it the same shape: a [ … ] list or a { … } block, as it was.');
+    } else if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('It should be one { … } block.');
+    return v;
+  } catch (e) {
+    $('#itemError').textContent = e.message;
+    return null;
+  }
+}
+function saveItem(copy) {
+  const v = readItem();
+  if (!v) return;
+  const { path, i, isNew } = modalState;
+  if (modalState.value) { closeModal(); return change(d => setAt(path, v, d)); }
+  const list = at(path), hasIds = 'id' in v || list.some(x => x && 'id' in x);
+  if (copy) v.id = uniqueId(`${v.id || 'copy'}_copy`, new Set(list.map(x => x.id)));
+  if (hasIds && !v.id) return void ($('#itemError').textContent = 'It needs an "id".');
+  if (hasIds && list.some((x, j) => x.id === v.id && (isNew || copy || j !== i))) return void ($('#itemError').textContent = `Another one already has the id "${v.id}".`);
+  closeModal();
+  change(d => { const l = at(path, d); if (isNew) l.push(v); else if (copy) l.splice(i + 1, 0, v); else l[i] = v; });
+  toast(isNew ? 'Added' : copy ? 'Copied' : 'Saved');
+}
+function editValue(path) {
+  modalState = { path, value: true };
+  modal(`<h3>Change: ${esc(path)}</h3>
+    <textarea class="json" id="itemJson" spellcheck="false">${esc(pretty(at(path) ?? {}))}</textarea>
+    <p class="form-error" id="itemError"></p>
+    <div class="modal-actions"><button class="btn primary" data-act="item-save">Save</button><button class="btn" data-act="modal-close">Cancel</button></div>`);
+}
+function showChecks() {
+  const list = lint(D);
+  modal(`<h3>${list.length ? `${list.length} thing${list.length > 1 ? 's' : ''} to look at` : 'Everything links up'}</h3>
+    <p class="small muted">The board checks that every link points somewhere, nothing loops, and money alone never opens a step.</p>
+    ${list.length ? `<ul class="checks">${list.map((p, i) => `<li><span>${p.level === 'error' ? '⛔' : '⚠️'}</span><span>${esc(p.text)}</span>
+      ${p.go ? `<button class="btn small" data-act="check-go" data-i="${i}">Show me</button>` : '<span></span>'}</li>`).join('')}</ul>`
+      : '<p>✓ No broken links, no loops, and no step that money alone opens.</p>'}
+    <div class="modal-actions"><button class="btn" data-act="modal-close">Close</button></div>`);
+  modalState = { checks: list };
+}
+function mapHelp() {
+  modal(`<h3>How to read the map</h3>
+    <p><b>Columns</b> are life stages, toddler to elder. <b>Rows</b> are tracks: kinds of life (street, family, papers, school, trades, work, community).</p>
+    <p><b>Arrows</b> lead from a step to the steps that come after it. A dashed arrow means any one of those steps is enough. <b>BY AGE</b> steps need nothing before them: they open at that life stage.</p>
+    <p>The <b>six icons</b> on a step show what it asks for: ${D.dimensions.map(x => `${esc(x.icon)} ${esc(x.name.toLowerCase())}`).join(', ')}. A red <b>MONEY ONLY</b> tag means money alone opens it, which the design avoids.</p>
+    <p><b>Click</b> a step to see it, with everything before and after it lit up. <b>Drag</b> to move around; <b>⌘ + scroll</b> (or pinch) zooms. Click a kind at the top to light up the steps that ask for it.</p>
+    <div class="modal-actions"><button class="btn primary" data-act="modal-close">Got it</button></div>`);
+}
+
+// ---- what every button and box does ----
+const ACTS = {
+  tab: t => setTab(t.dataset.tab),
+  go: t => goTo(t.dataset.tab, t.dataset.id),
+  select: t => select(t.dataset.id),
+  pick: () => pickFile(),
+  'use-backup': () => { const b = readBackup(); if (b) { mode = 'download'; handle = null; open(b.text); } },
+  restore: () => { const b = pendingBackup; closeModal(); if (b) { undo.push(JSON.stringify(D)); D = normalise(JSON.parse(b.text)); touched(); toast('Brought back'); } },
+  'discard-backup': () => { closeModal(); writeBackup(false); },
+  save: () => save(),
+  undo: () => step(undo, redo),
+  redo: () => step(redo, undo),
+  download: () => download(pretty(D) + '\n'),
+  checks: () => showChecks(),
+  'check-go': t => { const p = modalState.checks[+t.dataset.i]; closeModal(); goTo(p.go.tab, p.go.id); },
+  'modal-bg': (t, e) => { if (e.target === t) closeModal(); },
+  'modal-close': () => closeModal(),
+  'edit-item': t => editItem(t.dataset.path, +t.dataset.i),
+  'add-item': t => editItem(t.dataset.path),
+  'edit-value': t => editValue(t.dataset.path),
+  'item-save': () => saveItem(false),
+  'item-dup': () => saveItem(true),
+  'item-del': () => { const { path, i } = modalState; closeModal(); change(d => at(path, d).splice(i, 1)); toast('Deleted'); },
+  'map-help': () => mapHelp(),
+  'new-branch': () => { if (!editing || leaveEdit()) newDraft(''); },
+  'add-after': () => newDraft(selected),
+  'edit-opp': () => startEdit(byId(D.opportunities)[selected]),
+  'remove-opp': () => askRemove(),
+  'remove-one': () => removeSteps([modalState.id]),
+  'remove-branch': () => removeSteps([...branchOf(D, modalState.id)]),
+  'save-opp': () => saveOpp(),
+  'cancel-edit': () => { editing = null; renderDrawer(); },
+  'close-drawer': () => { if (editing && !leaveEdit()) return; editing = null; selected = ''; refreshMarks(); renderDrawer(); },
+  'req-add': () => { editing.requires.push({ kind: 'skills', what: '' }); renderDrawer(); $$('#drawer [data-input=req]').pop()?.focus(); },
+  'req-del': t => { editing.requires.splice(+t.dataset.i, 1); renderDrawer(); },
+  'after-del': t => { editing.after = editing.after.filter(x => x !== t.dataset.id); renderDrawer(); },
+  dim: t => { focusDim = focusDim === t.dataset.id ? '' : t.dataset.id; for (const c of $$('.dims .chip')) c.classList.toggle('on', c.dataset.id === focusDim); refreshMarks(); },
+  'zoom-in': () => setZoom(zoom * 1.15),
+  'zoom-out': () => setZoom(zoom / 1.15),
+  'zoom-fit': () => { const box = $('.map-scroll'); if (box && layout) setZoom(Math.min(1, (box.clientWidth - 16) / layout.width)); },
+  'sim-trait': t => { const id = t.dataset.id; sim.traits = sim.traits.includes(id) ? sim.traits.filter(x => x !== id) : [...sim.traits, id]; drawSim(); },
+  'sim-has': t => { const id = t.dataset.id; sim.has = sim.has.includes(id) ? sim.has.filter(x => x !== id) : [...sim.has, id]; drawSim(); },
+  'sim-step': () => { simStep(); drawSim(); },
+  'sim-day': () => { simDay(); drawSim(); },
+  'sim-reset': () => { sim = newSim(sim.stage); drawSim(); },
+  'apply-json': () => {
+    let v;
+    try { v = JSON.parse($('#allJson').value); } catch (e) { $('#allError').textContent = e.message; return; }
+    if (!v || !Array.isArray(v.opportunities)) { $('#allError').textContent = 'It needs an "opportunities" list.'; return; }
+    undo.push(JSON.stringify(D)); redo = [];
+    D = normalise(v);
+    touched();
+    toast('Using the changes');
+  },
+  'reset-json': () => { $('#allJson').value = pretty(D); $('#allError').textContent = ''; },
+  'job-status': t => change(d => { const j = d.jobs[+t.dataset.i]; j.status = NEXT_STATUS[j.status] || 'todo'; }),
+  'job-up': t => moveJob(+t.dataset.i, -1),
+  'job-down': t => moveJob(+t.dataset.i, 1),
+  'use-go': t => {
+    const id = t.dataset.id, where = {
+      needs: ['needs', `need-${id}`], steps: ['progress', id], actions: ['world', `action-${id}`], places: ['world', `place-${id}`],
+      coasters: ['world', `coaster-${id}`], events: ['world', `event-${id}`], achievements: ['progress', 'achievements'],
+      skills: ['progress', 'skills'], moodlets: ['needs', 'moodlets'] }[t.dataset.kind];
+    if (where) goTo(where[0], where[1]);
+  }
+};
+const INPUTS = {
+  f: t => {
+    editing[t.dataset.k] = t.value;
+    if (t.dataset.k === 'name' && editing._isNew && !editing._idTouched) {
+      editing.id = uniqueId(slug(t.value) || 'step', new Set(D.opportunities.map(o => o.id)));
+      $('#idBox').value = editing.id;
+    }
+  },
+  'f-lines': t => { editing[t.dataset.k] = t.value.split('\n'); },
+  'f-id': t => { editing.id = t.value.trim(); editing._idTouched = true; },
+  req: t => { editing.requires[+t.dataset.i].what = t.value; $('#mixNote').innerHTML = mixNote(editing); },
+  'map-search': t => { query = t.value; refreshMarks(); },
+  'sim-need': t => { sim.needs[t.dataset.id] = +t.value; t.nextElementSibling.textContent = t.value; drawChoices(); },
+  'sim-money': t => { sim.money = Math.max(0, +t.value || 0); $('#simMoney').textContent = `GH₵ ${sim.money}`; drawChoices(); },
+  notes: t => {
+    if (!notesSnap) { undo.push(JSON.stringify(D)); redo = []; notesSnap = true; }
+    D.story.notes = t.value;
+    touched(false);
+  }
+};
+const CHANGES = {
+  f: t => { editing[t.dataset.k] = t.value; },
+  'f-any': t => { editing.afterAny = t.checked; },
+  'req-kind': t => { editing.requires[+t.dataset.i].kind = t.value; renderDrawer(); },
+  'after-add': t => { if (t.value) { editing.after.push(t.value); renderDrawer(); } },
+  'file-input': t => readPicked(t),
+  'sim-stage': t => { sim.stage = t.value; sim.routine = firstRoutine(sim.stage); render(); },
+  'sim-routine': t => { sim.routine = t.value; drawChoices(); },
+  'sim-weekday': t => { sim.time = (Math.floor(sim.time / 1440) - DAYS.indexOf(dayOf(sim.time)) + +t.value) * 1440 + (((sim.time % 1440) + 1440) % 1440); drawSim(); },
+  'sim-clock': t => { sim.clock = t.checked; drawChoices(); },
+  'sim-time': t => {
+    const [h, m] = t.value.split(':').map(Number);
+    if (!Number.isNaN(h)) { sim.time = Math.floor(sim.time / 1440) * 1440 + h * 60 + (m || 0); drawSim(); }
+  },
+  'world-stage': t => { worldStage = t.value; render(); },
+  'world-need': t => { worldNeed = t.value; render(); }
+};
+const isTyping = el => !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
+function bindEvents() {
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-act]');
+    if (t && ACTS[t.dataset.act]) ACTS[t.dataset.act](t, e);
+  });
+  document.addEventListener('input', e => { const t = e.target.closest('[data-input]'); if (t && INPUTS[t.dataset.input]) INPUTS[t.dataset.input](t, e); });
+  document.addEventListener('change', e => { const t = e.target.closest('[data-change]'); if (t && CHANGES[t.dataset.change]) CHANGES[t.dataset.change](t, e); });
+  document.addEventListener('focusout', e => { if (e.target.matches?.('[data-input=notes]')) notesSnap = false; });
+  document.addEventListener('keydown', e => {
+    const mod = e.metaKey || e.ctrlKey, key = e.key.toLowerCase();
+    if (mod && key === 's') { e.preventDefault(); if (D) save(); }
+    else if (mod && key === 'z' && D && !isTyping(e.target)) { e.preventDefault(); e.shiftKey ? step(redo, undo) : step(undo, redo); }
+    else if (e.key === 'Escape') { if ($('#modal').innerHTML) closeModal(); else if (selected || editing) ACTS['close-drawer'](); }
+    else if (e.key === 'Enter' && e.target.matches?.('.search')) { const hit = $('.node:not(.dim)'); if (hit && query.trim()) select(hit.dataset.id); }
+  });
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+  window.addEventListener('resize', () => { const box = $('.map-scroll'); if (box) box.style.height = `calc(100vh - ${$('#top').offsetHeight + $('.map-tools').offsetHeight}px)`; });
+}
+
+if (typeof document !== 'undefined') start();
+</script>
+</body>
+</html>

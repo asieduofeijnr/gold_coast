@@ -6,3 +6,9 @@ blender/buildings/reference/
 blender/vehicles/*.svg
 blender/vehicles/*.svg.png
 assets/concepts/
+# The design board keeps its own backups here (see design/serve.py): local history, not part of the repo
+design/backups/
+__pycache__/
+# Reference notes in sketch/: read for ideas, not ours to publish
+sketch/Lagos_life_claude_sessions.md
+sketch/sims engine.txt

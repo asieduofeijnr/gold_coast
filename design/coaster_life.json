@@ -1,0 +1,4480 @@
+{
+  "meta": {
+    "title": "Coaster Life",
+    "subtitle": "Gold Coast's life design: what a Coaster needs, what they can become, and the world they live it in.",
+    "version": 1,
+    "updated": "2026-10-30",
+    "notes": "A Coaster is anyone living in Gold Coast. Three systems work together: needs and behaviour (what does the Coaster need now?), life progression (what can the Coaster become, achieve, or reach over time?), and the world (where, and with whom, do they live it?). The game today is one young woman's hustle in town; this is where a Coaster comes from, and where they can go.",
+    "principles": [
+      {
+        "name": "Needs pull, the world offers",
+        "text": "Every action says what it gives (+25 hunger) and takes (−20 hygiene). The Coaster weighs each one by how badly they need it, the way The Sims' objects advertise."
+      },
+      {
+        "name": "Survive first, then belong, then rise",
+        "text": "Hunger, thirst, sleep and the toilet come first. Company, fun and belonging count for more once the body is safe; hope and respect most of all when the rest is in place."
+      },
+      {
+        "name": "Money never opens everything",
+        "text": "Every step also asks for something money can't buy: a skill, an education, a relationship, a reputation, or a choice. The board warns you when money alone opens a step."
+      },
+      {
+        "name": "Every lock says how to open it",
+        "text": "Nothing is hidden. Each step lists exactly what it takes, so the player always knows what to work on next."
+      },
+      {
+        "name": "Hard, but never hopeless",
+        "text": "Life starts hard (food from the rubbish, a market table for a roof), but nothing is lost for good, and kindness, faith and community are always a way up."
+      },
+      {
+        "name": "Ghana is the content",
+        "text": "Kenkey and waakye, trotros, susu, dumsor, Free SHS, apprenticeships and freedom ceremonies, knocking, landguards and funerals: they are the mechanics, not decoration."
+      },
+      {
+        "name": "Follow the player's lead",
+        "text": "A Coaster looks after their own needs, but never undoes the player's choices: they won't quit school, leave a partner or skip work by themselves."
+      }
+    ],
+    "proverbs": [
+      {
+        "twi": "Obi nnim ɔbrempɔn ahyiaseɛ.",
+        "english": "Nobody knows the beginning of a great person."
+      },
+      {"twi": "Ɔbra yɛ ko.", "english": "Life is a battle."},
+      {"twi": "Dua koro gye mframa a, ebu.", "english": "A tree that faces the wind alone breaks."},
+      {"twi": "Sankɔfa.", "english": "Go back and fetch what you left behind."}
+    ],
+    "howToEdit": [
+      "A branch is a step in 'opportunities'. Add one with a new id, and put the id of the step it grows from in its 'after'.",
+      "'after' lists the steps that must come first: all of them, or any one if 'afterAny' is true. Leave it empty and the step opens when the Coaster reaches its life stage.",
+      "'requires' says what a step takes. Each has a 'kind' (choices, education, skills, relationships, reputation or resources) and a 'what'. Give every step at least one kind that isn't resources: money alone never opens anything.",
+      "An action's 'requires' is the id of the step that opens it, like 'taken_in' opening 'Sleep on a mat'. Its 'needs' are what it gives (+) and takes (−); 'earns' is [least, most] in cedis.",
+      "An action's 'hours' (like \"07:00 to 12:00\") and 'days' (mon to sun) say when it can happen; 'until' names the step after which the Coaster stops doing it (no more gutter once someone takes you in). A routine line's 'actions' are what it pulls towards at that time.",
+      "Remove a branch by deleting its step, and any steps that only come after it. The board's Remove button does this, and takes out the links to it too.",
+      "'jobs' is the build plan: each job brings parts of the design into the game, listed in its 'uses' (needs, steps, actions, places, coasters, events, achievements, skills, moodlets). Its order is the order to build them; its number is its name.",
+      "'tutorial' holds the lessons. 'when' is one of: start, after:<lesson>, need below:<need> <number>, first:<something happening>, arrive:<place>, time:<HH:MM>, day:<number>, money above:<cedis>, money below:<cedis>. 'point' is place:<place> or ui:<part of the screen>. 'doneWhen' is what ticks it off ('got it' means a button)."
+    ]
+  },
+  "dimensions": [
+    {
+      "id": "choices",
+      "name": "Choices",
+      "icon": "🧭",
+      "color": "#7a4fd0",
+      "text": "The paths the Coaster commits to: school or the market, faith, love, staying or leaving."
+    },
+    {
+      "id": "education",
+      "name": "Education",
+      "icon": "🎓",
+      "color": "#2e5aa6",
+      "text": "School and certificates: basic school, the BECE, Free SHS, the WASSCE, a trade's freedom, a course, a degree."
+    },
+    {
+      "id": "skills",
+      "name": "Skills",
+      "icon": "🛠️",
+      "color": "#d27f1f",
+      "text": "What the Coaster can do, from 0 to 10: street smarts, trading, sewing, football, reading…"
+    },
+    {
+      "id": "relationships",
+      "name": "Relationships",
+      "icon": "🤝",
+      "color": "#c2507a",
+      "text": "Who knows them, trusts them, and vouches for them: a guardian, a master, friends, a partner, the family, the elders."
+    },
+    {
+      "id": "reputation",
+      "name": "Reputation",
+      "icon": "⭐",
+      "color": "#b38600",
+      "text": "Their name in each circle: the market, the street, the church or mosque, the school, the family, the town."
+    },
+    {
+      "id": "resources",
+      "name": "Resources",
+      "icon": "💰",
+      "color": "#3f7a3a",
+      "text": "Cedis, things (a head pan, a sewing machine), papers (a birth certificate, a Ghana Card) and property (a stall, land, a house)."
+    }
+  ],
+  "lifeStages": [
+    {
+      "id": "toddler",
+      "name": "Toddler",
+      "ages": "2 to 4",
+      "color": "#d9a24f",
+      "text": "Small, but already surviving. Needs come fast, and the market floor is the whole world."
+    },
+    {
+      "id": "child",
+      "name": "Child",
+      "ages": "5 to 11",
+      "color": "#cf7f45",
+      "text": "Old enough to help, to hawk, or to learn. Someone to look after them changes everything."
+    },
+    {
+      "id": "teen",
+      "name": "Teen",
+      "ages": "12 to 17",
+      "color": "#bd6342",
+      "text": "Strong enough to carry loads, old enough to choose: school, a trade, or the street."
+    },
+    {
+      "id": "young_adult",
+      "name": "Young adult",
+      "ages": "18 to 25",
+      "color": "#9e4d3b",
+      "text": "Papers, money, love, and the first big bets."
+    },
+    {
+      "id": "adult",
+      "name": "Adult",
+      "ages": "26 to 49",
+      "color": "#7c3c31",
+      "text": "Building: a business, a house, a family, a name."
+    },
+    {
+      "id": "elder",
+      "name": "Elder",
+      "ages": "50 and over",
+      "color": "#572c25",
+      "text": "People come for advice. What they built outlives them."
+    }
+  ],
+  "needTiers": [
+    {
+      "id": "survival",
+      "name": "Survival",
+      "color": "#b23a2e",
+      "text": "The body comes first. These get urgent fast."
+    },
+    {
+      "id": "comfort",
+      "name": "Safety and comfort",
+      "color": "#d27f1f",
+      "text": "Being clean, and somewhere safe to lay your head."
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "color": "#c2507a",
+      "text": "People and joy. They count for more once the body is looked after."
+    },
+    {
+      "id": "spirit",
+      "name": "Spirit",
+      "color": "#7a4fd0",
+      "text": "Hope and dignity. Slow to fall, slow to rise, and they colour every choice."
+    }
+  ],
+  "needs": [
+    {
+      "id": "hunger",
+      "name": "Hunger",
+      "local": "Ɛkɔm",
+      "icon": "🍲",
+      "tier": "survival",
+      "curve": "urgent",
+      "text": "Food: kenkey and fish, waakye, a plate at the chop bar, or whatever a hungry child can find.",
+      "decay": {"toddler": 6, "child": 5, "teen": 5, "young_adult": 4.5, "adult": 4, "elder": 3.5},
+      "whenLow": "Below 25 the Coaster can think of nothing else. At 0, energy drains fast and health starts to fall."
+    },
+    {
+      "id": "thirst",
+      "name": "Thirst",
+      "local": "Nsuo",
+      "icon": "💧",
+      "tier": "survival",
+      "curve": "urgent",
+      "text": "Water: a sachet of pure water, the standpipe, a kind seller's cup. In the Harmattan it goes faster.",
+      "decay": {"toddler": 8, "child": 7, "teen": 7, "young_adult": 6, "adult": 6, "elder": 5},
+      "whenLow": "In the heat, thirst comes before hunger. At 0, health falls quickly."
+    },
+    {
+      "id": "energy",
+      "name": "Energy",
+      "local": "Ahoɔden",
+      "icon": "⚡",
+      "tier": "survival",
+      "curve": "urgent",
+      "text": "Sleep and rest: under a market table, on a station bench, on a mat, or one day in a bed of your own.",
+      "decay": {"toddler": 7, "child": 6, "teen": 5, "young_adult": 5, "adult": 5, "elder": 6},
+      "whenLow": "Tired Coasters work slowly and make mistakes. At 0 they fall asleep wherever they are."
+    },
+    {
+      "id": "bladder",
+      "name": "Bladder",
+      "local": "",
+      "icon": "🚻",
+      "tier": "survival",
+      "curve": "urgent",
+      "text": "The public toilet costs a coin. The gutter costs your dignity.",
+      "decay": {"toddler": 12, "child": 10, "teen": 9, "young_adult": 8, "adult": 8, "elder": 10},
+      "whenLow": "At 0, an accident: hygiene and respect drop."
+    },
+    {
+      "id": "health",
+      "name": "Health",
+      "local": "Apɔmuden",
+      "icon": "🩺",
+      "tier": "survival",
+      "curve": "urgent",
+      "text": "Malaria, cholera and fever come from mosquitoes, bad water and bad food. The chemist, the nurse and an NHIS card bring it back.",
+      "decay": {"toddler": 0, "child": 0, "teen": 0, "young_adult": 0, "adult": 0, "elder": 0.5},
+      "whenLow": "Sick Coasters can't work or learn, and need care. It falls through risks and events, not the clock."
+    },
+    {
+      "id": "hygiene",
+      "name": "Hygiene",
+      "local": "",
+      "icon": "🫧",
+      "tier": "comfort",
+      "curve": "steady",
+      "text": "A bucket bath, the bathhouse, the sea, clean clothes off the line.",
+      "decay": {"toddler": 4, "child": 4, "teen": 4, "young_adult": 3.5, "adult": 3, "elder": 3},
+      "whenLow": "People keep their distance: friendships, work and respect all suffer."
+    },
+    {
+      "id": "safety",
+      "name": "Safety",
+      "local": "Banbɔ",
+      "icon": "🏠",
+      "tier": "comfort",
+      "curve": "urgent",
+      "text": "A safe place to sleep, and someone who has your back: a kind seller nearby, a guardian's room, a door that locks.",
+      "decay": {"toddler": 3, "child": 3, "teen": 2, "young_adult": 1.5, "adult": 1, "elder": 1},
+      "whenLow": "Afraid: the Coaster sleeps badly, and either avoids every risk or takes the wrong ones."
+    },
+    {
+      "id": "social",
+      "name": "Company",
+      "local": "Gist",
+      "icon": "💬",
+      "tier": "heart",
+      "curve": "grows",
+      "text": "Talking, gisting, playing, being known by name.",
+      "decay": {"toddler": 3, "child": 4, "teen": 5, "young_adult": 4, "adult": 3, "elder": 3},
+      "whenLow": "Lonely: the mood sinks, and the Coaster looks for any company, even bad company."
+    },
+    {
+      "id": "fun",
+      "name": "Fun",
+      "local": "Anigyeɛ",
+      "icon": "🎉",
+      "tier": "heart",
+      "curve": "grows",
+      "text": "Ampe, football, music, a Black Stars match at the viewing centre, the songs at church.",
+      "decay": {"toddler": 5, "child": 5, "teen": 5, "young_adult": 4, "adult": 3, "elder": 2},
+      "whenLow": "Bored and restless: learning and work go slower."
+    },
+    {
+      "id": "belonging",
+      "name": "Belonging",
+      "local": "Abusua",
+      "icon": "👪",
+      "tier": "heart",
+      "curve": "grows",
+      "text": "Someone who calls you their own: a guardian, a church family, a partner, children, the abusua.",
+      "decay": {
+        "toddler": 1.5,
+        "child": 1.5,
+        "teen": 1,
+        "young_adult": 1,
+        "adult": 0.8,
+        "elder": 0.6
+      },
+      "whenLow": "Alone in the world: hope drains, and every setback feels bigger."
+    },
+    {
+      "id": "hope",
+      "name": "Hope",
+      "local": "Anidasoɔ",
+      "icon": "✨",
+      "tier": "spirit",
+      "curve": "grows",
+      "text": "Faith, dreams and small wins. Hope keeps a Coaster trying.",
+      "decay": {
+        "toddler": 0.5,
+        "child": 0.6,
+        "teen": 0.8,
+        "young_adult": 0.8,
+        "adult": 0.6,
+        "elder": 0.5
+      },
+      "whenLow": "Giving up: fewer choices appear, and risky shortcuts start to look good."
+    },
+    {
+      "id": "respect",
+      "name": "Respect",
+      "local": "Animuonyam",
+      "icon": "👑",
+      "tier": "spirit",
+      "curve": "grows",
+      "text": "Being treated with dignity. It comes from honest work, helping others, and how people see you.",
+      "decay": {
+        "toddler": 0,
+        "child": 0.3,
+        "teen": 0.6,
+        "young_adult": 0.8,
+        "adult": 0.8,
+        "elder": 0.5
+      },
+      "whenLow": "Ashamed: the Coaster avoids people and accepts less than they deserve."
+    }
+  ],
+  "moodlets": [
+    {"id": "belle_full", "name": "Belly full", "mood": 15, "text": "That waakye was sweet paa."},
+    {
+      "id": "small_win",
+      "name": "A small win",
+      "mood": 10,
+      "text": "A cedi earned with my own hands."
+    },
+    {"id": "akwaaba", "name": "Akwaaba", "mood": 10, "text": "Someone welcomed me by name."},
+    {
+      "id": "sunday_best",
+      "name": "Sunday best",
+      "mood": 10,
+      "text": "Clean clothes, loud songs, a full church."
+    },
+    {
+      "id": "black_stars_won",
+      "name": "Black Stars won!",
+      "mood": 20,
+      "text": "The whole street is shouting. Tonight everyone is family."
+    },
+    {
+      "id": "full_heart",
+      "name": "Full heart",
+      "mood": 20,
+      "text": "Someone said: you are my child."
+    },
+    {"id": "susu_day", "name": "Susu day", "mood": 15, "text": "My turn to collect the susu."},
+    {
+      "id": "dumsor",
+      "name": "Dumsor",
+      "mood": -10,
+      "text": "Lights off again. No fan, no study, no TV."
+    },
+    {
+      "id": "rained_on",
+      "name": "Caught in the rain",
+      "mood": -10,
+      "text": "Soaked, and the gutters are overflowing."
+    },
+    {
+      "id": "mosquito_war",
+      "name": "Mosquito war",
+      "mood": -10,
+      "text": "Bzzz all night. Sleeping outside has a price."
+    },
+    {
+      "id": "chased",
+      "name": "Chased",
+      "mood": -15,
+      "text": "The city guards chased us off the road again."
+    },
+    {"id": "shamed", "name": "Shamed", "mood": -15, "text": "People saw what I had to do."}
+  ],
+  "traits": [
+    {
+      "id": "hustler",
+      "name": "Hustler",
+      "icon": "💪",
+      "text": "Always finding a way to make a coin.",
+      "effects": "Earns 20% more from work; energy falls 10% faster.",
+      "likes": ["hawk_water", "carry_load", "pull_net"],
+      "motive": "Earn something every day."
+    },
+    {
+      "id": "sweet_mouth",
+      "name": "Sweet mouth",
+      "icon": "🗣️",
+      "text": "Can talk almost anyone into almost anything.",
+      "effects": "Relationships grow 25% faster; better odds when talking their way out.",
+      "likes": ["sweet_talk_seller", "gist_neighbours"],
+      "motive": "Be liked by everyone in the room."
+    },
+    {
+      "id": "book_long",
+      "name": "Book long",
+      "icon": "📚",
+      "text": "Loves to learn. Reads anything, even the newspaper the kelewele comes wrapped in.",
+      "effects": "Education and reading grow 25% faster; reading is fun for them.",
+      "likes": ["read_newspaper", "study_street_light", "attend_class"],
+      "motive": "Learn something new every day."
+    },
+    {
+      "id": "prayerful",
+      "name": "Prayerful",
+      "icon": "🙏",
+      "text": "Faith first: church or mosque every week, and a prayer before every meal.",
+      "effects": "Hope falls half as fast; more belonging from services.",
+      "likes": ["church_service", "friday_prayers"],
+      "motive": "Worship every week."
+    },
+    {
+      "id": "street_smart",
+      "name": "Street smart",
+      "icon": "🦊",
+      "text": "Knows every shortcut, every trick, every danger.",
+      "effects": "Safety falls slower at night; better odds in street events.",
+      "likes": ["pick_trash_food", "call_passengers"],
+      "motive": "Never get caught out."
+    },
+    {
+      "id": "generous",
+      "name": "Generous",
+      "icon": "🤲",
+      "text": "Shares the last piece of bread.",
+      "effects": "Relationships and reputation grow faster; money goes faster too.",
+      "likes": ["share_food", "help_carry_bowls"],
+      "motive": "Make sure nobody near them is hungry."
+    },
+    {
+      "id": "humble",
+      "name": "Humble",
+      "icon": "🌱",
+      "text": "Never shows off, and greets every elder properly.",
+      "effects": "Elders trust them sooner; respect grows 10% faster.",
+      "likes": ["elders_advice", "help_carry_bowls"],
+      "motive": "Be thought of as well brought up."
+    },
+    {
+      "id": "hot_temper",
+      "name": "Hot temper",
+      "icon": "🔥",
+      "text": "Quick to fight, quick to forgive.",
+      "effects": "Wins more confrontations; relationships fall faster after a quarrel.",
+      "likes": ["street_football"],
+      "motive": "Never let anyone look down on them."
+    },
+    {
+      "id": "footballer",
+      "name": "Born footballer",
+      "icon": "⚽",
+      "text": "A ball at their feet since they could walk.",
+      "effects": "Football grows 50% faster; any game is fun.",
+      "likes": ["street_football", "watch_match"],
+      "motive": "Play football every day."
+    },
+    {
+      "id": "ambitious",
+      "name": "Ambitious",
+      "icon": "🚀",
+      "text": "Dreams big: a house, a car, maybe abroad.",
+      "effects": "Every step forward lifts hope; big goals show up sooner.",
+      "likes": ["take_course", "susu_pay"],
+      "motive": "Always be moving up."
+    },
+    {
+      "id": "shy",
+      "name": "Shy",
+      "icon": "🫣",
+      "text": "Quiet in a crowd, loyal in private.",
+      "effects": "Company falls slower; meeting strangers is harder.",
+      "likes": ["read_newspaper", "stay_near_seller"],
+      "motive": "A few close friends, not a crowd."
+    },
+    {
+      "id": "joker",
+      "name": "Joker",
+      "icon": "😂",
+      "text": "Makes the whole compound laugh.",
+      "effects": "Lifts the fun of people nearby; company grows faster.",
+      "likes": ["gist_neighbours", "play_ampe", "play_market_kids"],
+      "motive": "Make someone laugh today."
+    },
+    {
+      "id": "neat",
+      "name": "Neat",
+      "icon": "🧺",
+      "text": "Ironed clothes, swept floor, everything in its place.",
+      "effects": "Hygiene matters more to them; better at sewing and cooking.",
+      "likes": ["bucket_bath", "bathhouse_bath", "splash_standpipe"],
+      "motive": "Keep everything clean."
+    }
+  ],
+  "decisionModel": {
+    "text": "How a Coaster decides by themselves. Every action says what it gives and takes. The Coaster weighs each gain by how badly they need it (urgent needs climb steeply as they fall, and the heart and spirit count for more once the body is fed), adds a little for what their personality likes, leaves out what they can't do yet, then picks one of the best three at random, the better ones more often, so they never feel like robots.",
+    "pickFromTop": 3,
+    "curves": {"urgent": 2.2, "steady": 1.6, "grows": 1.3},
+    "tierWeights": {"survival": 1, "comfort": 0.8, "heart": 0.7, "spirit": 0.6},
+    "maslowTiers": ["heart", "spirit"],
+    "maslowFloor": 0.3,
+    "lossWeight": 0.6,
+    "traitLikeBonus": 1.5,
+    "earnWeight": 2.5,
+    "costWeight": 1.5,
+    "comfortableCedis": {
+      "toddler": 5,
+      "child": 20,
+      "teen": 60,
+      "young_adult": 200,
+      "adult": 500,
+      "elder": 300
+    },
+    "sleepDecay": 0.5,
+    "explain": {
+      "pickFromTop": "picks at random among this many of the best",
+      "curves": "how steeply each kind of need gets urgent as it falls (bigger is steeper)",
+      "tierWeights": "how much each tier counts",
+      "maslowTiers": "tiers that count for less while the body is hungry, thirsty or tired",
+      "maslowFloor": "how much those tiers still count when the body's needs are empty (0 to 1)",
+      "lossWeight": "how much a loss hurts compared with a gain of the same size",
+      "traitLikeBonus": "times the score when their personality likes the action",
+      "earnWeight": "how much earning money counts, when they have little",
+      "costWeight": "how much spending counts against an action, when they have little",
+      "comfortableCedis": "at each life stage, money above this stops pulling them to work",
+      "sleepDecay": "needs fall this much slower while asleep",
+      "routineBonus": "added to what the Coaster's routine says to do at this time of day",
+      "repeatMinutes": "doing the same thing again within this many minutes is less appealing…",
+      "repeatFactor": "…it's worth this share of its score (sleep doesn't count)"
+    },
+    "routineBonus": 25,
+    "repeatMinutes": 120,
+    "repeatFactor": 0.5
+  },
+  "routines": [
+    {
+      "id": "toddler_market",
+      "stage": "toddler",
+      "name": "A market toddler's day",
+      "schedule": [
+        {"time": "05:30", "do": "Wake under a market table as the sellers arrive"},
+        {
+          "time": "06:00",
+          "do": "Look for food: leftovers, the rubbish heap, a kind seller",
+          "actions": ["eat_with_auntie", "help_carry_bowls", "pick_trash_food"]
+        },
+        {
+          "time": "09:00",
+          "do": "Follow the market women, learning faces",
+          "actions": ["stay_near_seller", "help_carry_bowls"]
+        },
+        {"time": "12:00", "do": "Nap in the shade of the cloth stalls", "actions": ["nap_in_shade"]},
+        {
+          "time": "15:00",
+          "do": "Play with the other market children",
+          "actions": ["play_market_kids"]
+        },
+        {"time": "18:00", "do": "Find a dry, safe place for the night"},
+        {"time": "20:00", "do": "Sleep", "actions": ["sleep_safe_spot", "sleep_under_stall"]}
+      ]
+    },
+    {
+      "id": "child_guardian",
+      "stage": "child",
+      "name": "A child with a guardian",
+      "schedule": [
+        {"time": "05:00", "do": "Fetch water at the standpipe", "actions": ["fetch_water"]},
+        {"time": "06:00", "do": "Sweep the compound, wash the bowls", "actions": ["help_at_home"]},
+        {
+          "time": "07:30",
+          "do": "School (or hawking, if there's no school)",
+          "actions": ["attend_class"]
+        },
+        {"time": "14:00", "do": "Help at Auntie Akos's stall", "actions": ["help_carry_bowls"]},
+        {
+          "time": "17:00",
+          "do": "Ampe or football at the park",
+          "actions": ["play_ampe", "street_football"]
+        },
+        {
+          "time": "19:00",
+          "do": "Eat, then homework under the street light (if there's no dumsor)",
+          "actions": ["study_street_light"]
+        },
+        {"time": "21:00", "do": "Sleep on the mat", "actions": ["sleep_on_mat"]}
+      ]
+    },
+    {
+      "id": "teen_kayayo",
+      "stage": "teen",
+      "name": "A kayayo's day",
+      "schedule": [
+        {"time": "04:30", "do": "Wake in the shared room, or at the station"},
+        {
+          "time": "05:30",
+          "do": "The market opens: carry loads for Madam Serwaa's customers",
+          "actions": ["carry_load"]
+        },
+        {
+          "time": "12:00",
+          "do": "Waakye or kenkey for lunch",
+          "actions": ["chop_bar_meal", "wash_bowls"]
+        },
+        {"time": "13:00", "do": "More loads", "actions": ["carry_load"]},
+        {"time": "17:00", "do": "Pay the susu collector", "actions": ["susu_pay"]},
+        {"time": "18:00", "do": "A bath at the bathhouse", "actions": ["bathhouse_bath"]},
+        {"time": "20:00", "do": "Sleep", "actions": ["sleep_on_mat", "sleep_station_bench"]}
+      ]
+    },
+    {
+      "id": "teen_student",
+      "stage": "teen",
+      "name": "A boarding student at SHS",
+      "schedule": [
+        {"time": "05:00", "do": "Rising bell, morning devotion"},
+        {"time": "06:30", "do": "Breakfast in the dining hall"},
+        {"time": "07:30", "do": "Classes", "actions": ["attend_class"]},
+        {"time": "15:00", "do": "Sports and clubs", "actions": ["street_football", "play_ampe"]},
+        {"time": "19:00", "do": "Prep (study time)", "actions": ["study_street_light"]},
+        {"time": "21:30", "do": "Lights out", "actions": ["sleep_on_mat"]}
+      ]
+    },
+    {
+      "id": "young_apprentice",
+      "stage": "young_adult",
+      "name": "An apprentice's day",
+      "schedule": [
+        {"time": "06:00", "do": "Open Madam Adjoa's shop and sweep it"},
+        {
+          "time": "07:00",
+          "do": "Learn and work: hems, cuts, fittings",
+          "actions": ["apprentice_day"]
+        },
+        {"time": "13:00", "do": "Lunch with the other apprentices"},
+        {"time": "18:00", "do": "Close the shop"},
+        {
+          "time": "19:00",
+          "do": "Choir practice on Wednesdays, or more sewing",
+          "actions": ["church_service"]
+        },
+        {"time": "22:00", "do": "Sleep", "actions": ["sleep_on_mat"]}
+      ]
+    },
+    {
+      "id": "adult_trader",
+      "stage": "adult",
+      "name": "A market trader's day",
+      "schedule": [
+        {"time": "05:00", "do": "Buy stock at the wholesale market"},
+        {"time": "07:00", "do": "Open the stall", "actions": ["run_stall"]},
+        {"time": "12:00", "do": "Mobile money, suppliers, the susu", "actions": ["susu_pay"]},
+        {"time": "18:00", "do": "Close the stall"},
+        {
+          "time": "19:00",
+          "do": "Family time, and the children's homework",
+          "actions": ["gist_neighbours"]
+        },
+        {"time": "21:00", "do": "The day's accounts"}
+      ]
+    },
+    {
+      "id": "elder_day",
+      "stage": "elder",
+      "name": "An elder's day",
+      "schedule": [
+        {"time": "06:00", "do": "Morning devotion", "actions": ["church_service"]},
+        {"time": "09:00", "do": "Visitors come for advice"},
+        {"time": "13:00", "do": "Rest"},
+        {"time": "16:00", "do": "A family meeting, or the palace", "actions": ["elders_advice"]},
+        {"time": "20:00", "do": "Stories for the grandchildren", "actions": ["gist_neighbours"]}
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "id": "street_smarts",
+      "name": "Street smarts",
+      "icon": "🦊",
+      "text": "Reading the street: danger, chances, shortcuts."
+    },
+    {
+      "id": "trading",
+      "name": "Trading",
+      "icon": "🛒",
+      "text": "Buying low, selling well, haggling, keeping customers."
+    },
+    {
+      "id": "strength",
+      "name": "Strength",
+      "icon": "🏋🏾",
+      "text": "Carrying loads, pulling nets, long days."
+    },
+    {
+      "id": "literacy",
+      "name": "Reading and writing",
+      "icon": "✍🏾",
+      "text": "From reading a MoMo menu to writing a letter."
+    },
+    {
+      "id": "numeracy",
+      "name": "Numbers",
+      "icon": "🔢",
+      "text": "Change, prices, savings, accounts."
+    },
+    {"id": "cooking", "name": "Cooking", "icon": "🍳", "text": "Kenkey, jollof, light soup, fufu."},
+    {"id": "sewing", "name": "Sewing", "icon": "🧵", "text": "Hems, cuts, kaba and slit, fittings."},
+    {
+      "id": "football",
+      "name": "Football",
+      "icon": "⚽",
+      "text": "From the park to the colts to an academy."
+    },
+    {"id": "music", "name": "Music", "icon": "🥁", "text": "Choir, drums, highlife."},
+    {
+      "id": "charisma",
+      "name": "Charisma",
+      "icon": "🗣️",
+      "text": "A sweet mouth: persuading, calming, selling."
+    },
+    {
+      "id": "driving",
+      "name": "Driving",
+      "icon": "🚐",
+      "text": "From mate to driver: the road, the rules, the trotro."
+    },
+    {
+      "id": "teaching",
+      "name": "Teaching",
+      "icon": "🧑🏾‍🏫",
+      "text": "Explaining, patience, a class of forty."
+    },
+    {
+      "id": "leadership",
+      "name": "Leadership",
+      "icon": "🪘",
+      "text": "Speaking for others, settling quarrels, being followed."
+    },
+    {"id": "business", "name": "Business", "icon": "📒", "text": "Staff, stock, profit, growing."}
+  ],
+  "relationshipLadder": ["Stranger", "Familiar face", "Padi (friend)", "Trusted", "Family"],
+  "relationshipTypes": [
+    {
+      "id": "guardian",
+      "name": "A guardian",
+      "icon": "🫶🏾",
+      "text": "An auntie, a market woman or a church mother who takes the Coaster in."
+    },
+    {
+      "id": "friends",
+      "name": "Friends",
+      "icon": "🧒🏾",
+      "text": "The market children, school mates, padis."
+    },
+    {
+      "id": "mentor",
+      "name": "A mentor",
+      "icon": "🧑🏾‍🏫",
+      "text": "A pastor, a teacher, a coach or a businesswoman who believes in them."
+    },
+    {
+      "id": "master",
+      "name": "A master",
+      "icon": "🧵",
+      "text": "The tradesperson who teaches an apprentice."
+    },
+    {
+      "id": "boss",
+      "name": "A boss",
+      "icon": "💼",
+      "text": "Someone who gives them work: Madam Serwaa, a driver, a car owner."
+    },
+    {"id": "partner", "name": "A partner", "icon": "💞", "text": "Courtship, and maybe marriage."},
+    {
+      "id": "family",
+      "name": "Family (abusua)",
+      "icon": "👪",
+      "text": "Blood, in-laws, and the wider family that comes with marriage."
+    },
+    {
+      "id": "elders",
+      "name": "Elders and chiefs",
+      "icon": "🪑",
+      "text": "The people who give out land, settle disputes, and bless."
+    },
+    {
+      "id": "customers",
+      "name": "Customers",
+      "icon": "🛍️",
+      "text": "Who comes back to your stall, your kiosk, your trotro."
+    }
+  ],
+  "reputationCircles": [
+    {
+      "id": "market",
+      "name": "The market",
+      "icon": "🛒",
+      "text": "Honest scales, fair prices, debts paid."
+    },
+    {"id": "street", "name": "The street", "icon": "🦊", "text": "Tough, fair, not to be cheated."},
+    {
+      "id": "faith",
+      "name": "Church or mosque",
+      "icon": "🙏",
+      "text": "Faithful, helpful, a good example."
+    },
+    {"id": "school", "name": "School", "icon": "🎓", "text": "Clever, hardworking, well behaved."},
+    {
+      "id": "family",
+      "name": "The family",
+      "icon": "👪",
+      "text": "Respectful, responsible, someone the family is proud of."
+    },
+    {
+      "id": "town",
+      "name": "The town",
+      "icon": "🏘️",
+      "text": "Known all over Gold Coast: someone people listen to."
+    }
+  ],
+  "resourceTypes": [
+    {
+      "id": "cedis",
+      "name": "Cedis",
+      "icon": "💵",
+      "text": "Coins and notes, mobile money, susu savings."
+    },
+    {
+      "id": "things",
+      "name": "Things",
+      "icon": "🧺",
+      "text": "A head pan, a chop box, a lamp, a phone, a sewing machine, tools."
+    },
+    {
+      "id": "papers",
+      "name": "Papers",
+      "icon": "📄",
+      "text": "A birth certificate, an NHIS card, a Ghana Card, a driver's licence, a passport, a land indenture."
+    },
+    {
+      "id": "property",
+      "name": "Property",
+      "icon": "🏠",
+      "text": "A rented room, a stall, a kiosk, land, a house, a trotro."
+    }
+  ],
+  "tracks": [
+    {"id": "street", "name": "Street and survival", "color": "#8b6b4e"},
+    {"id": "care", "name": "Home and family", "color": "#c2507a"},
+    {"id": "papers", "name": "Papers", "color": "#4a6f86"},
+    {"id": "learning", "name": "School and learning", "color": "#2e5aa6"},
+    {"id": "trade", "name": "Trades", "color": "#d27f1f"},
+    {"id": "work", "name": "Work and business", "color": "#3f7a3a"},
+    {"id": "community", "name": "Faith, sport and community", "color": "#1f8a84"}
+  ],
+  "opportunities": [
+    {
+      "id": "start_market_child",
+      "name": "Alone at the market",
+      "stage": "toddler",
+      "track": "street",
+      "start": true,
+      "where": "market",
+      "summary": "You're three. Your mother sold tomatoes at Nkabom Market until the fever took her, and nobody knows your father. The market is home now.",
+      "requires": [],
+      "after": [],
+      "cost": "",
+      "unlocks": ["Survival comes first: food, water, and somewhere safe to sleep"]
+    },
+    {
+      "id": "market_rhythm",
+      "name": "Learn the market's rhythm",
+      "stage": "toddler",
+      "track": "street",
+      "where": "market",
+      "summary": "Which sellers throw food away at closing, where the shade moves, and when the city guards come.",
+      "requires": [
+        {"kind": "skills", "what": "Street smarts 1"},
+        {"kind": "choices", "what": "Watch and learn instead of grabbing"}
+      ],
+      "after": ["start_market_child"],
+      "cost": "",
+      "unlocks": ["Safer scavenging", "Street smarts grows faster"]
+    },
+    {
+      "id": "safe_sleeping_spot",
+      "name": "A safe place to sleep",
+      "stage": "toddler",
+      "track": "street",
+      "where": "market",
+      "summary": "Mama Akua lets you sleep under her tomato table: out of the rain, away from the rats, and near someone who'd hear you cry.",
+      "requires": [
+        {"kind": "relationships", "what": "Mama Akua knows you (Familiar face)"},
+        {"kind": "reputation", "what": "Market: a quiet, honest child"}
+      ],
+      "after": ["market_rhythm"],
+      "cost": "",
+      "unlocks": ["Sleep safely at the market"]
+    },
+    {
+      "id": "kind_seller",
+      "name": "A kind kenkey seller",
+      "stage": "toddler",
+      "track": "care",
+      "where": "market",
+      "summary": "Auntie Akos saves you the ends of the kenkey and calls you 'my small one'.",
+      "requires": [
+        {"kind": "relationships", "what": "Visit her stall five days in a row"},
+        {"kind": "choices", "what": "Help carry her bowls instead of stealing"}
+      ],
+      "after": ["start_market_child"],
+      "cost": "",
+      "unlocks": ["A meal most days", "Auntie Akos (Familiar face)"]
+    },
+    {
+      "id": "first_numbers",
+      "name": "Counting tomatoes",
+      "stage": "toddler",
+      "track": "learning",
+      "where": "market",
+      "summary": "The market women teach you to count by heaping tomatoes in fives.",
+      "requires": [
+        {"kind": "relationships", "what": "Auntie Akos lets you sit with her"},
+        {"kind": "choices", "what": "Sit and count instead of running off"}
+      ],
+      "after": ["kind_seller"],
+      "cost": "",
+      "unlocks": ["Numbers 1", "Helping at the stalls"]
+    },
+    {
+      "id": "feeding_programme",
+      "name": "The Saturday feeding programme",
+      "stage": "toddler",
+      "track": "community",
+      "where": "church",
+      "summary": "On Saturday mornings the Methodist church feeds the market children: rice and stew, a Bible story, and a song with actions.",
+      "requires": [{"kind": "choices", "what": "Follow the other children there"}],
+      "after": ["start_market_child"],
+      "cost": "",
+      "unlocks": ["A full belly every Saturday", "First friends", "Sunday school"]
+    },
+    {
+      "id": "taken_in",
+      "name": "Taken in by Auntie Akos",
+      "stage": "child",
+      "track": "care",
+      "where": "compound_house",
+      "summary": "She has five children already, but one more mouth is no problem, she says. You sleep on a mat in her room at Auntie Adwoa's compound house.",
+      "requires": [
+        {"kind": "relationships", "what": "Auntie Akos trusts you (Trusted)"},
+        {"kind": "reputation", "what": "Market: known as honest"},
+        {"kind": "choices", "what": "Do the chores before school"}
+      ],
+      "after": ["kind_seller"],
+      "cost": "Chores every morning",
+      "unlocks": [
+        "A home: safety, and a mat to sleep on",
+        "A guardian for school and papers",
+        "Belonging"
+      ]
+    },
+    {
+      "id": "station_errands",
+      "name": "Call passengers at the station",
+      "stage": "child",
+      "track": "street",
+      "where": "trotro_station",
+      "summary": "Shout the destinations for the drivers, and get a coin for every passenger who climbs in.",
+      "requires": [
+        {"kind": "skills", "what": "Street smarts 2"},
+        {"kind": "relationships", "what": "A driver lets you call for him"},
+        {"kind": "choices", "what": "Spend the day at the station"}
+      ],
+      "after": ["market_rhythm"],
+      "cost": "",
+      "unlocks": ["Coins every day", "Drivers who know you"]
+    },
+    {
+      "id": "birth_certificate",
+      "name": "A birth certificate",
+      "stage": "child",
+      "track": "papers",
+      "where": "district_office",
+      "summary": "At the Births and Deaths Registry, Auntie Akos swears you were born in the rainy season. Now you exist on paper.",
+      "requires": [
+        {"kind": "relationships", "what": "A guardian to swear for you"},
+        {"kind": "resources", "what": "GH₵ 5 for the form"}
+      ],
+      "after": ["taken_in"],
+      "cost": "GH₵ 5",
+      "unlocks": ["School", "An NHIS card", "One day, a Ghana Card"]
+    },
+    {
+      "id": "nhis_card",
+      "name": "An NHIS card",
+      "stage": "child",
+      "track": "papers",
+      "where": "district_office",
+      "summary": "With a National Health Insurance card, the nurse treats your malaria for almost nothing.",
+      "requires": [
+        {"kind": "relationships", "what": "A guardian to register you"},
+        {"kind": "resources", "what": "GH₵ 10 a year"}
+      ],
+      "after": ["birth_certificate"],
+      "cost": "GH₵ 10 a year",
+      "unlocks": ["Cheap visits to the nurse"]
+    },
+    {
+      "id": "basic_school",
+      "name": "Nkabom M/A Basic School",
+      "stage": "child",
+      "track": "learning",
+      "where": "basic_school",
+      "summary": "There are no fees, but you still need a uniform, sandals and a pencil. Mrs. Ofori takes you into Class 1.",
+      "requires": [
+        {"kind": "relationships", "what": "A guardian to enrol you"},
+        {"kind": "resources", "what": "Uniform and sandals (GH₵ 40)"},
+        {"kind": "choices", "what": "School instead of a full day's work"}
+      ],
+      "after": ["birth_certificate"],
+      "cost": "GH₵ 40",
+      "unlocks": ["Reading and numbers grow", "School friends", "The road to the BECE"]
+    },
+    {
+      "id": "hawk_water",
+      "name": "Hawk pure water in traffic",
+      "stage": "child",
+      "track": "work",
+      "where": "junction",
+      "summary": "A cool box of sachets on your head, weaving between the trotros at the junction. A few pesewas profit on every sachet.",
+      "requires": [
+        {"kind": "skills", "what": "Numbers 2, for the change"},
+        {"kind": "skills", "what": "Street smarts 2"},
+        {"kind": "resources", "what": "GH₵ 10 for a bag of sachets"}
+      ],
+      "after": ["market_rhythm", "first_numbers"],
+      "cost": "GH₵ 10",
+      "unlocks": ["Your first cedis", "Trading grows"]
+    },
+    {
+      "id": "errands",
+      "name": "Run errands for the compound",
+      "stage": "child",
+      "track": "work",
+      "where": "compound_house",
+      "summary": "Buy kerosene, carry messages, queue at the standpipe. Small coins, and a lot of trust.",
+      "requires": [
+        {"kind": "relationships", "what": "The neighbours know you"},
+        {"kind": "reputation", "what": "Family: trusted to carry money"}
+      ],
+      "after": ["taken_in"],
+      "cost": "",
+      "unlocks": ["Pocket money", "A good name in the compound"]
+    },
+    {
+      "id": "street_football",
+      "name": "Football at the park",
+      "stage": "child",
+      "track": "community",
+      "where": "park",
+      "summary": "Stones for goalposts and a ball made of plastic bags.",
+      "requires": [
+        {"kind": "skills", "what": "Football 1"},
+        {"kind": "choices", "what": "Join the children at the park"}
+      ],
+      "after": [],
+      "cost": "",
+      "unlocks": ["Football grows", "Friends from the street"]
+    },
+    {
+      "id": "colts_spotted",
+      "name": "Spotted by a colts coach",
+      "stage": "child",
+      "track": "community",
+      "where": "park",
+      "summary": "Coach Kwesi runs the Nkabom Colts. He saw you dribble past three boys.",
+      "requires": [
+        {"kind": "skills", "what": "Football 4"},
+        {"kind": "reputation", "what": "Street: known for your football"}
+      ],
+      "after": ["street_football"],
+      "cost": "",
+      "unlocks": ["A place in the Nkabom Colts"]
+    },
+    {
+      "id": "childrens_choir",
+      "name": "The children's choir",
+      "stage": "child",
+      "track": "community",
+      "where": "church",
+      "summary": "Sunday school, Christmas carols, and the first time a crowd claps for you.",
+      "requires": [
+        {"kind": "skills", "what": "Music 1"},
+        {"kind": "choices", "what": "Go to Sunday school every week"}
+      ],
+      "after": ["feeding_programme"],
+      "cost": "",
+      "unlocks": ["Music grows", "A church family", "Faith: a good name"]
+    },
+    {
+      "id": "station_boys",
+      "name": "Run with the station boys",
+      "stage": "teen",
+      "track": "street",
+      "where": "trotro_station",
+      "summary": "Calling, loading, and collecting 'tolls' from the drivers. Easy money, until the police come.",
+      "requires": [
+        {"kind": "relationships", "what": "The station boys accept you"},
+        {"kind": "reputation", "what": "Street: tough"},
+        {"kind": "choices", "what": "Take the easy money"}
+      ],
+      "after": ["station_errands"],
+      "cost": "",
+      "unlocks": ["Money every day", "A name on the street", "Trouble with the police"]
+    },
+    {
+      "id": "bece",
+      "name": "Pass the BECE",
+      "stage": "teen",
+      "track": "learning",
+      "where": "basic_school",
+      "summary": "The Basic Education Certificate Examination at the end of JHS 3. You study under the street light, unless there's dumsor.",
+      "requires": [
+        {"kind": "education", "what": "Finish JHS 3"},
+        {"kind": "skills", "what": "Reading 4 and Numbers 4"}
+      ],
+      "after": ["basic_school"],
+      "cost": "",
+      "unlocks": ["A Free SHS place", "Courses at Sankofa Training College"]
+    },
+    {
+      "id": "free_shs",
+      "name": "A Free SHS place",
+      "stage": "teen",
+      "track": "learning",
+      "where": "shs",
+      "summary": "The computer places you in a boarding school. Fees and food are free; the chop box, the trunk and the provisions are on you.",
+      "requires": [
+        {"kind": "resources", "what": "Chop box, trunk and provisions (GH₵ 300)"},
+        {"kind": "relationships", "what": "Someone to take you on reporting day"}
+      ],
+      "after": ["bece"],
+      "cost": "GH₵ 300",
+      "unlocks": ["Three years of SHS", "The road to the WASSCE", "Friends from all over Ghana"]
+    },
+    {
+      "id": "apprenticeship",
+      "name": "Apprentice to a master",
+      "stage": "teen",
+      "track": "trade",
+      "where": "tailor_shop",
+      "summary": "Madam Adjoa, seamstress: you bring the drinks and the fee, and over three years she teaches you everything from hems to kaba styles.",
+      "requires": [
+        {"kind": "relationships", "what": "A guarantor who vouches for you"},
+        {"kind": "resources", "what": "The fee and the drinks (GH₵ 150)"},
+        {"kind": "choices", "what": "Pick a trade: sewing, hair, mechanics, carpentry or welding"}
+      ],
+      "after": ["errands"],
+      "cost": "GH₵ 150",
+      "unlocks": ["Sewing grows (or your trade)", "A master who looks out for you"]
+    },
+    {
+      "id": "kayayo",
+      "name": "Carry loads as a kayayo",
+      "stage": "teen",
+      "track": "work",
+      "where": "market",
+      "summary": "A head pan from Madam Serwaa's pile, the market at dawn, and loads heavier than you are.",
+      "requires": [
+        {"kind": "skills", "what": "Strength 2"},
+        {"kind": "relationships", "what": "Madam Serwaa lets you carry for her customers"},
+        {"kind": "resources", "what": "A head pan (GH₵ 25)"}
+      ],
+      "after": ["hawk_water"],
+      "cost": "GH₵ 25",
+      "unlocks": ["Steady money", "Strength grows", "Market contacts"]
+    },
+    {
+      "id": "market_susu",
+      "name": "Join a market susu",
+      "stage": "teen",
+      "track": "work",
+      "where": "market",
+      "summary": "Every evening you give the susu collector a cedi. At the end of the month it all comes back to you, if you trusted the right man.",
+      "requires": [
+        {"kind": "relationships", "what": "The susu collector knows you"},
+        {"kind": "reputation", "what": "Market: pays every day"},
+        {"kind": "resources", "what": "A cedi a day"}
+      ],
+      "after": ["kayayo"],
+      "cost": "GH₵ 1 a day",
+      "unlocks": ["Savings", "Your first big purchase"]
+    },
+    {
+      "id": "colts_club",
+      "name": "Nkabom Colts",
+      "stage": "teen",
+      "track": "community",
+      "where": "park",
+      "summary": "Training at six in the morning, matches on Saturday. Sometimes scouts from the big clubs come to watch.",
+      "requires": [
+        {"kind": "relationships", "what": "Coach Kwesi picked you"},
+        {"kind": "skills", "what": "Football 5"},
+        {"kind": "choices", "what": "Train every morning"}
+      ],
+      "after": ["colts_spotted"],
+      "cost": "",
+      "unlocks": ["An academy trial"]
+    },
+    {
+      "id": "youth_fellowship",
+      "name": "The youth fellowship",
+      "stage": "teen",
+      "track": "community",
+      "where": "church",
+      "summary": "Choir, drama, football on the church field, and Pastor Mensah, who asks about your future.",
+      "requires": [
+        {"kind": "relationships", "what": "A church family"},
+        {"kind": "choices", "what": "Commit to the fellowship"}
+      ],
+      "after": ["childrens_choir"],
+      "cost": "",
+      "unlocks": ["A mentor: Pastor Mensah", "Hope"]
+    },
+    {
+      "id": "trotro_mate",
+      "name": "Trotro mate",
+      "stage": "young_adult",
+      "track": "street",
+      "where": "trotro_station",
+      "summary": "Hang from the sliding door shouting the destination, collect the fares, and count change in a moving bus.",
+      "requires": [
+        {"kind": "skills", "what": "Charisma 3"},
+        {"kind": "relationships", "what": "A driver who hires you"},
+        {"kind": "reputation", "what": "Street: honest with the fares"}
+      ],
+      "after": ["station_boys", "kayayo"],
+      "afterAny": true,
+      "cost": "",
+      "unlocks": ["Drivers who trust you", "The road to driving"]
+    },
+    {
+      "id": "rent_room",
+      "name": "A room of your own",
+      "stage": "young_adult",
+      "track": "care",
+      "where": "compound_house",
+      "summary": "Auntie Adwoa's room at the compound house: a bed, a door that locks, and GH₵140 every Monday.",
+      "requires": [
+        {"kind": "relationships", "what": "Auntie Adwoa rents it to you"},
+        {"kind": "choices", "what": "Live on your own in town"},
+        {"kind": "resources", "what": "GH₵140 every Monday"}
+      ],
+      "after": [],
+      "cost": "GH₵140 a week",
+      "unlocks": ["A bed of your own", "Rent every Monday"]
+    },
+    {
+      "id": "courtship",
+      "name": "Courtship",
+      "stage": "young_adult",
+      "track": "care",
+      "summary": "Walks home after church, phone calls until the credit runs out, and meeting each other's friends.",
+      "requires": [
+        {"kind": "relationships", "what": "Someone who likes you back (Padi)"},
+        {"kind": "choices", "what": "Make it serious"}
+      ],
+      "after": [],
+      "cost": "",
+      "unlocks": ["A partner"]
+    },
+    {
+      "id": "knocking",
+      "name": "The knocking ceremony",
+      "stage": "young_adult",
+      "track": "care",
+      "where": "compound_house",
+      "summary": "Kɔkɔɔkɔ: your partner's family comes with drinks to knock on your family's door. Both families must agree.",
+      "requires": [
+        {"kind": "relationships", "what": "A family to knock on (your guardian counts)"},
+        {"kind": "reputation", "what": "Family: a good name"},
+        {"kind": "resources", "what": "Drinks and gifts"}
+      ],
+      "after": ["courtship"],
+      "cost": "Drinks and gifts",
+      "unlocks": ["Engagement"]
+    },
+    {
+      "id": "ghana_card",
+      "name": "A Ghana Card",
+      "stage": "young_adult",
+      "track": "papers",
+      "where": "district_office",
+      "summary": "The national ID card. The queue at the NIA office starts at five in the morning: bring your birth certificate and your patience.",
+      "requires": [{"kind": "choices", "what": "Queue from dawn and lose a day's work"}],
+      "after": ["birth_certificate"],
+      "cost": "",
+      "unlocks": ["A SIM card in your name", "Mobile money", "A bank account", "A passport"]
+    },
+    {
+      "id": "drivers_licence",
+      "name": "A driver's licence",
+      "stage": "young_adult",
+      "track": "papers",
+      "where": "district_office",
+      "summary": "The DVLA test: the road, the rules, and reversing between two poles.",
+      "requires": [
+        {"kind": "education", "what": "Driving school, or years as a mate"},
+        {"kind": "skills", "what": "Driving 3"},
+        {"kind": "resources", "what": "GH₵ 500 of fees"}
+      ],
+      "after": ["ghana_card"],
+      "cost": "GH₵ 500",
+      "unlocks": ["Driving a trotro", "Driving for Uber"]
+    },
+    {
+      "id": "passport",
+      "name": "A passport",
+      "stage": "young_adult",
+      "track": "papers",
+      "where": "district_office",
+      "summary": "The form wants a guarantor: a teacher, a pastor or a nurse who has known you for years.",
+      "requires": [
+        {"kind": "relationships", "what": "A guarantor who has known you for years"},
+        {"kind": "resources", "what": "GH₵ 500 of fees"}
+      ],
+      "after": ["ghana_card"],
+      "cost": "GH₵ 500",
+      "unlocks": ["The abroad dream"]
+    },
+    {
+      "id": "sankofa_college",
+      "name": "Sankofa Training College",
+      "stage": "young_adult",
+      "track": "learning",
+      "where": "college",
+      "summary": "Short courses that lead to work: teaching, dressmaking, or mobile money. A class a day, a quiz, and a certificate at the end.",
+      "requires": [
+        {"kind": "choices", "what": "Pick a course: teaching, dressmaking or mobile money"},
+        {"kind": "resources", "what": "Course fees (GH₵ 120 to 350)"}
+      ],
+      "after": ["bece"],
+      "cost": "GH₵ 120 to 350",
+      "unlocks": ["A teaching, dressmaking or mobile money certificate"]
+    },
+    {
+      "id": "wassce",
+      "name": "Pass the WASSCE",
+      "stage": "young_adult",
+      "track": "learning",
+      "where": "shs",
+      "summary": "The West African Senior School Certificate Examination. Your grades decide which doors open.",
+      "requires": [
+        {"kind": "education", "what": "Finish SHS 3"},
+        {"kind": "skills", "what": "Reading 6 and Numbers 6"}
+      ],
+      "after": ["free_shs"],
+      "cost": "",
+      "unlocks": ["University", "Nursing or teacher training"]
+    },
+    {
+      "id": "university",
+      "name": "University",
+      "stage": "young_adult",
+      "track": "learning",
+      "summary": "An admission letter, the fees, and a hostel bed if you're lucky. The Legon dream.",
+      "requires": [
+        {"kind": "education", "what": "Good WASSCE grades"},
+        {"kind": "resources", "what": "Fees, or a scholarship"},
+        {"kind": "choices", "what": "Put work aside for four years"}
+      ],
+      "after": ["wassce"],
+      "cost": "GH₵ 3,000 a year, or a scholarship",
+      "unlocks": ["A degree", "National Service"]
+    },
+    {
+      "id": "national_service",
+      "name": "National Service",
+      "stage": "young_adult",
+      "track": "learning",
+      "summary": "A year of service after your degree: teaching in a village school, or filing papers at a district office.",
+      "requires": [{"kind": "choices", "what": "Go wherever you're posted"}],
+      "after": ["university"],
+      "cost": "",
+      "unlocks": ["The service certificate (government jobs ask for it)"]
+    },
+    {
+      "id": "freedom",
+      "name": "Freedom ceremony",
+      "stage": "young_adult",
+      "track": "trade",
+      "where": "tailor_shop",
+      "summary": "In front of both families, your master declares you a qualified seamstress. Drinks, prayers, and a certificate.",
+      "requires": [
+        {"kind": "skills", "what": "Sewing 7"},
+        {"kind": "relationships", "what": "Your master's blessing"},
+        {"kind": "resources", "what": "Drinks and a fowl for the ceremony (GH₵ 200)"}
+      ],
+      "after": ["apprenticeship"],
+      "cost": "GH₵ 200",
+      "unlocks": ["Work as a qualified seamstress", "Apprentices of your own, one day"]
+    },
+    {
+      "id": "sew_for_market",
+      "name": "Sew for the market women",
+      "stage": "young_adult",
+      "track": "trade",
+      "where": "market",
+      "summary": "Kaba and slit for the market women, paid by the piece.",
+      "requires": [
+        {"kind": "education", "what": "A freedom certificate, or Sankofa's dressmaking certificate"},
+        {"kind": "relationships", "what": "The cloth sellers trust your work"}
+      ],
+      "after": ["freedom", "sankofa_college"],
+      "afterAny": true,
+      "cost": "",
+      "unlocks": ["Sewing money", "Customers who come back"]
+    },
+    {
+      "id": "momo_wallet",
+      "name": "A mobile money wallet",
+      "stage": "young_adult",
+      "track": "work",
+      "where": "momo_kiosk",
+      "summary": "Mobile money on your own phone: get paid, pay, and save, with no bank.",
+      "requires": [
+        {"kind": "skills", "what": "Reading 2, for the menus"},
+        {"kind": "resources", "what": "A phone (GH₵ 150)"}
+      ],
+      "after": ["ghana_card"],
+      "cost": "GH₵ 150",
+      "unlocks": ["Mobile money"]
+    },
+    {
+      "id": "momo_agent",
+      "name": "Become a MoMo agent",
+      "stage": "young_adult",
+      "track": "work",
+      "where": "momo_kiosk",
+      "summary": "A yellow umbrella, a kiosk, and float: other people's money through your hands. Trust is everything.",
+      "requires": [
+        {"kind": "education", "what": "The mobile money agent course"},
+        {"kind": "relationships", "what": "Auntie Dede lets you mind her kiosk first"},
+        {"kind": "reputation", "what": "Market: known as honest"},
+        {"kind": "resources", "what": "GH₵ 1,000 of float"}
+      ],
+      "after": ["momo_wallet", "sankofa_college"],
+      "cost": "GH₵ 1,000 of float",
+      "unlocks": ["Commission on every transfer", "A kiosk of your own"]
+    },
+    {
+      "id": "trotro_driver",
+      "name": "Drive a trotro",
+      "stage": "young_adult",
+      "track": "work",
+      "where": "trotro_station",
+      "summary": "The owner gives you the van; you give him his 'sales' every evening, and what's left is yours.",
+      "requires": [
+        {"kind": "relationships", "what": "An owner who trusts you with his van"},
+        {"kind": "reputation", "what": "Street: a careful driver"}
+      ],
+      "after": ["trotro_mate", "drivers_licence"],
+      "cost": "",
+      "unlocks": ["Driving money every day", "One day, a trotro of your own"]
+    },
+    {
+      "id": "uber_driver",
+      "name": "Drive for Uber",
+      "stage": "young_adult",
+      "track": "work",
+      "summary": "A rented Yaris, a phone on the dashboard, and the app. The weekly payment to the car's owner comes first.",
+      "requires": [
+        {"kind": "relationships", "what": "A car owner who trusts you"},
+        {"kind": "reputation", "what": "Town: good ratings"},
+        {"kind": "resources", "what": "A smartphone and a MoMo wallet"}
+      ],
+      "after": ["drivers_licence"],
+      "cost": "GH₵ 900 a week to the owner",
+      "unlocks": ["Driving money", "One day, a car of your own"]
+    },
+    {
+      "id": "church_scholarship",
+      "name": "A church scholarship",
+      "stage": "young_adult",
+      "track": "community",
+      "where": "church",
+      "summary": "The church elders pay your fees, if Pastor Mensah vouches for you.",
+      "requires": [
+        {"kind": "relationships", "what": "Pastor Mensah (Trusted)"},
+        {"kind": "reputation", "what": "Faith: a faithful member"},
+        {"kind": "education", "what": "Good WASSCE grades"}
+      ],
+      "after": ["youth_fellowship", "wassce"],
+      "cost": "",
+      "unlocks": ["Fees paid at university or college"]
+    },
+    {
+      "id": "academy_trial",
+      "name": "An academy trial",
+      "stage": "young_adult",
+      "track": "community",
+      "where": "park",
+      "summary": "A scout invites you to a week's trial at a big football academy in the city.",
+      "requires": [
+        {"kind": "skills", "what": "Football 7"},
+        {"kind": "relationships", "what": "Coach Kwesi recommends you"},
+        {"kind": "resources", "what": "Boots and the fare (GH₵ 300)"}
+      ],
+      "after": ["colts_club"],
+      "cost": "GH₵ 300",
+      "unlocks": ["A football career (a later chapter)"]
+    },
+    {
+      "id": "station_master",
+      "name": "Station master",
+      "stage": "adult",
+      "track": "street",
+      "where": "trotro_station",
+      "summary": "The drivers' union makes you station master: you decide the queue, settle the fights, and keep the station boys in line.",
+      "requires": [
+        {"kind": "reputation", "what": "Street: respected, not feared"},
+        {"kind": "relationships", "what": "The union executives back you"},
+        {"kind": "skills", "what": "Leadership 5"},
+        {"kind": "choices", "what": "No more tolls: run it straight"}
+      ],
+      "after": ["trotro_mate"],
+      "cost": "",
+      "unlocks": ["Run the station", "Settle the drivers' quarrels"]
+    },
+    {
+      "id": "traditional_marriage",
+      "name": "Traditional marriage",
+      "stage": "adult",
+      "track": "care",
+      "where": "compound_house",
+      "summary": "Kente, drumming, the list read out loud, and everyone eating.",
+      "requires": [
+        {"kind": "relationships", "what": "Both families' blessing"},
+        {"kind": "resources", "what": "The list and the party (GH₵ 5,000 or more)"},
+        {"kind": "choices", "what": "Commit for life"}
+      ],
+      "after": ["knocking"],
+      "cost": "GH₵ 5,000 or more",
+      "unlocks": ["A spouse", "In-laws: a bigger family"]
+    },
+    {
+      "id": "first_child",
+      "name": "A child of your own",
+      "stage": "adult",
+      "track": "care",
+      "where": "compound_house",
+      "summary": "A naming ceremony on the eighth day. Now someone depends on you.",
+      "requires": [
+        {"kind": "relationships", "what": "A partner"},
+        {"kind": "resources", "what": "A safe room of your own"},
+        {"kind": "choices", "what": "Decide you're ready"}
+      ],
+      "after": ["traditional_marriage", "courtship"],
+      "afterAny": true,
+      "cost": "",
+      "unlocks": ["A child's needs to look after", "Belonging"]
+    },
+    {
+      "id": "land_papers",
+      "name": "Register the land",
+      "stage": "adult",
+      "track": "papers",
+      "where": "district_office",
+      "summary": "Take the indenture to the Lands Commission, so nobody can sell your plot twice.",
+      "requires": [
+        {"kind": "education", "what": "Knowing the process, or a lawyer friend"},
+        {"kind": "relationships", "what": "A surveyor you trust"},
+        {"kind": "resources", "what": "Fees (GH₵ 2,000)"}
+      ],
+      "after": ["buy_land"],
+      "cost": "GH₵ 2,000",
+      "unlocks": ["Safe from landguards", "A bank loan against the land"]
+    },
+    {
+      "id": "abroad",
+      "name": "The abroad dream",
+      "stage": "adult",
+      "track": "papers",
+      "summary": "Abrokyire: a visa interview and a ticket. Some go and send money home; some come back.",
+      "requires": [
+        {"kind": "education", "what": "A degree or a trade"},
+        {"kind": "resources", "what": "Visa fees and proof of funds (GH₵ 15,000 or more)"},
+        {"kind": "choices", "what": "Leave your people behind"}
+      ],
+      "after": ["passport"],
+      "cost": "GH₵ 15,000 or more",
+      "unlocks": ["A new chapter abroad (a later expansion)"]
+    },
+    {
+      "id": "teacher",
+      "name": "Teach at the basic school",
+      "stage": "adult",
+      "track": "learning",
+      "where": "basic_school",
+      "summary": "Mrs. Ofori needs teachers. You know how hard it is to learn when you're hungry.",
+      "requires": [
+        {"kind": "education", "what": "The teaching certificate"},
+        {"kind": "skills", "what": "Teaching 3"},
+        {"kind": "relationships", "what": "Mrs. Ofori gives you a class"}
+      ],
+      "after": ["sankofa_college"],
+      "cost": "",
+      "unlocks": ["A teacher's pay", "School: a good name"]
+    },
+    {
+      "id": "headteacher",
+      "name": "Headteacher",
+      "stage": "adult",
+      "track": "learning",
+      "where": "basic_school",
+      "summary": "The whole school is yours to run: forty teachers, a leaking roof, and a thousand children.",
+      "requires": [
+        {"kind": "education", "what": "A diploma or degree in education"},
+        {"kind": "reputation", "what": "School: respected by the parents"},
+        {"kind": "skills", "what": "Teaching 8 and Leadership 4"}
+      ],
+      "after": ["teacher"],
+      "cost": "",
+      "unlocks": ["Run the school"]
+    },
+    {
+      "id": "own_sewing_shop",
+      "name": "Your own sewing shop",
+      "stage": "adult",
+      "track": "trade",
+      "summary": "A signboard with your name on it, two machines, and customers who wait for you.",
+      "requires": [
+        {"kind": "reputation", "what": "Market: known for neat work"},
+        {"kind": "relationships", "what": "A landlord who rents to you"},
+        {"kind": "resources", "what": "Machines and a shop (GH₵ 4,000)"}
+      ],
+      "after": ["sew_for_market"],
+      "cost": "GH₵ 4,000",
+      "unlocks": ["Your own customers", "Room for apprentices"]
+    },
+    {
+      "id": "take_apprentices",
+      "name": "Take on apprentices",
+      "stage": "adult",
+      "track": "trade",
+      "summary": "Now you're the master. Your apprentices bring the drinks and learn from you.",
+      "requires": [
+        {"kind": "education", "what": "Your freedom certificate, or years of good work"},
+        {"kind": "reputation", "what": "Town: known for good work"}
+      ],
+      "after": ["own_sewing_shop"],
+      "cost": "",
+      "unlocks": ["Apprentices to help you", "Respect"]
+    },
+    {
+      "id": "own_stall",
+      "name": "Your own market stall",
+      "stage": "adult",
+      "track": "work",
+      "where": "market",
+      "summary": "A table of your own at Nkabom Market. The market queen has to know you first.",
+      "requires": [
+        {"kind": "skills", "what": "Trading 5"},
+        {"kind": "relationships", "what": "The market queen's approval"},
+        {"kind": "reputation", "what": "Market: known and trusted"},
+        {"kind": "resources", "what": "Rent and stock (GH₵ 800)"}
+      ],
+      "after": ["market_susu"],
+      "cost": "GH₵ 800",
+      "unlocks": ["Trading money", "Kayayei to carry for you"]
+    },
+    {
+      "id": "chop_bar",
+      "name": "Open a chop bar",
+      "stage": "adult",
+      "track": "work",
+      "where": "chop_bar",
+      "summary": "Fufu pounding at noon, light soup, and a queue of drivers. Maame Esi will teach you, if you ask her properly.",
+      "requires": [
+        {"kind": "skills", "what": "Cooking 7"},
+        {"kind": "relationships", "what": "Maame Esi's blessing (she trained you)"},
+        {"kind": "resources", "what": "Pots, benches and a spot (GH₵ 3,000)"}
+      ],
+      "after": ["market_susu"],
+      "cost": "GH₵ 3,000",
+      "unlocks": ["Daily sales", "Staff of your own"]
+    },
+    {
+      "id": "office_job",
+      "name": "An office job",
+      "stage": "adult",
+      "track": "work",
+      "where": "district_office",
+      "summary": "A desk, a monthly salary, and a long list of others who applied.",
+      "requires": [
+        {"kind": "education", "what": "A degree and the National Service certificate"},
+        {"kind": "relationships", "what": "Someone inside who puts your name forward"},
+        {"kind": "reputation", "what": "Town: a good name (they'll ask around)"}
+      ],
+      "after": ["national_service"],
+      "cost": "",
+      "unlocks": ["A monthly salary", "A bank loan for land or a car"]
+    },
+    {
+      "id": "own_trotro",
+      "name": "Own a trotro",
+      "stage": "adult",
+      "track": "work",
+      "where": "trotro_station",
+      "summary": "A second-hand Sprinter from Tema port, a driver, a mate, and a saying painted on the back.",
+      "requires": [
+        {"kind": "skills", "what": "Business 5"},
+        {"kind": "relationships", "what": "A driver you trust"},
+        {"kind": "resources", "what": "GH₵ 60,000, or a group of owners"}
+      ],
+      "after": ["trotro_driver"],
+      "cost": "GH₵ 60,000",
+      "unlocks": ["Daily sales from your driver", "A seat in the drivers' union"]
+    },
+    {
+      "id": "buy_land",
+      "name": "Buy a plot of land",
+      "stage": "adult",
+      "track": "work",
+      "where": "palace",
+      "summary": "An indenture, a site plan, and maybe landguards who say it's theirs. Ask the chief's people first.",
+      "requires": [
+        {"kind": "relationships", "what": "A chief or family head who gives it out"},
+        {"kind": "education", "what": "Knowing to check the papers first"},
+        {"kind": "resources", "what": "GH₵ 20,000, or a family plot"}
+      ],
+      "after": ["own_stall", "chop_bar", "own_sewing_shop", "office_job", "own_trotro"],
+      "afterAny": true,
+      "cost": "GH₵ 20,000",
+      "unlocks": ["Build a house", "Register the land"]
+    },
+    {
+      "id": "build_house",
+      "name": "Build, block by block",
+      "stage": "adult",
+      "track": "work",
+      "summary": "The foundation this year, the walls next year, the roof when the susu pays out. Ghanaians build in stages.",
+      "requires": [
+        {"kind": "relationships", "what": "A mason you trust"},
+        {"kind": "resources", "what": "Blocks and cement, paid in stages"},
+        {"kind": "choices", "what": "Build slowly instead of spending"}
+      ],
+      "after": ["buy_land"],
+      "cost": "GH₵ 60,000 over the years",
+      "unlocks": ["A house of your own: no more rent", "A family house"]
+    },
+    {
+      "id": "market_queen",
+      "name": "Market queen of your section",
+      "stage": "adult",
+      "track": "community",
+      "where": "market",
+      "summary": "The women of the cloth line choose you to speak for them: prices, quarrels, and the Assembly.",
+      "requires": [
+        {"kind": "reputation", "what": "Market: respected by the whole section"},
+        {"kind": "relationships", "what": "Many traders trust you"},
+        {"kind": "skills", "what": "Trading 8 and Leadership 5"},
+        {"kind": "choices", "what": "Stand for it"}
+      ],
+      "after": ["own_stall"],
+      "cost": "",
+      "unlocks": ["Settle disputes", "A voice at the Assembly"]
+    },
+    {
+      "id": "assembly_member",
+      "name": "Assembly member",
+      "stage": "adult",
+      "track": "community",
+      "where": "district_office",
+      "summary": "Elected to the District Assembly, to fight for gutters, street lights, and a new school roof.",
+      "requires": [
+        {"kind": "reputation", "what": "Town: known and trusted"},
+        {"kind": "relationships", "what": "The chief, the pastors and the market queens back you"},
+        {"kind": "choices", "what": "Stand for election"},
+        {"kind": "resources", "what": "Campaign posters (GH₵ 2,000)"}
+      ],
+      "after": ["market_queen", "station_master", "headteacher"],
+      "afterAny": true,
+      "cost": "GH₵ 2,000",
+      "unlocks": ["Shape the town"]
+    },
+    {
+      "id": "family_head",
+      "name": "Family head",
+      "stage": "elder",
+      "track": "care",
+      "where": "compound_house",
+      "summary": "Abusua panyin: the family brings you its quarrels, its funerals and its land.",
+      "requires": [
+        {"kind": "reputation", "what": "Family: respected by everyone"},
+        {"kind": "relationships", "what": "A big family that trusts you"},
+        {"kind": "choices", "what": "Accept the responsibility"}
+      ],
+      "after": ["first_child"],
+      "cost": "",
+      "unlocks": ["Lead the family", "Settle family disputes"]
+    },
+    {
+      "id": "hometown",
+      "name": "Back to the hometown",
+      "stage": "elder",
+      "track": "care",
+      "summary": "A house in the village, a small cocoa farm, and the grandchildren every Christmas.",
+      "requires": [
+        {"kind": "relationships", "what": "Family in the village"},
+        {"kind": "choices", "what": "Leave the town for the village"}
+      ],
+      "after": ["build_house"],
+      "cost": "",
+      "unlocks": ["A quiet life"]
+    },
+    {
+      "id": "will",
+      "name": "Write a will",
+      "stage": "elder",
+      "track": "papers",
+      "summary": "The house, the stall, the trotro: who gets what? Without a will, the family fights at the funeral.",
+      "requires": [
+        {"kind": "relationships", "what": "Heirs"},
+        {"kind": "education", "what": "A lawyer, or a witness who can read"},
+        {"kind": "choices", "what": "Decide who gets what"}
+      ],
+      "after": ["build_house", "own_stall", "own_trotro"],
+      "afterAny": true,
+      "cost": "",
+      "unlocks": ["Play on as your child: the next generation"]
+    },
+    {
+      "id": "church_elder",
+      "name": "Church elder",
+      "stage": "elder",
+      "track": "community",
+      "where": "church",
+      "summary": "Decades of faithfulness. Now the young ones come to you.",
+      "requires": [
+        {"kind": "reputation", "what": "Faith: decades of faithfulness"},
+        {"kind": "relationships", "what": "The whole congregation"}
+      ],
+      "after": ["youth_fellowship"],
+      "cost": "",
+      "unlocks": ["Counsel the young"]
+    },
+    {
+      "id": "queen_mother",
+      "name": "Queen mother",
+      "stage": "elder",
+      "track": "community",
+      "where": "palace",
+      "summary": "Ɔhemaa: the palace asks for your counsel, and the town comes to you before it goes to the chief. (For a man: a seat among the chief's elders.)",
+      "requires": [
+        {"kind": "reputation", "what": "Town: the highest respect"},
+        {"kind": "relationships", "what": "The royal family chooses you"},
+        {"kind": "choices", "what": "Accept the stool"}
+      ],
+      "after": ["family_head", "market_queen"],
+      "afterAny": true,
+      "cost": "",
+      "unlocks": ["A place at the palace"]
+    },
+    {
+      "id": "give_back",
+      "name": "Feed the market children",
+      "stage": "elder",
+      "track": "community",
+      "where": "market",
+      "summary": "Every Saturday you cook for the children who sleep under the market tables. You remember.",
+      "requires": [
+        {"kind": "choices", "what": "Remember where you came from"},
+        {"kind": "resources", "what": "Food money every week (GH₵ 300)"}
+      ],
+      "after": ["own_stall", "chop_bar"],
+      "afterAny": true,
+      "cost": "GH₵ 300 a week",
+      "unlocks": ["A legacy", "The circle closes"]
+    }
+  ],
+  "achievements": [
+    {
+      "id": "called_by_name",
+      "name": "Called by name",
+      "text": "Someone at the market calls you by your name.",
+      "unlocks": ["kind_seller", "safe_sleeping_spot"]
+    },
+    {
+      "id": "first_cedi",
+      "name": "First cedi",
+      "text": "Earn money with your own hands.",
+      "unlocks": ["hawk_water", "station_errands"]
+    },
+    {
+      "id": "honest_change",
+      "name": "Honest with money",
+      "text": "Give back extra change three times.",
+      "unlocks": ["taken_in", "errands", "market_susu", "momo_agent"]
+    },
+    {
+      "id": "never_absent",
+      "name": "Never absent",
+      "text": "A whole term at school without missing a day.",
+      "unlocks": ["bece", "church_scholarship"]
+    },
+    {
+      "id": "first_book",
+      "name": "A whole book",
+      "text": "Read a book from cover to cover.",
+      "unlocks": ["bece", "sankofa_college"]
+    },
+    {
+      "id": "colts_goal",
+      "name": "Goal for the colts",
+      "text": "Score in a Saturday colts match.",
+      "unlocks": ["colts_club", "academy_trial"]
+    },
+    {
+      "id": "first_payout",
+      "name": "First susu payout",
+      "text": "Save with the susu for a whole month.",
+      "unlocks": ["own_stall", "chop_bar"]
+    },
+    {
+      "id": "freedom_day",
+      "name": "Freedom day",
+      "text": "Pass your trade's freedom ceremony.",
+      "unlocks": ["sew_for_market", "take_apprentices"]
+    },
+    {
+      "id": "careful_driver",
+      "name": "A careful driver",
+      "text": "A year on the road without an accident.",
+      "unlocks": ["trotro_driver", "own_trotro"]
+    },
+    {
+      "id": "housewarming",
+      "name": "Housewarming",
+      "text": "Sleep under your own roof.",
+      "unlocks": ["hometown", "will"]
+    },
+    {
+      "id": "peacemaker",
+      "name": "Peacemaker",
+      "text": "Settle ten quarrels fairly.",
+      "unlocks": ["market_queen", "station_master", "family_head"]
+    },
+    {
+      "id": "sankofa",
+      "name": "Sankofa",
+      "text": "Go back for someone who is where you started.",
+      "unlocks": ["give_back", "queen_mother"]
+    }
+  ],
+  "coasters": [
+    {
+      "id": "auntie_akos",
+      "name": "Auntie Akos",
+      "role": "Kenkey seller",
+      "place": "market",
+      "traits": ["generous", "prayerful"],
+      "becomes": "guardian",
+      "text": "Five children of her own and room for one more. Strict about chores, soft about food.",
+      "line": "Come, my small one. Have you eaten?",
+      "routine": "At her stall from 06:00; church every Sunday."
+    },
+    {
+      "id": "mama_akua",
+      "name": "Mama Akua",
+      "role": "Tomato seller",
+      "place": "market",
+      "traits": ["shy", "neat"],
+      "becomes": "mentor",
+      "text": "Says little, sees everything. She knew your mother.",
+      "line": "Sit here, out of the sun.",
+      "routine": "Sells from 05:30 until the market closes."
+    },
+    {
+      "id": "madam_serwaa",
+      "name": "Madam Serwaa",
+      "role": "Hires the kayayei",
+      "place": "market",
+      "traits": ["hustler", "hot_temper"],
+      "becomes": "boss",
+      "text": "Her pile of head pans is where every kayayo's day starts. Fair, if you're never late.",
+      "line": "Load it well o. If it falls, you pay.",
+      "routine": "First in the market, last to leave."
+    },
+    {
+      "id": "maame_esi",
+      "name": "Maame Esi",
+      "role": "Runs the chop bar",
+      "place": "chop_bar",
+      "traits": ["hustler", "joker"],
+      "becomes": "boss",
+      "text": "The best fufu on the main road. Wash her bowls and she feeds you; work hard and she might teach you.",
+      "line": "Wash these bowls and I'll give you banku.",
+      "routine": "Pounding from 10:00; open until 21:00."
+    },
+    {
+      "id": "auntie_adwoa",
+      "name": "Auntie Adwoa",
+      "role": "Landlady of the compound house",
+      "place": "compound_house",
+      "traits": ["neat", "humble"],
+      "becomes": "elders",
+      "text": "Sits outside on her stool and knows everyone's business. Rent is due on Mondays.",
+      "line": "Work hard o, rent is coming!",
+      "routine": "On her stool by the gate, all day."
+    },
+    {
+      "id": "mrs_ofori",
+      "name": "Mrs. Ofori",
+      "role": "Headmistress, Nkabom M/A Basic School",
+      "place": "basic_school",
+      "traits": ["book_long", "humble"],
+      "becomes": "mentor",
+      "text": "Forty years of teaching. She notices the children who come to school hungry.",
+      "line": "Sit up. You are somebody.",
+      "routine": "At school 07:00 to 15:00, Monday to Friday."
+    },
+    {
+      "id": "madam_afriyie",
+      "name": "Madam Afriyie",
+      "role": "Registrar, Sankofa Training College",
+      "place": "college",
+      "traits": ["neat", "book_long"],
+      "becomes": "mentor",
+      "text": "Keeps the register, the fees and the certificates. Never late, never wrong.",
+      "line": "Which course? Fill the form, my dear.",
+      "routine": "At her desk Monday to Saturday."
+    },
+    {
+      "id": "auntie_dede",
+      "name": "Auntie Dede",
+      "role": "Mobile money agent",
+      "place": "momo_kiosk",
+      "traits": ["sweet_mouth", "hustler"],
+      "becomes": "boss",
+      "text": "Her yellow kiosk is the town's bank. She needs someone honest to mind it while she goes to the real bank.",
+      "line": "Count it twice. Then count it again.",
+      "routine": "At the kiosk from 07:00; to the bank by trotro at midday."
+    },
+    {
+      "id": "pastor_mensah",
+      "name": "Pastor Mensah",
+      "role": "Methodist minister",
+      "place": "church",
+      "traits": ["prayerful", "generous"],
+      "becomes": "mentor",
+      "text": "Runs the Saturday feeding programme himself, and remembers every child's name.",
+      "line": "God has a plan for you. So do I: homework.",
+      "routine": "Church every day; the feeding programme on Saturdays."
+    },
+    {
+      "id": "coach_kwesi",
+      "name": "Coach Kwesi",
+      "role": "Coach of the Nkabom Colts",
+      "place": "park",
+      "traits": ["footballer", "hot_temper"],
+      "becomes": "mentor",
+      "text": "Played for a big club once, until his knee went. Now he shouts at children at six in the morning.",
+      "line": "Again! The Black Stars don't rest.",
+      "routine": "Training at the park at 06:00; matches on Saturdays."
+    },
+    {
+      "id": "madam_adjoa",
+      "name": "Madam Adjoa",
+      "role": "Master seamstress",
+      "place": "tailor_shop",
+      "traits": ["neat", "ambitious"],
+      "becomes": "master",
+      "text": "Three machines, a radio, and the neatest kaba in town. Her apprentices become masters.",
+      "line": "Again. A hem must be straight like a road.",
+      "routine": "In her shop 07:00 to 18:00."
+    },
+    {
+      "id": "kofi",
+      "name": "Kofi",
+      "role": "A market boy",
+      "place": "market",
+      "traits": ["joker", "street_smart"],
+      "becomes": "friends",
+      "text": "Two years older than you and knows everything, or says he does. Your first friend.",
+      "line": "Chale, follow me. I know where the bread is.",
+      "routine": "Everywhere at once."
+    },
+    {
+      "id": "uncle_bonsu",
+      "name": "Uncle Bonsu",
+      "role": "Station master",
+      "place": "trotro_station",
+      "traits": ["street_smart", "humble"],
+      "becomes": "boss",
+      "text": "Decides which trotro loads next. The drivers fear him; the station boys respect him.",
+      "line": "Join the queue. Everybody joins the queue.",
+      "routine": "At the station from 05:00 to 22:00."
+    },
+    {
+      "id": "nana_ababio",
+      "name": "Nana Kwaku Ababio II",
+      "role": "Chief of Nkabom",
+      "place": "palace",
+      "traits": ["humble", "prayerful"],
+      "becomes": "elders",
+      "text": "Gives out the town's land and settles what the courts can't. He speaks through his linguist.",
+      "line": "(Through the ɔkyeame) Nana says you are welcome.",
+      "routine": "Sits at the palace in the mornings."
+    }
+  ],
+  "places": [
+    {
+      "id": "market",
+      "name": "Nkabom Market",
+      "area": "Town centre",
+      "hours": "05:30 to 18:00",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "Tomatoes in heaps, cloth to the ceiling, the shouts of the kayayei. The heart of Gold Coast.",
+      "people": [
+        "Market women",
+        "Auntie Efua, Auntie Ama, Auntie Yaa and Auntie Mansa",
+        "The market queen",
+        "Kayayei",
+        "City guards"
+      ]
+    },
+    {
+      "id": "rubbish_heap",
+      "name": "The rubbish heap",
+      "area": "Behind the market",
+      "hours": "Always",
+      "stages": ["toddler", "child", "teen"],
+      "text": "Where the market throws what it can't sell. Some of it is still good.",
+      "people": ["Scavenging children", "Stray dogs"]
+    },
+    {
+      "id": "junction",
+      "name": "The traffic junction",
+      "area": "Main road",
+      "hours": "Always",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "Trotros, taxis, hawkers weaving between them, and a street light that works when there's power.",
+      "people": ["Hawkers", "Drivers", "City guards"]
+    },
+    {
+      "id": "standpipe",
+      "name": "The standpipe",
+      "area": "The compounds",
+      "hours": "05:00 to 20:00 (some days it's dry)",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "One tap for the whole lane. Buckets in a queue, and gist in the queue.",
+      "people": ["Neighbours", "Children with buckets"]
+    },
+    {
+      "id": "public_toilet",
+      "name": "Public toilet",
+      "area": "By the market",
+      "hours": "05:00 to 22:00",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "Fifty pesewas to the attendant, who gives you a square of tissue.",
+      "people": ["The attendant"]
+    },
+    {
+      "id": "bathhouse",
+      "name": "Public bathhouse",
+      "area": "By the station",
+      "hours": "05:00 to 21:00",
+      "stages": ["child", "teen", "young_adult", "adult"],
+      "text": "A cedi for a bucket of water and a stall with a door.",
+      "people": ["The attendant"]
+    },
+    {
+      "id": "trotro_station",
+      "name": "Trotro station",
+      "area": "Main road",
+      "hours": "Always (the last trotro leaves at 22:00)",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "Mates shouting destinations, benches under a shelter, and hawkers selling everything.",
+      "people": ["Drivers", "Mates", "Station boys", "Hawkers"]
+    },
+    {
+      "id": "chop_bar",
+      "name": "Maame Esi's chop bar",
+      "area": "Main road",
+      "hours": "07:00 to 21:00",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "text": "Fufu and light soup, waakye, banku and tilapia. Wash the bowls and she'll feed you.",
+      "people": ["Drivers on their break"]
+    },
+    {
+      "id": "compound_house",
+      "name": "Auntie Adwoa's compound house",
+      "area": "The compounds",
+      "hours": "Always, for the people who live there",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "Rooms around a yard: a shared kitchen, a washing line, ten families, and no secrets.",
+      "people": ["Neighbours", "Children everywhere"]
+    },
+    {
+      "id": "church",
+      "name": "Methodist church",
+      "area": "Hill road",
+      "hours": "07:00 to 12:00 on Sundays; feeding on Saturday mornings",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "Hymns, drums, a long sermon, and the Saturday feeding programme for the market children.",
+      "people": ["The church mothers", "The choir"]
+    },
+    {
+      "id": "mosque",
+      "name": "Central mosque",
+      "area": "Zongo",
+      "hours": "Prayer times; Friday prayers at 13:00",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "text": "The call to prayer over the rooftops, and Friday's crowd in white.",
+      "people": ["The imam", "Neighbours from the zongo"]
+    },
+    {
+      "id": "basic_school",
+      "name": "Nkabom M/A Basic School",
+      "area": "School road",
+      "hours": "07:30 to 14:00, Monday to Friday",
+      "stages": ["child", "teen", "adult"],
+      "text": "Classrooms under a zinc roof, a flagpole, a mango tree, and forty pupils to a class.",
+      "people": ["Teachers", "Pupils"]
+    },
+    {
+      "id": "shs",
+      "name": "Senior high school",
+      "area": "Out of town (boarding)",
+      "hours": "Term time",
+      "stages": ["teen", "young_adult"],
+      "text": "Dormitories, a dining hall, prep in the evenings, and friends from all over Ghana.",
+      "people": ["The housemaster", "Students"]
+    },
+    {
+      "id": "college",
+      "name": "Sankofa Training College",
+      "area": "College road",
+      "hours": "08:00 to 17:00, Monday to Saturday",
+      "stages": ["young_adult", "adult"],
+      "text": "Short courses that lead to work: teaching, dressmaking, mobile money.",
+      "people": ["Lecturers", "Students"]
+    },
+    {
+      "id": "clinic",
+      "name": "Clinic and chemist",
+      "area": "Main road",
+      "hours": "07:00 to 20:00",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "The nurse, the chemist, and the long bench outside. With an NHIS card it's nearly free.",
+      "people": ["The nurse", "The chemist"]
+    },
+    {
+      "id": "viewing_centre",
+      "name": "Viewing centre",
+      "area": "The compounds",
+      "hours": "Match days, evenings",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "text": "A big screen, plastic chairs, and the loudest room in town when the Black Stars play.",
+      "people": ["The owner", "Football fans"]
+    },
+    {
+      "id": "tailor_shop",
+      "name": "Madam Adjoa's sewing shop",
+      "area": "Market road",
+      "hours": "07:00 to 18:00",
+      "stages": ["teen", "young_adult", "adult"],
+      "text": "Three sewing machines, a radio, and apprentices learning on scraps of cloth.",
+      "people": ["Apprentices"]
+    },
+    {
+      "id": "momo_kiosk",
+      "name": "Auntie Dede's MoMo kiosk",
+      "area": "By the college",
+      "hours": "07:00 to 19:00",
+      "stages": ["young_adult", "adult"],
+      "text": "A yellow kiosk: cash in, cash out, and a queue at the end of the month.",
+      "people": ["Customers"]
+    },
+    {
+      "id": "district_office",
+      "name": "District offices",
+      "area": "Old town",
+      "hours": "08:00 to 16:00, weekdays",
+      "stages": ["child", "young_adult", "adult", "elder"],
+      "text": "The Births and Deaths Registry, the NIA (Ghana Cards), the DVLA, the Lands Commission and the District Assembly, all down one long corridor.",
+      "people": ["Officers at the counters", "The queue"]
+    },
+    {
+      "id": "park",
+      "name": "The park",
+      "area": "Behind the school",
+      "hours": "Always",
+      "stages": ["child", "teen", "young_adult", "adult"],
+      "text": "A dusty field with two goalposts and no nets. The Nkabom Colts train here at dawn.",
+      "people": ["Children playing", "The Nkabom Colts"]
+    },
+    {
+      "id": "beach",
+      "name": "Nkabom beach",
+      "area": "The coast",
+      "hours": "Always",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "text": "Fishing canoes painted in bright colours, nets on the sand, and the sea that gave the Gold Coast its name.",
+      "people": ["Fishermen", "Fish smokers", "Swimmers"]
+    },
+    {
+      "id": "palace",
+      "name": "The chief's palace",
+      "area": "Old town",
+      "hours": "08:00 to 12:00",
+      "stages": ["adult", "elder"],
+      "text": "Where land is given out, disputes are settled, and the elders sit.",
+      "people": ["The queen mother", "The linguist (ɔkyeame)", "The elders"]
+    }
+  ],
+  "actions": [
+    {
+      "id": "pick_trash_food",
+      "name": "Pick food from the rubbish",
+      "place": "rubbish_heap",
+      "stages": ["toddler", "child", "teen"],
+      "minutes": 20,
+      "needs": {"hunger": 25, "hygiene": -20, "respect": -5},
+      "builds": ["Street smarts +1"],
+      "risk": "One time in four the food is bad: health −15.",
+      "flavor": "Half a meat pie, still warm. Don't look too closely."
+    },
+    {
+      "id": "beg_coins",
+      "name": "Beg at the traffic light",
+      "place": "junction",
+      "stages": ["toddler", "child"],
+      "minutes": 60,
+      "needs": {"respect": -10, "energy": -5},
+      "earns": [0.5, 2],
+      "builds": [],
+      "risk": "The city guards chase you off.",
+      "flavor": "Some drivers wave you away; one gives you a whole cedi.",
+      "until": "taken_in",
+      "hours": "06:00 to 20:00"
+    },
+    {
+      "id": "help_carry_bowls",
+      "name": "Help a seller carry her bowls",
+      "place": "market",
+      "stages": ["toddler", "child", "teen"],
+      "minutes": 30,
+      "needs": {"hunger": 15, "energy": -10, "social": 10, "hope": 5},
+      "builds": ["The seller likes you more (+2)", "Market reputation +1"],
+      "flavor": "She gives you a ball of kenkey and a smile."
+    },
+    {
+      "id": "stay_near_seller",
+      "name": "Sit by a seller's stall",
+      "place": "market",
+      "stages": ["toddler", "child"],
+      "minutes": 60,
+      "needs": {"safety": 20, "social": 10, "fun": -5},
+      "builds": ["Mama Akua knows you better (+1)"],
+      "flavor": "Mama Akua lets you sit by her basin while she sells."
+    },
+    {
+      "id": "play_market_kids",
+      "name": "Play with the market children",
+      "place": "market",
+      "stages": ["toddler", "child"],
+      "minutes": 40,
+      "needs": {"fun": 25, "social": 20, "energy": -5},
+      "builds": ["Friends +1"],
+      "flavor": "Hide and seek between the cloth stalls, until someone's auntie shouts."
+    },
+    {
+      "id": "eat_with_auntie",
+      "name": "Eat at Auntie Akos's stall",
+      "place": "market",
+      "stages": ["toddler", "child"],
+      "minutes": 20,
+      "requires": "kind_seller",
+      "needs": {"hunger": 45, "social": 10, "belonging": 5},
+      "builds": ["Auntie Akos likes you more (+1)"],
+      "flavor": "The ends of the kenkey, a little pepper, and a piece of fish."
+    },
+    {
+      "id": "sweet_talk_seller",
+      "name": "Sweet-talk a seller",
+      "place": "market",
+      "stages": ["toddler", "child", "teen", "young_adult"],
+      "minutes": 10,
+      "trait": "sweet_mouth",
+      "needs": {"hunger": 30, "social": 10},
+      "builds": ["Charisma +1"],
+      "risk": "Do it too often and she stops laughing.",
+      "flavor": "'Auntie, your waakye is the sweetest in Gold Coast.' It works."
+    },
+    {
+      "id": "feeding_saturday",
+      "name": "The Saturday feeding programme",
+      "place": "church",
+      "stages": ["toddler", "child"],
+      "minutes": 90,
+      "hours": "08:00 to 11:00",
+      "needs": {"hunger": 50, "hope": 10, "social": 15, "belonging": 10},
+      "builds": ["Church reputation +1"],
+      "risk": "Saturdays only.",
+      "flavor": "Rice and stew, a Bible story, and a song with actions.",
+      "days": ["sat"]
+    },
+    {
+      "id": "nap_in_shade",
+      "name": "Nap in the shade",
+      "place": "market",
+      "stages": ["toddler", "child"],
+      "minutes": 90,
+      "hours": "11:00 to 17:00",
+      "needs": {"energy": 25, "safety": -5},
+      "builds": [],
+      "flavor": "Curled up on a sack in the shade of the cloth stalls."
+    },
+    {
+      "id": "sleep_under_stall",
+      "name": "Sleep under a market table",
+      "place": "market",
+      "stages": ["toddler", "child", "teen"],
+      "minutes": 540,
+      "hours": "18:00 to 06:00",
+      "needs": {"energy": 65, "safety": -10},
+      "builds": [],
+      "risk": "Rain, rats and mosquitoes: health may fall.",
+      "flavor": "A market table keeps the rain off. Mostly.",
+      "until": "taken_in"
+    },
+    {
+      "id": "sleep_safe_spot",
+      "name": "Sleep under Mama Akua's table",
+      "place": "market",
+      "stages": ["toddler", "child"],
+      "minutes": 600,
+      "hours": "18:00 to 06:00",
+      "requires": "safe_sleeping_spot",
+      "needs": {"energy": 80, "safety": 15},
+      "builds": [],
+      "flavor": "On a folded sack, with her radio still playing.",
+      "until": "taken_in"
+    },
+    {
+      "id": "sleep_station_bench",
+      "name": "Sleep on a station bench",
+      "place": "trotro_station",
+      "stages": ["child", "teen", "young_adult"],
+      "minutes": 420,
+      "hours": "21:00 to 05:00",
+      "needs": {"energy": 55, "safety": -20},
+      "builds": [],
+      "risk": "Touts, thieves, and the first trotro at five.",
+      "flavor": "The shelter's roof, and the drivers' radios all night."
+    },
+    {
+      "id": "sleep_on_mat",
+      "name": "Sleep on a mat in the compound",
+      "place": "compound_house",
+      "stages": ["toddler", "child", "teen", "young_adult"],
+      "minutes": 540,
+      "hours": "20:00 to 06:00",
+      "requires": "taken_in",
+      "needs": {"energy": 90, "safety": 30, "belonging": 5},
+      "builds": [],
+      "flavor": "Six children on two mats, and nobody is afraid."
+    },
+    {
+      "id": "sleep_in_bed",
+      "name": "Sleep in your own bed",
+      "place": "compound_house",
+      "stages": ["young_adult", "adult", "elder"],
+      "minutes": 480,
+      "hours": "20:00 to 08:00",
+      "requires": "rent_room",
+      "needs": {"energy": 95, "safety": 30},
+      "builds": [],
+      "flavor": "A door that locks, a mosquito net, and the whole night."
+    },
+    {
+      "id": "buy_pure_water",
+      "name": "Buy a sachet of pure water",
+      "place": "junction",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 2,
+      "cost": 0.5,
+      "needs": {"thirst": 40},
+      "builds": [],
+      "flavor": "Bite the corner, squeeze, and it's gone.",
+      "hours": "06:00 to 22:00"
+    },
+    {
+      "id": "drink_standpipe",
+      "name": "Drink at the standpipe",
+      "place": "standpipe",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 15,
+      "needs": {"thirst": 30},
+      "builds": [],
+      "risk": "Some days it's dry; in the rains the water can be bad.",
+      "flavor": "Cupped hands under the tap while the queue complains."
+    },
+    {
+      "id": "splash_standpipe",
+      "name": "Splash at the standpipe",
+      "place": "standpipe",
+      "stages": ["toddler", "child"],
+      "minutes": 15,
+      "needs": {"hygiene": 15, "thirst": 5, "fun": 10},
+      "builds": [],
+      "flavor": "A splash under the tap until somebody shouts."
+    },
+    {
+      "id": "fetch_water",
+      "name": "Fetch water for the compound",
+      "place": "standpipe",
+      "stages": ["child", "teen"],
+      "minutes": 40,
+      "requires": "taken_in",
+      "needs": {"energy": -15, "thirst": 10, "belonging": 5},
+      "builds": ["Auntie Akos is pleased (+2)", "Family reputation +1", "Strength +1"],
+      "flavor": "Two buckets, the long walk back, and not a drop spilled."
+    },
+    {
+      "id": "help_at_home",
+      "name": "Help around the compound",
+      "place": "compound_house",
+      "stages": ["child", "teen", "young_adult"],
+      "minutes": 60,
+      "hours": "05:00 to 21:00",
+      "requires": "taken_in",
+      "needs": {"safety": 20, "belonging": 5, "social": 5, "energy": -5},
+      "builds": ["Auntie Akos is pleased (+1)", "Family reputation +1"],
+      "flavor": "Sweep the yard, wash the bowls, and mind the little ones."
+    },
+    {
+      "id": "public_toilet",
+      "name": "Use the public toilet",
+      "place": "public_toilet",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 5,
+      "cost": 0.5,
+      "needs": {"bladder": 100},
+      "builds": [],
+      "flavor": "Fifty pesewas and a square of tissue."
+    },
+    {
+      "id": "use_gutter",
+      "name": "Use the gutter",
+      "place": "junction",
+      "stages": ["toddler", "child", "teen", "young_adult"],
+      "minutes": 2,
+      "needs": {"bladder": 100, "respect": -15, "hygiene": -10},
+      "builds": [],
+      "risk": "If someone sees: shamed (respect −10 more).",
+      "flavor": "Nobody's looking. Hopefully.",
+      "until": "taken_in"
+    },
+    {
+      "id": "compound_toilet",
+      "name": "Use the compound's toilet",
+      "place": "compound_house",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 5,
+      "requires": ["taken_in", "rent_room"],
+      "needs": {"bladder": 100},
+      "builds": [],
+      "risk": "A queue every morning.",
+      "flavor": "Ten families, one toilet, and a bucket of water to flush."
+    },
+    {
+      "id": "bucket_bath",
+      "name": "Bucket bath",
+      "place": "compound_house",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 15,
+      "requires": ["taken_in", "rent_room"],
+      "needs": {"hygiene": 70},
+      "builds": [],
+      "flavor": "Cold water, a chewing stick, and the day washes off."
+    },
+    {
+      "id": "bathhouse_bath",
+      "name": "Bath at the bathhouse",
+      "place": "bathhouse",
+      "stages": ["child", "teen", "young_adult", "adult"],
+      "minutes": 15,
+      "cost": 1,
+      "needs": {"hygiene": 80},
+      "builds": [],
+      "flavor": "A bucket of water and a door that shuts."
+    },
+    {
+      "id": "wash_in_sea",
+      "name": "Wash in the sea",
+      "place": "beach",
+      "stages": ["child", "teen", "young_adult"],
+      "minutes": 30,
+      "needs": {"hygiene": 30, "fun": 10},
+      "builds": [],
+      "risk": "Salt in your hair, sand everywhere.",
+      "flavor": "The waves do the scrubbing.",
+      "hours": "06:00 to 18:00"
+    },
+    {
+      "id": "play_ampe",
+      "name": "Play ampe",
+      "place": "park",
+      "stages": ["child", "teen"],
+      "minutes": 30,
+      "needs": {"fun": 30, "social": 20, "energy": -10},
+      "builds": ["Friends +1"],
+      "flavor": "Clap, jump, kick a foot out: odd or even?",
+      "hours": "07:00 to 19:00"
+    },
+    {
+      "id": "street_football",
+      "name": "Play football at the park",
+      "place": "park",
+      "stages": ["child", "teen", "young_adult"],
+      "minutes": 60,
+      "needs": {"fun": 35, "social": 15, "energy": -20},
+      "builds": ["Football +1", "Street reputation +1"],
+      "risk": "A scraped knee, or the ball in the gutter.",
+      "flavor": "Stones for goalposts. The trotros wait.",
+      "hours": "06:00 to 19:00"
+    },
+    {
+      "id": "watch_match",
+      "name": "Watch the Black Stars",
+      "place": "viewing_centre",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 120,
+      "hours": "19:00 to 22:00",
+      "cost": 2,
+      "needs": {"fun": 40, "social": 30},
+      "builds": [],
+      "risk": "If they lose, the whole room sulks.",
+      "flavor": "When Ghana scores, the plastic chairs fly."
+    },
+    {
+      "id": "gist_neighbours",
+      "name": "Gist with the neighbours",
+      "place": "compound_house",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 30,
+      "requires": ["taken_in", "rent_room"],
+      "needs": {"social": 30, "fun": 10},
+      "builds": ["The neighbours like you more (+1)"],
+      "risk": "Gist travels: say the wrong thing and the whole lane knows.",
+      "flavor": "Who's courting whom, whose roof leaks, and what the pastor said.",
+      "hours": "06:00 to 22:00"
+    },
+    {
+      "id": "church_service",
+      "name": "Go to church",
+      "place": "church",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 240,
+      "hours": "07:00 to 12:00",
+      "needs": {"hope": 30, "belonging": 15, "social": 15, "fun": 10},
+      "builds": ["Church reputation +1"],
+      "risk": "Sundays only, and the sermon is long.",
+      "flavor": "Drums, hymns, and dancing to the offering bowl.",
+      "days": ["sun"]
+    },
+    {
+      "id": "friday_prayers",
+      "name": "Friday prayers",
+      "place": "mosque",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 60,
+      "hours": "12:30 to 14:00",
+      "needs": {"hope": 30, "belonging": 15, "social": 10},
+      "builds": ["Mosque reputation +1"],
+      "risk": "Fridays only.",
+      "flavor": "Shoulder to shoulder, the whole zongo in white.",
+      "days": ["fri"]
+    },
+    {
+      "id": "attend_class",
+      "name": "Go to class",
+      "place": "basic_school",
+      "stages": ["child", "teen"],
+      "minutes": 390,
+      "hours": "07:30 to 14:00",
+      "requires": "basic_school",
+      "needs": {"energy": -10, "social": 15, "hope": 5, "safety": 10},
+      "builds": ["A day of school", "Reading +1", "Numbers +1"],
+      "risk": "Hard to learn on an empty stomach.",
+      "flavor": "Forty voices reciting the times tables.",
+      "days": ["mon", "tue", "wed", "thu", "fri"]
+    },
+    {
+      "id": "study_street_light",
+      "name": "Study under the street light",
+      "place": "junction",
+      "stages": ["child", "teen", "young_adult"],
+      "minutes": 90,
+      "hours": "19:00 to 23:00",
+      "requires": "basic_school",
+      "needs": {"energy": -10, "fun": -5, "hope": 5},
+      "builds": ["Reading +1"],
+      "risk": "Dumsor: no light tonight.",
+      "flavor": "The moths and you, sharing one bulb."
+    },
+    {
+      "id": "read_newspaper",
+      "name": "Read the kelewele newspaper",
+      "place": "market",
+      "stages": ["child", "teen", "young_adult", "adult"],
+      "minutes": 15,
+      "trait": "book_long",
+      "requires": "basic_school",
+      "needs": {"fun": 10},
+      "builds": ["Reading +1"],
+      "flavor": "Yesterday's news, a little oily, still interesting."
+    },
+    {
+      "id": "hawk_water",
+      "name": "Hawk pure water",
+      "place": "junction",
+      "stages": ["child", "teen", "young_adult"],
+      "minutes": 180,
+      "requires": "hawk_water",
+      "needs": {"energy": -20, "thirst": -10},
+      "earns": [3, 8],
+      "builds": ["Trading +1"],
+      "risk": "Traffic, and the city guards.",
+      "flavor": "'Pure water! Ice water!'"
+    },
+    {
+      "id": "call_passengers",
+      "name": "Call passengers for a driver",
+      "place": "trotro_station",
+      "stages": ["child", "teen"],
+      "minutes": 120,
+      "requires": "station_errands",
+      "needs": {"energy": -15, "social": 10},
+      "earns": [1, 4],
+      "builds": ["Drivers know you better (+1)"],
+      "flavor": "'Circle! Circle! One more seat!'"
+    },
+    {
+      "id": "carry_load",
+      "name": "Carry a load (kayayo)",
+      "place": "market",
+      "stages": ["teen", "young_adult"],
+      "minutes": 45,
+      "requires": "kayayo",
+      "needs": {"energy": -25, "thirst": -10},
+      "earns": [2, 20],
+      "builds": ["Strength +1", "Customers +1"],
+      "risk": "Drop a load and you pay for it.",
+      "flavor": "Yam, tomatoes, a whole cooler: on your head, through the crowd."
+    },
+    {
+      "id": "susu_pay",
+      "name": "Pay the susu collector",
+      "place": "market",
+      "stages": ["teen", "young_adult", "adult"],
+      "minutes": 5,
+      "cost": 1,
+      "requires": "market_susu",
+      "needs": {"hope": 5},
+      "builds": ["Savings +GH₵ 1", "Market reputation +1"],
+      "risk": "A susu collector can vanish with everyone's money.",
+      "flavor": "He marks your card: another day done."
+    },
+    {
+      "id": "chop_bar_meal",
+      "name": "Eat at Maame Esi's",
+      "place": "chop_bar",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 30,
+      "cost": 12,
+      "needs": {"hunger": 70, "social": 10},
+      "builds": [],
+      "flavor": "Fufu and light soup, eaten with your right hand."
+    },
+    {
+      "id": "wash_bowls",
+      "name": "Wash bowls for a meal",
+      "place": "chop_bar",
+      "stages": ["child", "teen", "young_adult"],
+      "minutes": 45,
+      "needs": {"energy": -10, "hunger": 40},
+      "builds": ["Maame Esi likes you more (+1)"],
+      "flavor": "Twenty bowls, a basin, and a plate of banku at the end."
+    },
+    {
+      "id": "apprentice_day",
+      "name": "A day at the master's shop",
+      "place": "tailor_shop",
+      "stages": ["teen", "young_adult"],
+      "minutes": 600,
+      "hours": "07:00 to 18:00",
+      "requires": "apprenticeship",
+      "needs": {"energy": -20, "social": 10, "hope": 5},
+      "builds": ["Sewing +1", "Madam Adjoa trusts you more (+1)"],
+      "flavor": "Hems on scraps of cloth until they're straight.",
+      "days": ["mon", "tue", "wed", "thu", "fri", "sat"]
+    },
+    {
+      "id": "sew_piece",
+      "name": "Sew a dress for a customer",
+      "place": "market",
+      "stages": ["young_adult", "adult"],
+      "minutes": 180,
+      "requires": "sew_for_market",
+      "needs": {"energy": -15, "respect": 5},
+      "earns": [20, 60],
+      "builds": ["Sewing +1", "Customers +1"],
+      "flavor": "A kaba and slit for Auntie Yaa's daughter's wedding."
+    },
+    {
+      "id": "take_course",
+      "name": "A class at Sankofa College",
+      "place": "college",
+      "stages": ["young_adult", "adult"],
+      "minutes": 120,
+      "hours": "08:00 to 17:00",
+      "requires": "sankofa_college",
+      "needs": {"energy": -10, "hope": 10},
+      "builds": ["A class towards your certificate"],
+      "flavor": "Notes, a quiz, and one step closer to a certificate.",
+      "days": ["mon", "tue", "wed", "thu", "fri", "sat"]
+    },
+    {
+      "id": "momo_shift",
+      "name": "Mind the MoMo kiosk",
+      "place": "momo_kiosk",
+      "stages": ["young_adult", "adult"],
+      "minutes": 120,
+      "hours": "07:00 to 19:00",
+      "requires": "momo_agent",
+      "needs": {"energy": -10, "social": 10},
+      "earns": [45, 45],
+      "builds": ["Market reputation +1"],
+      "risk": "Fraudsters with 'wrong transfers'.",
+      "flavor": "Cash in, cash out, count it twice."
+    },
+    {
+      "id": "drive_trotro",
+      "name": "Drive the trotro",
+      "place": "trotro_station",
+      "stages": ["young_adult", "adult"],
+      "minutes": 600,
+      "hours": "05:00 to 21:00",
+      "requires": "trotro_driver",
+      "needs": {"energy": -30, "social": 10},
+      "earns": [80, 150],
+      "builds": ["Driving +1"],
+      "risk": "Police checkpoints, potholes, and the owner's sales first.",
+      "flavor": "Ten trips to town and back, the radio on full."
+    },
+    {
+      "id": "run_stall",
+      "name": "Run your stall",
+      "place": "market",
+      "stages": ["adult", "elder"],
+      "minutes": 600,
+      "requires": "own_stall",
+      "needs": {"energy": -20, "social": 20, "respect": 5},
+      "earns": [60, 200],
+      "builds": ["Trading +1", "Market reputation +1"],
+      "flavor": "'Customer, come and see! Fine tomatoes!'"
+    },
+    {
+      "id": "queue_ghana_card",
+      "name": "Queue for the Ghana Card",
+      "place": "district_office",
+      "stages": ["young_adult", "adult", "elder"],
+      "minutes": 480,
+      "requires": "birth_certificate",
+      "needs": {"energy": -30, "fun": -20},
+      "builds": ["The Ghana Card, after three visits"],
+      "risk": "'The network is down. Come back tomorrow.'",
+      "flavor": "Number 214 in the queue. They're serving 31.",
+      "days": ["mon", "tue", "wed", "thu", "fri"],
+      "hours": "08:00 to 16:00"
+    },
+    {
+      "id": "clinic_visit",
+      "name": "See the nurse",
+      "place": "clinic",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 120,
+      "cost": 5,
+      "requires": "nhis_card",
+      "needs": {"health": 40},
+      "builds": [],
+      "flavor": "A malaria test, three tablets, and a talk about mosquito nets."
+    },
+    {
+      "id": "chemist_medicine",
+      "name": "Buy medicine at the chemist",
+      "place": "clinic",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 10,
+      "cost": 15,
+      "needs": {"health": 20},
+      "builds": [],
+      "risk": "Without the nurse, it may be the wrong medicine.",
+      "flavor": "'Take two now and two tonight.'"
+    },
+    {
+      "id": "swim_beach",
+      "name": "Swim at the beach",
+      "place": "beach",
+      "stages": ["child", "teen", "young_adult", "adult"],
+      "minutes": 60,
+      "needs": {"fun": 40, "hygiene": -10, "social": 10},
+      "builds": [],
+      "risk": "Strong currents: never swim alone.",
+      "flavor": "The waves, the canoes, and sand everywhere after.",
+      "hours": "07:00 to 18:00"
+    },
+    {
+      "id": "pull_net",
+      "name": "Pull the net with the fishermen",
+      "place": "beach",
+      "stages": ["teen", "young_adult", "adult"],
+      "minutes": 120,
+      "needs": {"energy": -25, "social": 15, "hunger": 10},
+      "earns": [5, 15],
+      "builds": ["Strength +1", "The fishermen like you more (+1)"],
+      "flavor": "Twenty people on one rope, singing as they pull. They pay in fish and coins.",
+      "hours": "06:00 to 17:00"
+    },
+    {
+      "id": "share_food",
+      "name": "Share your food",
+      "place": "market",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "minutes": 10,
+      "trait": "generous",
+      "needs": {"hunger": -20, "belonging": 10, "hope": 5},
+      "builds": ["Reputation +2", "Friends +2"],
+      "flavor": "Half your kenkey to the smallest one. You remember being small."
+    },
+    {
+      "id": "elders_advice",
+      "name": "Ask the elders for advice",
+      "place": "palace",
+      "stages": ["adult", "elder"],
+      "minutes": 60,
+      "needs": {"hope": 15, "respect": 5},
+      "builds": ["The elders know you better (+1)"],
+      "flavor": "The linguist repeats your words to the chief, and his to you."
+    }
+  ],
+  "events": [
+    {
+      "id": "city_guards",
+      "name": "City guards!",
+      "place": "junction",
+      "stages": ["child", "teen", "young_adult"],
+      "text": "The city guards are clearing hawkers off the road, and they're coming your way.",
+      "options": [
+        {
+          "label": "Give them 'something small' (GH₵ 5)",
+          "check": "Safe",
+          "outcome": "They move on. Respect −5."
+        },
+        {
+          "label": "Run!",
+          "check": "Street smarts: 70%",
+          "outcome": "If you're caught, they take your goods."
+        },
+        {
+          "label": "Hide your box under a stall",
+          "check": "Street smarts: 50%",
+          "outcome": "If it fails, the seller shouts at you to move it."
+        },
+        {
+          "label": "Talk your way out",
+          "check": "Charisma: 60%",
+          "outcome": "If it fails, a fine of GH₵ 10."
+        }
+      ]
+    },
+    {
+      "id": "dumsor",
+      "name": "Dumsor",
+      "place": "",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "text": "Lights off. No fan, no street light, no TV.",
+      "options": [
+        {
+          "label": "Buy a rechargeable lamp (GH₵ 30)",
+          "check": "Safe",
+          "outcome": "Study and work go on, and the lamp is yours."
+        },
+        {
+          "label": "Study by a candle",
+          "check": "Energy above 40",
+          "outcome": "Tired eyes: energy −10."
+        },
+        {"label": "Sleep early", "check": "Safe", "outcome": "No study tonight."}
+      ]
+    },
+    {
+      "id": "rain_flood",
+      "name": "Rain! The gutters overflow",
+      "place": "market",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult"],
+      "text": "The sky opens. Water runs knee-deep through the market lanes.",
+      "options": [
+        {
+          "label": "Shelter at the station",
+          "check": "Safe",
+          "outcome": "Dry, but the day's work is lost."
+        },
+        {
+          "label": "Help the sellers save their goods",
+          "check": "Strength: 60%",
+          "outcome": "If it works: market reputation +3."
+        },
+        {
+          "label": "Keep working in the rain",
+          "check": "Health: 50%",
+          "outcome": "If it fails: a fever, health −20."
+        }
+      ]
+    },
+    {
+      "id": "kind_stranger",
+      "name": "A kind stranger",
+      "place": "market",
+      "stages": ["toddler", "child"],
+      "text": "A woman in her church dress stops and offers you a bowl of rice.",
+      "options": [
+        {"label": "Take it, and thank her", "check": "Safe", "outcome": "Hunger +50, hope +10."},
+        {
+          "label": "Ask if she needs help at home",
+          "check": "Charisma: 40%",
+          "outcome": "If it works: a regular errand job."
+        },
+        {"label": "Say no", "check": "Safe", "outcome": "Respect +2, and still hungry."}
+      ]
+    },
+    {
+      "id": "malaria",
+      "name": "Fever and shivering",
+      "place": "",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "Hot, then cold, then hot again. It's malaria.",
+      "options": [
+        {
+          "label": "See the nurse (GH₵ 5 with an NHIS card)",
+          "check": "An NHIS card",
+          "outcome": "The right tablets: health comes back in two days."
+        },
+        {
+          "label": "Buy tablets at the chemist (GH₵ 15)",
+          "check": "70% they're the right ones",
+          "outcome": "If not, three more days in bed."
+        },
+        {
+          "label": "Sleep it off",
+          "check": "Health: 40%",
+          "outcome": "If it fails: very sick, health −40."
+        }
+      ]
+    },
+    {
+      "id": "station_touts",
+      "name": "Touts at the station",
+      "place": "trotro_station",
+      "stages": ["teen", "young_adult"],
+      "text": "Two station boys want a cut of everything you earned today.",
+      "options": [
+        {"label": "Pay them GH₵ 2", "check": "Safe", "outcome": "They let you pass."},
+        {
+          "label": "Talk your way out",
+          "check": "Charisma: 55%",
+          "outcome": "If it fails, pay GH₵ 4."
+        },
+        {
+          "label": "Call Uncle Bonsu",
+          "check": "Uncle Bonsu trusts you",
+          "outcome": "He sends them away."
+        }
+      ]
+    },
+    {
+      "id": "susu_vanished",
+      "name": "The susu collector is gone",
+      "place": "market",
+      "stages": ["teen", "young_adult", "adult"],
+      "text": "Nobody has seen the susu collector for three days, or the month's money.",
+      "options": [
+        {"label": "Accept the loss", "check": "Safe", "outcome": "Savings gone, hope −10."},
+        {
+          "label": "Go to the market queen",
+          "check": "The market queen trusts you",
+          "outcome": "She finds him: half the money comes back."
+        },
+        {
+          "label": "Track him down yourself",
+          "check": "Street smarts: 30%",
+          "outcome": "If it works: all of it back."
+        }
+      ]
+    },
+    {
+      "id": "landguards",
+      "name": "Landguards on your plot",
+      "place": "",
+      "stages": ["adult", "elder"],
+      "text": "Young men with cutlasses say the land is theirs, and your blocks are in the way.",
+      "options": [
+        {
+          "label": "Pay them off (GH₵ 2,000)",
+          "check": "Safe, for now",
+          "outcome": "They may come back."
+        },
+        {
+          "label": "Call the chief who gave it to you",
+          "check": "The elders trust you",
+          "outcome": "The chief settles it."
+        },
+        {
+          "label": "The police and the Lands Commission",
+          "check": "Your land papers are in order",
+          "outcome": "If not: months in court."
+        }
+      ]
+    },
+    {
+      "id": "cholera_scare",
+      "name": "Cholera in the next town",
+      "place": "",
+      "stages": ["toddler", "child", "teen", "young_adult", "adult", "elder"],
+      "text": "The radio says cholera is spreading in the next town.",
+      "options": [
+        {"label": "Drink only sealed sachets", "check": "Safe (GH₵ 2 a day)", "outcome": "Safe."},
+        {
+          "label": "Boil the standpipe water",
+          "check": "Safe (charcoal and time)",
+          "outcome": "Safe, but slower."
+        },
+        {
+          "label": "Carry on as usual",
+          "check": "Health: 70%",
+          "outcome": "If it fails: very sick, health −40."
+        }
+      ]
+    },
+    {
+      "id": "match_day",
+      "name": "Black Stars match day",
+      "place": "viewing_centre",
+      "stages": ["child", "teen", "young_adult", "adult", "elder"],
+      "text": "Ghana plays tonight. The whole town is in red, gold and green.",
+      "options": [
+        {
+          "label": "Watch at the viewing centre (GH₵ 2)",
+          "check": "Safe",
+          "outcome": "Fun +40, and if they win: Black Stars won!"
+        },
+        {
+          "label": "Listen on a neighbour's radio",
+          "check": "Safe",
+          "outcome": "Fun +20, company +20."
+        },
+        {"label": "Work through it", "check": "Safe", "outcome": "Money, but you miss it."}
+      ]
+    },
+    {
+      "id": "funeral",
+      "name": "A funeral on Saturday",
+      "place": "",
+      "stages": ["teen", "young_adult", "adult", "elder"],
+      "text": "A neighbour's mother has died. The funeral is on Saturday, in black and red.",
+      "options": [
+        {"label": "Go, and give GH₵ 10", "check": "Safe", "outcome": "Company +30, reputation +2."},
+        {"label": "Send GH₵ 20", "check": "Safe", "outcome": "Reputation +1."},
+        {"label": "Stay home", "check": "Safe", "outcome": "Reputation −2: people notice."}
+      ]
+    },
+    {
+      "id": "top_of_class",
+      "name": "The headmistress calls you",
+      "place": "basic_school",
+      "stages": ["child", "teen"],
+      "text": "You came first in the class. A scholarship board wants to meet you on Friday.",
+      "options": [
+        {
+          "label": "Go in your cleanest uniform",
+          "check": "Hygiene above 60",
+          "outcome": "A scholarship for SHS."
+        },
+        {
+          "label": "Bring your guardian",
+          "check": "Your guardian trusts you",
+          "outcome": "They agree to support you."
+        },
+        {"label": "Don't go: there's work", "check": "Safe", "outcome": "The chance passes."}
+      ]
+    }
+  ],
+  "worldRhythms": [
+    {
+      "name": "Dawn at the market",
+      "when": "05:30 to 08:00",
+      "text": "The market wants carriers: loads pay double, and the sellers throw out last night's leftovers."
+    },
+    {
+      "name": "Sunday morning",
+      "when": "Sundays, 07:00 to 12:00",
+      "text": "Church calls everyone with faith, the way the school bus calls in The Sims."
+    },
+    {
+      "name": "Nightfall",
+      "when": "20:00 to 05:00",
+      "text": "The street gets dangerous: safety falls twice as fast outside, and the market closes."
+    },
+    {
+      "name": "Harmattan",
+      "when": "December to February",
+      "text": "A dry, dusty wind: thirst falls 25% faster, and the dust lowers hygiene."
+    },
+    {
+      "name": "Rainy season",
+      "when": "April to July",
+      "text": "Floods, mosquitoes and malaria: more rain and fever events."
+    },
+    {
+      "name": "Dumsor",
+      "when": "Some evenings",
+      "text": "Power cuts: no street light to study by, no fans, no TV."
+    },
+    {
+      "name": "Market days",
+      "when": "Tuesdays and Fridays",
+      "text": "More customers, more loads, more sales, and more pickpockets."
+    },
+    {
+      "name": "Month end",
+      "when": "The last days of the month",
+      "text": "Salaries arrive: queues at the MoMo kiosk, rent due, and the susu pays out."
+    }
+  ],
+  "story": {
+    "origins": [
+      {
+        "id": "market_child",
+        "name": "The market child",
+        "stage": "toddler",
+        "start": "start_market_child",
+        "text": "You're three. Your mother sold tomatoes at Nkabom Market until the fever took her, and nobody knows your father. The market women let you be, mostly.",
+        "firstGoals": ["kind_seller", "market_rhythm", "feeding_programme"],
+        "startNeeds": {
+          "hunger": 30,
+          "thirst": 45,
+          "energy": 75,
+          "bladder": 70,
+          "health": 85,
+          "hygiene": 35,
+          "safety": 25,
+          "social": 40,
+          "fun": 50,
+          "belonging": 15,
+          "hope": 45,
+          "respect": 40
+        },
+        "startMoney": 0
+      },
+      {
+        "id": "new_in_town",
+        "name": "New in town",
+        "stage": "young_adult",
+        "start": "",
+        "inGame": true,
+        "alreadyDone": ["birth_certificate", "ghana_card", "momo_wallet", "kayayo", "rent_room"],
+        "text": "You came down from the north on the night bus, with GH₵100 on your phone and Auntie Adwoa's room waiting. Madam Serwaa needs kayayei. This is the game as it is today.",
+        "firstGoals": ["sankofa_college", "market_susu", "momo_agent"]
+      },
+      {
+        "id": "fishers_child",
+        "name": "The fisher's child",
+        "stage": "child",
+        "start": "",
+        "text": "Your father's canoe went out and never came back. Your mother smokes fish on the beach with six mouths to feed. You're seven.",
+        "firstGoals": ["birth_certificate", "basic_school"]
+      },
+      {
+        "id": "sent_to_town",
+        "name": "Sent to town",
+        "stage": "child",
+        "start": "",
+        "text": "Your family in the village sent you to an 'auntie' in town, to work and to learn. She's not as kind as they hoped.",
+        "firstGoals": ["errands", "basic_school"]
+      },
+      {
+        "id": "compound_family",
+        "name": "The compound family",
+        "stage": "toddler",
+        "start": "",
+        "text": "Two parents, one room, five children, and a lot of love. Poor, but never alone.",
+        "firstGoals": ["first_numbers", "basic_school"]
+      }
+    ],
+    "chapters": [
+      {
+        "id": "ch1",
+        "name": "The market raised me",
+        "stage": "toddler",
+        "goals": ["kind_seller", "safe_sleeping_spot", "feeding_programme"],
+        "beats": [
+          "Day one: hungry at the rubbish heap.",
+          "The first time Auntie Akos calls you 'my small one'.",
+          "A night of rain, and Mama Akua lets you under her table."
+        ]
+      },
+      {
+        "id": "ch2",
+        "name": "A name on paper",
+        "stage": "child",
+        "goals": ["taken_in", "birth_certificate", "basic_school", "hawk_water"],
+        "beats": [
+          "Auntie Akos's room at the compound house: a mat of your own.",
+          "The registry: now you exist.",
+          "A choice: Class 1, or the junction with a box of pure water."
+        ]
+      },
+      {
+        "id": "ch3",
+        "name": "The head pan",
+        "stage": "teen",
+        "goals": ["kayayo", "bece", "free_shs", "apprenticeship"],
+        "beats": [
+          "Dawn with the kayayei, at Madam Serwaa's pile of head pans.",
+          "BECE results day.",
+          "The drinks for the master's family."
+        ]
+      },
+      {
+        "id": "ch4",
+        "name": "Freedom",
+        "stage": "young_adult",
+        "goals": ["ghana_card", "freedom", "momo_wallet", "courtship"],
+        "beats": [
+          "The queue at the NIA office.",
+          "Your freedom ceremony, in front of everyone.",
+          "Someone walks you home after church."
+        ]
+      },
+      {
+        "id": "ch5",
+        "name": "Block by block",
+        "stage": "adult",
+        "goals": ["own_stall", "buy_land", "build_house", "traditional_marriage"],
+        "beats": [
+          "A stall of your own.",
+          "Landguards at the plot.",
+          "Kente, drums, and two families eating together."
+        ]
+      },
+      {
+        "id": "ch6",
+        "name": "Sankofa",
+        "stage": "elder",
+        "goals": ["family_head", "give_back", "will"],
+        "beats": [
+          "The family brings its quarrels to you.",
+          "Saturday: you cook for the market children. One of them has your old eyes.",
+          "A will, and a new life for your child to play."
+        ]
+      }
+    ],
+    "notes": ""
+  },
+  "buildParts": [
+    {
+      "id": "built",
+      "name": "In the game already",
+      "text": "What Jobs 1 to 18 built: the young woman's hustle in town. It becomes the 'New in town' start."
+    },
+    {
+      "id": "foundations",
+      "name": "Part 1: Foundations",
+      "text": "The game reads the design, and teaches you as you play."
+    },
+    {
+      "id": "needs",
+      "name": "Part 2: Needs and behaviour",
+      "text": "All twelve needs, her mood, and what she wants, on the young woman you play now."
+    },
+    {
+      "id": "progress",
+      "name": "Part 3: What she can become",
+      "text": "Skills, people, a good name, papers, the life map, and choices."
+    },
+    {
+      "id": "world",
+      "name": "Part 4: A living world",
+      "text": "The week and the weather, street events, and townspeople who live by their needs."
+    },
+    {
+      "id": "life",
+      "name": "Part 5: A whole life",
+      "text": "Growing up, and the story from a toddler at the market to a young woman with a trade."
+    }
+  ],
+  "jobs": [
+    {
+      "id": "built",
+      "number": null,
+      "part": "built",
+      "title": "Gold Coast today (Jobs 1 to 18)",
+      "status": "done",
+      "goal": "A young woman's hustle in town: walking, money on her phone, hunger and energy, the chop bar, carrying loads, rent, the college and its jobs, saving, and one shared town online.",
+      "builds": [],
+      "test": "450 checks, all passing.",
+      "doneWhen": "",
+      "ask": [],
+      "after": [],
+      "uses": {
+        "needs": ["hunger", "energy"],
+        "actions": [
+          "wash_bowls",
+          "carry_load",
+          "take_course",
+          "momo_shift",
+          "sew_piece",
+          "chop_bar_meal",
+          "sleep_in_bed"
+        ],
+        "places": [
+          "market",
+          "chop_bar",
+          "compound_house",
+          "trotro_station",
+          "college",
+          "basic_school",
+          "momo_kiosk"
+        ],
+        "steps": ["sankofa_college", "momo_agent", "sew_for_market", "teacher"],
+        "coasters": [
+          "madam_serwaa",
+          "maame_esi",
+          "auntie_adwoa",
+          "auntie_dede",
+          "mrs_ofori",
+          "madam_afriyie"
+        ]
+      }
+    },
+    {
+      "id": "job19",
+      "number": 19,
+      "part": "foundations",
+      "title": "The design inside the game",
+      "status": "todo",
+      "goal": "The game reads this design, so a change on the board changes the game.",
+      "builds": [
+        "Move coaster_life.json into the game as gold-coast/data/coaster_life.json, the only copy. The board and serve.py open and save it there, and the Web export includes it (Godot leaves plain .json files out unless the export's filter names them).",
+        "Make the design match the game first: the game's tested numbers win. Her hunger and energy rates (6 and 4 an hour), the chop bar's six dishes, the loads' pay, the rent, the college's fees and the jobs' pay go into the design.",
+        "A Design autoload (autoload/design.gd) reads the file once at the start, with need(), action(), place(), step(), stage(), coaster() and lesson(). A broken file or a missing id gives a clear error.",
+        "GameState takes her need rates from the design, for her life stage, instead of its own settings.",
+        "A test loads the design, finds every id the game uses, and runs the same link checks as the board."
+      ],
+      "test": "Changing hunger's young-adult rate on the board, then pressing Play, changes how fast she gets hungry; every other check still passes.",
+      "doneWhen": "The game and the board share one design file, and the tests pass.",
+      "ask": [],
+      "after": ["built"],
+      "uses": {}
+    },
+    {
+      "id": "job20",
+      "number": 20,
+      "part": "foundations",
+      "title": "The tutorial: what to do now",
+      "status": "todo",
+      "goal": "A new player always knows what to do next, and learns each thing the first time it matters.",
+      "builds": [
+        "Lessons come from the design (the board's Tutorial tab): what each says, when it shows, what it points at, and what ticks it off. A lesson can show in a new game, after another lesson, when a need gets low, the first time something happens, on arriving somewhere, at a time of day, or when money goes above or below an amount.",
+        "A tip card at the top of the screen, painted like the chop bar's menu board, with the lesson's words, an icon, and the key to press. It never stops the game (only the welcome waits for a click). Doing the thing ticks it off with a little sound; 'Got it' closes it.",
+        "'Show me': the arrow from the loads (GuideMarker) points at the lesson's place, from the screen's edge when it's off screen.",
+        "Goals: a GOALS page on the phone lists what to do now, and the top one shows on the tip card when no lesson is up. They come from the tutorial now, and later from the story's chapters and the life map.",
+        "The phone's menu gains TIPS (on or off) and TUTORIAL AGAIN. Finished lessons are saved (save version 4), and a loaded game never repeats them. How to play stays, for the keys.",
+        "The first lessons, for the game as it is today: the 'New in town' lessons on the Tutorial tab."
+      ],
+      "test": "A new game shows the welcome; each lesson shows once, at its moment, and ticks off when she does it; tips off hides them; saving and loading keeps them; the arrow finds each place.",
+      "doneWhen": "Someone who has never played gets through the first day (earning, eating, sleeping and saving) just by following the tips.",
+      "ask": [
+        "Where the tip card goes on the screen (top middle is suggested), and whether the welcome should wait for a click."
+      ],
+      "after": ["job19"],
+      "uses": {}
+    },
+    {
+      "id": "job21",
+      "number": 21,
+      "part": "needs",
+      "title": "Water and the toilet",
+      "status": "todo",
+      "goal": "Two new body needs, thirst and bladder, and the town's water and toilets.",
+      "builds": [
+        "Thirst and bladder in GameState, like hunger and energy: rates from the design for her life stage, announced when they change, and saved.",
+        "Room on the phone for more needs: a NEEDS page (N, or the phone's left key) shows every need as a bar with its icon, and the main screen shows the two lowest instead of always food and energy. Each blinks when it's low.",
+        "A standpipe by the compound house (a new Blender prop): free water, and at times a queue of townspeople with buckets.",
+        "Pure water: the chop bar's 'pure water' fills thirst now, not hunger, and the Provisions Store sells sachets too.",
+        "A public toilet block by the market (50 pesewas, an attendant at the door) and the compound house's own toilet (free for the people who live there, with a queue in the morning). Both are new Blender models.",
+        "At 0: thirst makes her energy drain faster, and a full bladder means an accident (a text, and she needs a wash)."
+      ],
+      "test": "The rates match the design; drinking and the toilets fill their needs at the right prices; the accident happens at 0; saving keeps both needs.",
+      "doneWhen": "She has to drink and find a toilet through the day, and the tests pass.",
+      "ask": ["How the needs should show on the phone, if not the two lowest on its main screen."],
+      "after": ["job20"],
+      "uses": {
+        "needs": ["thirst", "bladder"],
+        "actions": ["buy_pure_water", "drink_standpipe", "public_toilet", "compound_toilet"],
+        "places": ["standpipe", "public_toilet"]
+      }
+    },
+    {
+      "id": "job22",
+      "number": 22,
+      "part": "needs",
+      "title": "Clean and well",
+      "status": "todo",
+      "goal": "Hygiene and health: keeping clean, getting sick, and getting better.",
+      "builds": [
+        "Hygiene and health in GameState. Hygiene falls with time, and faster with hard work; health falls only through risks and events, never by the clock.",
+        "Washing: a bucket bath at home (free) and a bathhouse by the trotro station (GH₵1, a new Blender model).",
+        "Being dirty shows: sellers and customers remark on it, and the jobs that meet people pay a little less.",
+        "Getting sick: sleeping outside, mosquitoes can give her malaria (a chance, not every time). A fever slows her walk, tires her faster, and stops skilled work.",
+        "Getting better: a clinic and chemist on the main road (a new Blender model). The nurse costs more until she has an NHIS card (Job 30); the chemist is quick, but not always right.",
+        "Every risk shows its chance, like 'one time in four'."
+      ],
+      "test": "Hygiene falls and baths fill it; malaria can come from mosquitoes, at its chance; a fever slows her and stops skilled work; the clinic and the chemist make her well.",
+      "doneWhen": "Staying clean and well is part of her day, and the tests pass.",
+      "ask": [],
+      "after": ["job21"],
+      "uses": {
+        "needs": ["hygiene", "health"],
+        "actions": ["bucket_bath", "bathhouse_bath", "clinic_visit", "chemist_medicine"],
+        "places": ["bathhouse", "clinic"],
+        "events": ["malaria", "cholera_scare"]
+      }
+    },
+    {
+      "id": "job23",
+      "number": 23,
+      "part": "needs",
+      "title": "Company and fun",
+      "status": "todo",
+      "goal": "The heart needs: people to talk to, and things to enjoy.",
+      "builds": [
+        "Company and fun in GameState. They count for less while she's hungry, thirsty or tired, as in the design's decision model.",
+        "Talking: E on a seller, a neighbour or a townsperson offers GREET or GIST (a short talk in Twi and Pidgin, in speech bubbles). Gisting fills company and takes a little time.",
+        "Fun: kicking the children's ball, ampe with the girls, a radio in her room, and the Black Stars at a viewing centre on match evenings (a new place).",
+        "The neighbours gist in the compound in the evenings, and she can join them."
+      ],
+      "test": "Talking fills company; the games and the viewing centre fill fun; both count for less when she's hungry.",
+      "doneWhen": "She has reasons to talk to people and to enjoy herself, and the tests pass.",
+      "ask": ["How talking should work: a short choice of lines (GREET, GIST, ASK), or one key."],
+      "after": ["job22"],
+      "uses": {
+        "needs": ["social", "fun"],
+        "actions": ["gist_neighbours", "watch_match", "street_football", "play_ampe"],
+        "places": ["viewing_centre", "park"],
+        "events": ["match_day"]
+      }
+    },
+    {
+      "id": "job24",
+      "number": 24,
+      "part": "needs",
+      "title": "Safe, belonging, hopeful, respected",
+      "status": "todo",
+      "goal": "The last four needs, and the church.",
+      "builds": [
+        "Safety, belonging, hope and respect in GameState. Safety falls on the street at night and fills at home; belonging grows with people who call her their own; hope with faith and small wins; respect with honest work, and it falls with shame (the gutter, begging, being late).",
+        "The Methodist church on Hill road (a new Blender model): Sunday service from 07:00 (hymns, drums, a sermon) and the Saturday feeding programme. Pastor Mensah greets everyone at the door.",
+        "Today's game feeds them: rent paid on time and loads delivered in time raise respect, a late load lowers it, and sleeping in her bed fills safety.",
+        "The NEEDS page shows all twelve, grouped as the design groups them: survival, comfort, heart, and spirit."
+      ],
+      "test": "Each need moves with the right actions; the church opens on Sundays; the NEEDS page shows all twelve in their groups.",
+      "doneWhen": "All twelve needs work, and the tests pass.",
+      "ask": [],
+      "after": ["job23"],
+      "uses": {
+        "needs": ["safety", "belonging", "hope", "respect"],
+        "actions": ["church_service"],
+        "places": ["church"],
+        "coasters": ["pastor_mensah"]
+      }
+    },
+    {
+      "id": "job25",
+      "number": 25,
+      "part": "needs",
+      "title": "Mood and moodlets",
+      "status": "todo",
+      "goal": "How she feels: a mood from her needs and the moment, which changes how she does things.",
+      "builds": [
+        "A mood from her needs (the low ones pull it down) and moodlets, the design's short feelings (Belly full, Dumsor, Chased, Black Stars won!), each lasting a while.",
+        "A small face on the phone's main screen that smiles or frowns; the NEEDS page lists the moodlets, and why.",
+        "Mood matters: in a good mood she works a little faster and gets tips; in a bad one she walks slower, and some people won't deal with her.",
+        "Moodlets from what already happens: a big meal, a payment arriving, rent paid, the room locked, mosquitoes, passing out."
+      ],
+      "test": "Each moodlet starts and ends at the right time, the mood follows the needs and moodlets, and a good or bad mood changes the right things.",
+      "doneWhen": "Her mood shows, explains itself, and matters, and the tests pass.",
+      "ask": ["How much a good or a bad mood should change things."],
+      "after": ["job24"],
+      "uses": {
+        "moodlets": [
+          "belle_full",
+          "small_win",
+          "akwaaba",
+          "sunday_best",
+          "full_heart",
+          "rained_on",
+          "mosquito_war",
+          "shamed"
+        ]
+      }
+    },
+    {
+      "id": "job26",
+      "number": 26,
+      "part": "needs",
+      "title": "What she wants, and free will",
+      "status": "todo",
+      "goal": "The design's decision model in the game: she can say what she wants, and look after herself.",
+      "builds": [
+        "The board's simulator in GDScript: every action scored by how badly she needs what it gives, her traits and routine, and what she can't do yet, with the design's numbers.",
+        "WANTS on the phone: the three things that would help her most now, and where. The tutorial's hints use them ('She wants water: the standpipe is free').",
+        "Free will (on or off in the phone's menu): left standing for half a minute, she goes and does the top choice herself, as Sims do. Any key or click takes over, and she never undoes your choices (she won't quit a job or skip a class).",
+        "Each thing she can do in the game is tagged with its design id, so the scores know where everything is.",
+        "Traits: she gets two of the design's traits in a new game, shown on the phone."
+      ],
+      "test": "WANTS match the design's scores; free will does the top choice when she's left alone; the game and the board's simulator pick the same thing from the same needs.",
+      "doneWhen": "Left alone, she looks after herself sensibly, and the tests pass.",
+      "ask": ["Whether free will starts on or off, and whether the player picks her traits."],
+      "after": ["job25"],
+      "uses": {"actions": ["share_food"]}
+    },
+    {
+      "id": "job27",
+      "number": 27,
+      "part": "progress",
+      "title": "Skills that grow",
+      "status": "todo",
+      "goal": "Skills from 0 to 10 that grow by doing, alongside the certificates.",
+      "builds": [
+        "The design's fourteen skills, each from 0 to 10, growing a little each time she does something that builds them (the design's 'builds': loads build strength, the kiosk builds trading, classes build reading).",
+        "Certificates stay as education: a college course gives its certificate and also starts its skill (dressmaking starts sewing at 3).",
+        "A level up texts the phone (SEWING 4!), and a SKILLS page shows each skill's level and how far it is to the next.",
+        "Higher levels pay: a better seamstress earns more for a dress; a stronger kayayo tires less.",
+        "Skills rust slowly when they're not used, but never below what a certificate gives."
+      ],
+      "test": "Doing things builds the right skills; levels show and pay; certificates set their skill; rust stops at the certificate's level.",
+      "doneWhen": "You can watch her get better at things by doing them, and the tests pass.",
+      "ask": [],
+      "after": ["job26"],
+      "uses": {
+        "skills": [
+          "street_smarts",
+          "trading",
+          "strength",
+          "literacy",
+          "numeracy",
+          "cooking",
+          "sewing",
+          "charisma",
+          "teaching",
+          "business"
+        ]
+      }
+    },
+    {
+      "id": "job28",
+      "number": 28,
+      "part": "progress",
+      "title": "People who know you",
+      "status": "todo",
+      "goal": "Relationships: the people of Gold Coast remember her, from stranger to family.",
+      "builds": [
+        "The design's named Coasters each know her somewhere on the ladder: stranger, familiar face, padi (friend), trusted, family. Their personalities and lines come from the design.",
+        "It grows with greeting, gisting, helping, working for them and paying on time, and falls with lateness, quarrels and unpaid rent (it builds on Job 23's talking).",
+        "CONTACTS on the phone, like an old Nokia's phonebook: each person, where to find them, and how well they know her.",
+        "Each rung changes something: Madam Serwaa gives better-paid loads to someone she trusts, Maame Esi adds a little extra for a padi, and Auntie Adwoa waits a day for the rent of someone trusted."
+      ],
+      "test": "Each action moves the right person the right way; every rung's change works; contacts are saved.",
+      "doneWhen": "The people she deals with remember her and treat her differently, and the tests pass.",
+      "ask": ["What each of the six people should give at each rung."],
+      "after": ["job27"],
+      "uses": {}
+    },
+    {
+      "id": "job29",
+      "number": 29,
+      "part": "progress",
+      "title": "A good name, and achievements",
+      "status": "todo",
+      "goal": "Reputation in each circle of the town, and milestones the game celebrates.",
+      "builds": [
+        "Reputation in the design's six circles (the market, the street, church or mosque, school, the family, the town), each from 0 to 100, moved by what she does: loads in time raise the market's, honest change raises it more, a late load lowers it.",
+        "The design's achievements, noticed by the game (First cedi, Honest with money, First susu payout…), each with a jingle and a text. A NAME page on the phone shows her reputation and achievements.",
+        "A test of honesty now and then: a customer pays too much, and she can give back the change.",
+        "Reputation and achievements count towards the life map's steps (Job 31)."
+      ],
+      "test": "Each action moves the right circle; each achievement fires once, at the right moment; both are saved.",
+      "doneWhen": "Her good name grows with honest work, and the tests pass.",
+      "ask": [],
+      "after": ["job28"],
+      "uses": {"achievements": ["first_cedi", "honest_change", "peacemaker"]}
+    },
+    {
+      "id": "job30",
+      "number": 30,
+      "part": "progress",
+      "title": "Papers, and the district offices",
+      "status": "todo",
+      "goal": "Documents as things she has: a birth certificate, an NHIS card and a Ghana Card, and later a licence and a passport.",
+      "builds": [
+        "Papers among her things, on a PAPERS page: the 'New in town' start has a birth certificate and a Ghana Card, and she can get an NHIS card.",
+        "The district offices in the old town (a new Blender model): the registry, the NIA and the NHIS desk, with a queue that starts at dawn.",
+        "Queues take time, and some days 'the network is down: come back tomorrow'.",
+        "The NHIS card makes the nurse cheap (Job 22). Papers will open other steps later: a Ghana Card for a SIM and a wallet of her own (Job 41)."
+      ],
+      "test": "Papers come the right way; the queue and its bad days work; the NHIS card changes the clinic's price; papers are saved.",
+      "doneWhen": "She can get her papers, and they matter, and the tests pass.",
+      "ask": [],
+      "after": ["job29"],
+      "uses": {
+        "steps": ["nhis_card", "ghana_card"],
+        "actions": ["queue_ghana_card"],
+        "places": ["district_office"]
+      }
+    },
+    {
+      "id": "job31",
+      "number": 31,
+      "part": "progress",
+      "title": "The life map in the game",
+      "status": "todo",
+      "goal": "Her phone shows what she can become next, and exactly what each step needs.",
+      "builds": [
+        "Checkable requirements: on the board's step form, each line of 'What it takes' can say how the game checks it (a skill and a level, a person and a rung, a circle and a level, a paper, a step done, an achievement, money, or a choice). Lines without one are shown, but not checked.",
+        "A LIFE page on the phone: the steps she can reach next, each line ticked or not ('every lock says how to open it'), and 'Show me' to point the way.",
+        "A step happens when all its lines are ticked and its moment comes (paying the fee, a ceremony, a talk): a fanfare, a text, and the new things it opens.",
+        "A big map view, like the board's, with the steps she's done lit up.",
+        "Steps done are saved, and each start begins with its own already done (for 'New in town': a birth certificate, a Ghana Card, a wallet, carrying loads, and a rented room)."
+      ],
+      "test": "Every step's lines check correctly; steps happen when they should and never before; no step opens with money alone.",
+      "doneWhen": "You can plan her life from the phone, and the tests pass.",
+      "ask": ["Whether the big map opens on the phone or on its own screen."],
+      "after": ["job30"],
+      "uses": {"steps": ["rent_room", "kayayo", "birth_certificate", "momo_wallet"]}
+    },
+    {
+      "id": "job32",
+      "number": 32,
+      "part": "progress",
+      "title": "Choices",
+      "status": "todo",
+      "goal": "Moments where the player decides, which the life map remembers.",
+      "builds": [
+        "A choice card: a question, two or three answers, and what each costs or opens. It comes when the story or a step needs it (school or a full day's work; the easy money or not).",
+        "Choices live in the design: a new 'choices' list, with its own section on the board, each with when it comes, its answers, and what they change.",
+        "Choices made are saved, and the life map's 'choice' lines check them.",
+        "The first ones, for the young woman: give back extra change, lend money to a friend, join the market susu or not."
+      ],
+      "test": "Each choice comes at its moment; its answers change the right things; the life map sees them.",
+      "doneWhen": "Her choices shape what she can become, and the tests pass.",
+      "ask": [],
+      "after": ["job31"],
+      "uses": {"steps": ["market_susu"], "actions": ["susu_pay"]}
+    },
+    {
+      "id": "job33",
+      "number": 33,
+      "part": "world",
+      "title": "The week, the weather, and dumsor",
+      "status": "todo",
+      "goal": "The town's rhythms: days that differ, seasons, rain and power cuts.",
+      "builds": [
+        "Days of the week matter: Sunday church, the Saturday feeding programme, Friday prayers at the central mosque in the zongo (a new place), and market days on Tuesday and Friday (more loads, more customers).",
+        "Months and seasons: the Harmattan (December to February: dry haze, and thirst falls faster) and the rains (April to July: showers, flooded gutters, more mosquitoes). Rain uses Job 11's lighting presets, or brings them forward.",
+        "Dumsor: some evenings the power cuts out. The street lamps and the kiosk's light go dark, the viewing centre closes, and the 'Dumsor' moodlet starts.",
+        "Month end: salaries, queues at the MoMo kiosk, and the susu paying out.",
+        "Online, everyone in the shared town has the same weather and power cuts, as they have the same clock."
+      ],
+      "test": "Each day, season and power cut comes when it should, and changes the right things.",
+      "doneWhen": "The town feels different on a Sunday, in the rain, and in a power cut, and the tests pass.",
+      "ask": ["How often dumsor should come, and how long the rains should last."],
+      "after": ["job32"],
+      "uses": {
+        "actions": ["friday_prayers"],
+        "places": ["mosque"],
+        "events": ["dumsor", "rain_flood"],
+        "moodlets": ["dumsor", "black_stars_won", "susu_day"]
+      }
+    },
+    {
+      "id": "job34",
+      "number": 34,
+      "part": "world",
+      "title": "Street events",
+      "status": "todo",
+      "goal": "Surprises with choices: the design's street events in the game.",
+      "builds": [
+        "An event card, like the choice card: what's happening, and the answers. There's always a safe way out that costs something, and chancier ones with their odds shown (Street smarts: 70%), or ones that need a person, a paper or a skill.",
+        "Events start by place, time, life stage and chance, never too often.",
+        "The first ones: the city guards at the junction, a kind stranger, touts at the station, the susu collector vanishing, and a funeral on Saturday.",
+        "Their odds use her skills (Job 27) and the people she knows (Job 28)."
+      ],
+      "test": "Each event starts only where and when it should; its odds follow her skills; every answer does what it says.",
+      "doneWhen": "The town surprises her, with real choices, and the tests pass.",
+      "ask": ["How often events should come."],
+      "after": ["job33"],
+      "uses": {
+        "events": ["city_guards", "kind_stranger", "station_touts", "susu_vanished", "funeral"],
+        "moodlets": ["chased"],
+        "places": ["junction"]
+      }
+    },
+    {
+      "id": "job35",
+      "number": 35,
+      "part": "world",
+      "title": "Townspeople who live by their needs",
+      "status": "todo",
+      "goal": "The people of Gold Coast are Coasters too, with needs, personalities and routines from the design.",
+      "builds": [
+        "The named Coasters follow their routines from the design (Maame Esi pounds fufu from 10:00, Auntie Dede goes to the bank at midday) instead of fixed scripts.",
+        "Some townspeople choose what to do with the decision model (Job 26): a hungry one goes to the chop bar, a tired one goes home.",
+        "Far from her, people only count their needs roughly and move between places, like the towns in The Sims, so the game stays fast on the web.",
+        "Each named Coaster has their own traits from the design, which show in what they do and say. Uncle Bonsu, the station master, comes to the trotro station."
+      ],
+      "test": "Routines run on time from the design; hungry townspeople eat; the frame rate holds 60 on the web.",
+      "doneWhen": "The town runs on the same rules she does, and the tests pass.",
+      "ask": [],
+      "after": ["job34"],
+      "uses": {"coasters": ["uncle_bonsu"]}
+    },
+    {
+      "id": "job36",
+      "number": 36,
+      "part": "life",
+      "title": "Growing up: life stages",
+      "status": "todo",
+      "goal": "Age and the six life stages: what changes as a Coaster grows, and how the years pass.",
+      "builds": [
+        "Age and life stage in GameState and the save. Each stage takes its numbers from the design: how fast needs fall, what she can do, how fast she walks, and her size.",
+        "How the years pass: a chapter ends when its goals are done (or after enough days). A 'Two years later…' card sums up what happened, then the next chapter starts. Needs, skills, people and papers carry over.",
+        "What she carries by stage: a toddler or a child has coins in a pocket, not a phone, so the needs and goals show on a small tin box instead. The phone comes with her first one (a step on the life map).",
+        "The 'New in town' start (today's game) is a young adult, so nothing changes for it.",
+        "Online, the town shows other players at their own ages, and a time skip happens only for the player who skips."
+      ],
+      "test": "Each stage's numbers come from the design; a chapter's end moves her on with everything carried over; the HUD follows her stage.",
+      "doneWhen": "A Coaster can grow from one stage to the next, and the tests pass.",
+      "ask": ["How long a chapter should last if its goals aren't done."],
+      "after": ["job35"],
+      "uses": {}
+    },
+    {
+      "id": "job37",
+      "number": 37,
+      "part": "life",
+      "title": "A toddler, a child and a teen",
+      "status": "todo",
+      "goal": "Her younger selves, built in Blender the same way as the young woman.",
+      "builds": [
+        "build_player_character.py makes her at three younger ages: a toddler in an old, too-big T-shirt, a girl in school uniform (and in play clothes), and a teen in a kaba and slit, in the same style and colors.",
+        "The animations they need: toddling, sitting on a sack, sleeping curled up, carrying a small bowl, and playing. The teen carries a head pan like the woman.",
+        "The town's children use them too, so the market children look like hers.",
+        "Pictures of each from every side, like the woman's preview."
+      ],
+      "test": "Each model loads with its animations, matches the style, and stays light enough for the web.",
+      "doneWhen": "You can see her at every age, and the tests pass.",
+      "ask": ["What she wears at each age (drawings welcome, as for the trotro)."],
+      "after": ["job36"],
+      "uses": {}
+    },
+    {
+      "id": "job38",
+      "number": 38,
+      "part": "life",
+      "title": "Chapter 1: The market raised me",
+      "status": "todo",
+      "goal": "A new start: a three-year-old alone at Nkabom Market, and the first chapter of her life.",
+      "builds": [
+        "NEW GAME asks where to start: 'Alone at the market' (a toddler) or 'New in town' (the young woman, as now).",
+        "The market child's world: the rubbish heap behind the market, a junction where the traffic stops, Auntie Akos's kenkey stall and Mama Akua's tomatoes (new sellers), Kofi the market boy, and the church's Saturday feeding programme.",
+        "Her actions: picking food from the rubbish (with its risk), helping a seller carry her bowls, sitting by a stall, splashing at the standpipe, begging at the junction, napping in the shade, and sleeping under a market table.",
+        "The chapter's goals on the tin box (a kind kenkey seller, a safe place to sleep, the feeding programme), its story beats as short picture cards, and its end: 'Two years later…', into Chapter 2.",
+        "The market child's tutorial lessons (the Tutorial tab)."
+      ],
+      "test": "A toddler game starts at the market; every goal can be reached by following the tips; the chapter ends into the child stage.",
+      "doneWhen": "You can play the market child's first chapter from start to end, and the tests pass.",
+      "ask": ["Whether the toddler is always a girl, like the young woman, or the player chooses."],
+      "after": ["job37"],
+      "uses": {
+        "steps": [
+          "start_market_child",
+          "market_rhythm",
+          "safe_sleeping_spot",
+          "kind_seller",
+          "first_numbers",
+          "feeding_programme"
+        ],
+        "actions": [
+          "pick_trash_food",
+          "beg_coins",
+          "help_carry_bowls",
+          "stay_near_seller",
+          "play_market_kids",
+          "eat_with_auntie",
+          "feeding_saturday",
+          "nap_in_shade",
+          "sleep_under_stall",
+          "sleep_safe_spot",
+          "splash_standpipe",
+          "sweet_talk_seller",
+          "use_gutter"
+        ],
+        "places": ["rubbish_heap"],
+        "coasters": ["auntie_akos", "mama_akua", "kofi"],
+        "achievements": ["called_by_name", "sankofa"]
+      }
+    },
+    {
+      "id": "job39",
+      "number": 39,
+      "part": "life",
+      "title": "Chapter 2: A name on paper",
+      "status": "todo",
+      "goal": "The child years: a home, a birth certificate, school, and the first cedis.",
+      "builds": [
+        "Taken in by Auntie Akos: a mat in her room at the compound house, chores in the morning, and her children as brothers and sisters.",
+        "The birth certificate at the registry (Job 30's district offices), with Auntie Akos swearing for her.",
+        "Nkabom M/A Basic School as a pupil: classes on weekdays (on the school's benches, with Mrs. Ofori), homework under the street light, and the headmistress's scholarship call.",
+        "Work for a child: hawking pure water at the junction, calling passengers at the station, errands for the compound, and washing bowls at Maame Esi's.",
+        "Play: football at the park, where the colts coach watches, and the children's choir.",
+        "The chapter's goals, beats and tutorial lessons, and its end into the teen years."
+      ],
+      "test": "Every goal of the chapter can be reached; school days and work fit around each other; the chapter ends into the teen stage.",
+      "doneWhen": "You can play the child's chapter from start to end, and the tests pass.",
+      "ask": [],
+      "after": ["job38"],
+      "uses": {
+        "steps": [
+          "taken_in",
+          "basic_school",
+          "hawk_water",
+          "errands",
+          "station_errands",
+          "street_football",
+          "colts_spotted",
+          "childrens_choir"
+        ],
+        "actions": [
+          "sleep_on_mat",
+          "help_at_home",
+          "fetch_water",
+          "attend_class",
+          "study_street_light",
+          "read_newspaper",
+          "hawk_water",
+          "call_passengers",
+          "wash_in_sea"
+        ],
+        "coasters": ["coach_kwesi"],
+        "events": ["top_of_class"],
+        "achievements": ["never_absent", "first_book"],
+        "skills": ["football", "music"]
+      }
+    },
+    {
+      "id": "job40",
+      "number": 40,
+      "part": "life",
+      "title": "Chapter 3: The head pan",
+      "status": "todo",
+      "goal": "The teen years: carrying loads, the BECE, and the big choice of school, a trade, or the street.",
+      "builds": [
+        "Carrying loads as a teen kayayo (today's loads, from Job 8), with a head pan bought from Madam Serwaa's pile.",
+        "The market susu: a cedi a day to the collector, and the payout at the month's end (and the risk he vanishes, Job 34).",
+        "The BECE at the end of JHS 3, and its results day.",
+        "The choice of paths: a Free SHS place (boarding school away from town, told as a time skip with letters home), an apprenticeship with Madam Adjoa (a new sewing shop on Market road), or the station boys.",
+        "The colts club and the youth fellowship, for the players who choose them.",
+        "The chapter's goals, beats and tutorial lessons, and its end into the young adult years."
+      ],
+      "test": "Each path can be chosen and played; the susu pays out; the chapter ends into the young adult stage with the right steps done.",
+      "doneWhen": "You can play the teen's chapter on each path, and the tests pass.",
+      "ask": ["Whether SHS is a time skip, or a school she can play at."],
+      "after": ["job39"],
+      "uses": {
+        "steps": [
+          "bece",
+          "free_shs",
+          "apprenticeship",
+          "station_boys",
+          "colts_club",
+          "youth_fellowship"
+        ],
+        "actions": ["apprentice_day", "sleep_station_bench"],
+        "places": ["tailor_shop", "shs"],
+        "coasters": ["madam_adjoa"],
+        "achievements": ["first_payout", "colts_goal"]
+      }
+    },
+    {
+      "id": "job41",
+      "number": 41,
+      "part": "life",
+      "title": "Chapter 4: Freedom",
+      "status": "todo",
+      "goal": "The young adult years, joining today's game: papers, a phone of her own, a trade, and love.",
+      "builds": [
+        "The market child, grown up, reaches where the 'New in town' start begins: loads, a rented room at Auntie Adwoa's, and the college. From here both starts share the chapter.",
+        "The freedom ceremony for an apprentice (drinks, prayers and a certificate in front of both families), and sewing for the market women.",
+        "Her own phone and mobile money wallet, with her Ghana Card (Job 30): until now the phone wasn't hers.",
+        "Courtship and the knocking ceremony: someone who walks her home after church.",
+        "The trotro mate's job, a driver's licence, and driving a trotro. The WASSCE for the ones who went to SHS.",
+        "The chapter's goals, beats and tutorial lessons. Chapters 5 and 6 (an adult and an elder) come later."
+      ],
+      "test": "Both starts reach this chapter with the right steps done, and each of its goals can be reached.",
+      "doneWhen": "The story runs from the market toddler to a young woman with a trade, and the tests pass.",
+      "ask": [],
+      "after": ["job40"],
+      "uses": {
+        "steps": [
+          "freedom",
+          "courtship",
+          "knocking",
+          "trotro_mate",
+          "drivers_licence",
+          "trotro_driver",
+          "wassce"
+        ],
+        "actions": ["drive_trotro"],
+        "skills": ["driving"]
+      }
+    },
+    {
+      "id": "later",
+      "number": null,
+      "part": "life",
+      "title": "Later: an adult, an elder, and more starts",
+      "status": "later",
+      "goal": "To plan once Chapter 4 plays well.",
+      "builds": [
+        "Chapter 5, 'Block by block' (an adult): a stall of her own, a chop bar, land and landguards, building a house, marriage, a child, the market queen and the Assembly.",
+        "Chapter 6, 'Sankofa' (an elder): the family head, feeding the market children, a will, and playing on as her child.",
+        "The other starts: the fisher's child (with the beach and its canoes), sent to town, and the compound family.",
+        "More paths: university and National Service, the colts' academy trial, Uber, the MoMo agent's own kiosk, and the abroad dream."
+      ],
+      "test": "",
+      "doneWhen": "",
+      "ask": [],
+      "after": ["job41"],
+      "uses": {
+        "steps": [
+          "own_stall",
+          "chop_bar",
+          "market_queen",
+          "assembly_member",
+          "buy_land",
+          "land_papers",
+          "build_house",
+          "own_trotro",
+          "office_job",
+          "traditional_marriage",
+          "first_child",
+          "family_head",
+          "hometown",
+          "will",
+          "church_elder",
+          "queen_mother",
+          "give_back",
+          "university",
+          "national_service",
+          "church_scholarship",
+          "academy_trial",
+          "uber_driver",
+          "passport",
+          "abroad",
+          "station_master",
+          "own_sewing_shop",
+          "take_apprentices",
+          "headteacher"
+        ],
+        "actions": ["run_stall", "elders_advice", "pull_net", "swim_beach"],
+        "places": ["beach", "palace"],
+        "coasters": ["nana_ababio"],
+        "events": ["landguards"],
+        "achievements": ["careful_driver", "housewarming", "freedom_day"],
+        "skills": ["leadership"]
+      }
+    }
+  ],
+  "tutorial": [
+    {
+      "id": "welcome",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Akwaaba!",
+      "when": "start",
+      "point": "",
+      "text": "This is you: new in Gold Coast, with GH₵100 on your phone. Walk with WASD or the arrow keys, or click where you want to go.",
+      "doneWhen": "walked"
+    },
+    {
+      "id": "phone",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Your phone",
+      "when": "after:welcome",
+      "point": "ui:phone",
+      "text": "Your phone shows your money, the time and the day. The bars down its sides are your food and energy: when one blinks, see to it.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "first_load",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Earn your first cedis",
+      "when": "after:phone",
+      "point": "place:market",
+      "text": "Madam Serwaa at Nkabom Market pays kayayei to carry loads. Press E at her stall to take one.",
+      "doneWhen": "load picked up"
+    },
+    {
+      "id": "delivering",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Carry it there",
+      "when": "first:load picked up",
+      "point": "",
+      "text": "Follow the arrow to the gold ring, and press E to hand the load over. In time, full pay; late, half.",
+      "doneWhen": "load delivered"
+    },
+    {
+      "id": "paid",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Paid by mobile money",
+      "when": "first:load delivered",
+      "point": "ui:phone",
+      "text": "The money came to your phone, with a text. Every payment in and out shows there.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "food",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Hungry?",
+      "when": "need below:hunger 40",
+      "point": "place:chop_bar",
+      "text": "Maame Esi's chop bar sells food. Walk up to her stall, press E, and pick what you can afford.",
+      "doneWhen": "ate"
+    },
+    {
+      "id": "no_money",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Short of money?",
+      "when": "first:payment failed",
+      "point": "place:chop_bar",
+      "text": "Maame Esi pays GH₵20 to wash her bowls, once a day. Press E at the basin by her stall.",
+      "doneWhen": "washed bowls"
+    },
+    {
+      "id": "tired",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Tired?",
+      "when": "need below:energy 35",
+      "point": "place:compound_house",
+      "text": "Sleep in your room at Auntie Adwoa's compound house: press E at the door. You can sleep on the street with Z, but mosquitoes will wake you.",
+      "doneWhen": "slept in bed"
+    },
+    {
+      "id": "saved",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Your day is saved",
+      "when": "first:slept in bed",
+      "point": "ui:menu",
+      "text": "Going to bed saves the game. You can also save whenever you're free, from the phone's menu (M).",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "night",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Night is coming",
+      "when": "time:18:30",
+      "point": "place:compound_house",
+      "text": "The market closed at 18:00, and the street gets dark. Get home to your bed.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "rent",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "Rent is coming",
+      "when": "day:6",
+      "point": "place:compound_house",
+      "text": "Auntie Adwoa wants GH₵140 every Monday at 08:00. If you can't pay, she locks your room until you do.",
+      "doneWhen": "rent paid"
+    },
+    {
+      "id": "college",
+      "origin": "new_in_town",
+      "job": "job20",
+      "title": "A way up",
+      "when": "money above:150",
+      "point": "place:college",
+      "text": "Carrying loads is hard work. Sankofa Training College teaches skills that pay more: see Madam Afriyie at her desk.",
+      "doneWhen": "enrolled"
+    },
+    {
+      "id": "thirsty",
+      "origin": "",
+      "job": "job21",
+      "title": "Thirsty?",
+      "when": "need below:thirst 40",
+      "point": "place:standpipe",
+      "text": "The standpipe by the compound house is free. A sachet of pure water is 50 pesewas at the chop bar or the store.",
+      "doneWhen": "drank"
+    },
+    {
+      "id": "toilet",
+      "origin": "",
+      "job": "job21",
+      "title": "Need the toilet?",
+      "when": "need below:bladder 35",
+      "point": "place:public_toilet",
+      "text": "The public toilet by the market is 50 pesewas. The compound house has one for the people who live there.",
+      "doneWhen": "used the toilet"
+    },
+    {
+      "id": "needs_page",
+      "origin": "",
+      "job": "job21",
+      "title": "All your needs",
+      "when": "after:thirsty",
+      "point": "ui:phone",
+      "text": "Press N to see all your needs. The phone's screen shows the two lowest.",
+      "doneWhen": "opened needs"
+    },
+    {
+      "id": "dirty",
+      "origin": "",
+      "job": "job22",
+      "title": "Time for a wash",
+      "when": "need below:hygiene 35",
+      "point": "place:bathhouse",
+      "text": "A bucket bath at home is free, and the bathhouse by the station is GH₵1. People notice when you need one.",
+      "doneWhen": "washed"
+    },
+    {
+      "id": "fever",
+      "origin": "",
+      "job": "job22",
+      "title": "A fever",
+      "when": "first:sick",
+      "point": "place:clinic",
+      "text": "It's malaria. See the nurse at the clinic, or buy tablets at the chemist. Sleeping outside brings the mosquitoes.",
+      "doneWhen": "got better"
+    },
+    {
+      "id": "lonely",
+      "origin": "",
+      "job": "job23",
+      "title": "Lonely?",
+      "when": "need below:social 35",
+      "point": "",
+      "text": "Press E on a neighbour or a seller to greet them, or gist. People are good company.",
+      "doneWhen": "talked"
+    },
+    {
+      "id": "sunday",
+      "origin": "",
+      "job": "job24",
+      "title": "Sunday",
+      "when": "first:sunday",
+      "point": "place:church",
+      "text": "On Sundays the Methodist church on Hill road fills with songs. It's good for hope, and for meeting people.",
+      "doneWhen": "went to church"
+    },
+    {
+      "id": "mood",
+      "origin": "",
+      "job": "job25",
+      "title": "How you feel",
+      "when": "first:mood changed",
+      "point": "ui:phone",
+      "text": "The face on your phone shows your mood. The NEEDS page says why.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "wants",
+      "origin": "",
+      "job": "job26",
+      "title": "Not sure what to do?",
+      "when": "day:2",
+      "point": "ui:phone",
+      "text": "The phone's WANTS show the three things that would help most right now, and where to find them.",
+      "doneWhen": "opened wants"
+    },
+    {
+      "id": "skill_up",
+      "origin": "",
+      "job": "job27",
+      "title": "Getting better",
+      "when": "first:skill up",
+      "point": "",
+      "text": "Doing things builds skills. The SKILLS page shows how far you've got, and better skills pay more.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "contacts",
+      "origin": "",
+      "job": "job28",
+      "title": "People remember",
+      "when": "first:relationship up",
+      "point": "ui:phone",
+      "text": "Your CONTACTS show who knows you, and how well. People treat a padi better than a stranger.",
+      "doneWhen": "opened contacts"
+    },
+    {
+      "id": "achievement",
+      "origin": "",
+      "job": "job29",
+      "title": "An achievement!",
+      "when": "first:achievement",
+      "point": "",
+      "text": "The game noticed. Your achievements and your good name, on the NAME page, help open new steps in life.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "papers",
+      "origin": "",
+      "job": "job30",
+      "title": "Papers",
+      "when": "arrive:district_office",
+      "point": "",
+      "text": "The district offices make the papers that open doors: an NHIS card for cheap visits to the nurse, and a Ghana Card. The queue starts at dawn.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "life_page",
+      "origin": "",
+      "job": "job31",
+      "title": "What can you become?",
+      "when": "first:step in reach",
+      "point": "ui:phone",
+      "text": "Your phone's LIFE page shows the steps you can reach next, and exactly what each one needs. Money alone never opens one.",
+      "doneWhen": "opened life"
+    },
+    {
+      "id": "choice",
+      "origin": "",
+      "job": "job32",
+      "title": "Your choice",
+      "when": "first:choice",
+      "point": "",
+      "text": "Some moments ask you to decide. What you choose stays with you, and opens different steps in life.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "event",
+      "origin": "",
+      "job": "job34",
+      "title": "Something's happening",
+      "when": "first:event",
+      "point": "",
+      "text": "There's always a safe way out that costs something, and chancier ways. The odds show beside each one.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "small",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "You're three",
+      "when": "start",
+      "point": "",
+      "text": "Your mother is gone, and the market is your home now. Walk with WASD, or click where you want to go.",
+      "doneWhen": "walked"
+    },
+    {
+      "id": "tin_box",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Your tin box",
+      "when": "after:small",
+      "point": "ui:tin box",
+      "text": "Your tin box shows your needs, the coins in your pocket, and what to do now. Hunger and thirst come fast when you're small.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "goals",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Your goals",
+      "when": "after:tin_box",
+      "point": "ui:tin box",
+      "text": "These are this chapter's goals. Reach them all, and the years move on.",
+      "doneWhen": "got it"
+    },
+    {
+      "id": "food_hunt",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Find food",
+      "when": "need below:hunger 50",
+      "point": "place:rubbish_heap",
+      "text": "The rubbish heap behind the market has leftovers: free, but they can make you sick. Helping a seller carry her bowls earns a little kenkey.",
+      "doneWhen": "ate"
+    },
+    {
+      "id": "water",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Water",
+      "when": "need below:thirst 50",
+      "point": "place:standpipe",
+      "text": "The standpipe is free. Cup your hands under the tap.",
+      "doneWhen": "drank"
+    },
+    {
+      "id": "gutter",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Need to go?",
+      "when": "need below:bladder 35",
+      "point": "",
+      "text": "The public toilet costs 50 pesewas that you don't have. The gutter is free, but people see.",
+      "doneWhen": "used the toilet"
+    },
+    {
+      "id": "auntie_akos",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Auntie Akos",
+      "when": "after:food_hunt",
+      "point": "place:market",
+      "text": "The kenkey seller watches you. Help her carry her bowls five days in a row, and she'll remember you.",
+      "doneWhen": "step: kind_seller"
+    },
+    {
+      "id": "first_night",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Night",
+      "when": "time:18:00",
+      "point": "place:market",
+      "text": "The market empties at night. Sleep under a market table. Mama Akua's is the safest, once she knows you.",
+      "doneWhen": "slept"
+    },
+    {
+      "id": "saturday",
+      "origin": "market_child",
+      "job": "job38",
+      "title": "Saturday",
+      "when": "first:saturday",
+      "point": "place:church",
+      "text": "On Saturday mornings the church feeds the market children. Follow them up Hill road.",
+      "doneWhen": "step: feeding_programme"
+    }
+  ]
+}

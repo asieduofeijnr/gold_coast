@@ -485,3 +485,21 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   the rules change online: the bed refills her energy quickly instead, and
   activities just take their few seconds. A rule that only made sense alone
   had to change when other people arrived.
+
+## Job 18, part 4: a server on the internet
+- **A reverse proxy.** Nakama doesn't do HTTPS itself, so Caddy stands in
+  front of it: browsers talk to Caddy securely, and Caddy passes everything on
+  to Nakama inside the droplet. Caddy also fetches the certificate (the proof
+  that `api.yourgame.com` is really yours) from Let's Encrypt, for free, and
+  renews it by itself.
+- **Secrets stay where they're used.** The droplet makes its own passwords and
+  keys when it's set up, and keeps them in a file there (`.env`) that never
+  goes into git or a chat. The repo only has the recipe. The game's server key
+  is different: every copy of the game carries it, so it can't be a secret.
+- **Only open what must be open.** The firewall lets in SSH and the web, and
+  nothing else. The console and the database aren't published at all; to reach
+  the console you open an SSH tunnel, a private pipe from your Mac into the
+  droplet.
+- **One place for the address.** `live_server.gd` says where the server is.
+  The game reads it, and so does the deploy script, so the two can't disagree.
+

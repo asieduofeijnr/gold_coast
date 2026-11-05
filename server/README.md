@@ -36,8 +36,11 @@ stay). To see what it's doing: `docker compose -f server/docker-compose.yml logs
 Nakama reads `modules/` when it starts. After changing them:
 `docker compose -f server/docker-compose.yml restart nakama`.
 
-## Online (later)
+## Online
 
 For players on itch.io, the server has to be on the internet with HTTPS (a
 secure page can only talk to a secure server): a small rented server, a
-domain name, and its own passwords and server key instead of the ones here.
+domain name, and its own passwords and keys instead of the ones here.
+`production/` has all of it, ready for a DigitalOcean droplet: see
+`production/README.md`. The game finds that server through
+`gold-coast/scripts/live_server.gd`.

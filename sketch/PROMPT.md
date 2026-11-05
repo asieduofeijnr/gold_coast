@@ -6,6 +6,8 @@
 > password-protected page, screenshots, and test on another computer are left.
 > Job 18's first parts (the account card, the server on this computer, and a
 > shared town with one clock) are built; cloud saves are next.
+> The server is ready for the internet (part 4): it goes online once there's
+> a droplet and a domain (`server/production/README.md`).
 > **Planned next:** phase three, Coaster Life (Jobs 19 to 41), on the design
 > board's Build plan tab (section 7). It starts with Job 19 when I say so.
 
@@ -777,6 +779,12 @@ of peeling plaster. Flat colors, simple shapes.
   - **Logging out:** the phone menu's LOG OUT (LOG IN, playing offline) saves
     her game first if she's free, then goes back to the title screen; the
     title screen's start menu has LOG OUT (or LOG IN) too, to switch accounts.
+- **Job 18, part 4: the server, ready for the internet** (DigitalOcean).
+  `server/production/` (Caddy for HTTPS, Nakama, PostgreSQL; `setup.sh`,
+  `deploy.sh`, `check.sh`, `backup.sh`, and a README with every step).
+  `LiveServer` (`scripts/live_server.gd`) holds the online server's name
+  (`HOST`, empty for now) and the game's key, and `Online.use_server_for()`
+  points the web build on itch.io at it.
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports
@@ -937,6 +945,14 @@ Its console is at http://127.0.0.1:7351 (admin / password). The AI's sandbox
 can't run Docker (nor can commands typed with `!` in the AI's chat); start it
 in your own Terminal. Nakama reads `server/modules/` when it starts, so after
 changing them: `docker compose -f server/docker-compose.yml restart nakama`.
+
+**The server on the internet** (a DigitalOcean droplet; the steps are in
+`server/production/README.md`), from your own Terminal:
+```bash
+bash server/production/deploy.sh root@<IP>   # put the server on the droplet, or update it
+bash server/production/check.sh              # check HTTPS, and that the console and database are closed
+ssh -L 7351:127.0.0.1:7351 root@<IP>         # then the console is at http://127.0.0.1:7351
+```
 
 **Two players on this computer:** each needs their own account, and a browser
 keeps one login, so use two browsers: run `sh gold-coast/tests/serve_web.sh`,
@@ -1770,10 +1786,20 @@ my "Lagos Life" picture; everyone who signs up lives in the same town.
 5. **Tests:** automated, with a pretend server (no internet), and by hand with
    the server on this computer and two browser windows.
 
-**Later (before the itch.io page goes public):** the server on the internet
-(a rented server, a domain, HTTPS, and its own passwords and server key);
-confirmation and password-reset emails (Nakama doesn't send emails, so the
-server needs code and an email sender); a lawyer's look at the five pages.
+**The server on the internet (part 4, ready on 2026-11-05):** `server/production/`
+has it for a DigitalOcean droplet: Caddy in front for HTTPS (a free certificate,
+renewed by itself), every key the droplet's own (made there, in its `.env`,
+never in git), a firewall with only SSH and the web open, the console reached
+through an SSH tunnel, and nightly database backups. The game finds it through
+`gold-coast/scripts/live_server.gd`: `HOST` (empty until the droplet exists)
+and `SERVER_KEY`. The web build on itch.io uses it; the editor, the tests, and
+the web build on this computer keep this computer's server
+(`Online.use_server_for()`). The steps are in `server/production/README.md`.
+Tests: `tests/test_live_server.gd`, 11 checks (461 in all).
+
+**Later (before the itch.io page goes public):** confirmation and
+password-reset emails (Nakama doesn't send emails, so the server needs code
+and an email sender); a lawyer's look at the five pages.
 
 **Done when:** you can sign up, save on one computer and continue on another,
 two players see each other walk around town, and the tests pass.

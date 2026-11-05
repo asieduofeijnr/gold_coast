@@ -1,0 +1,7 @@
+# HTTPS for Gold Coast's server. Caddy gets a free certificate for the server's
+# name ($DOMAIN, from .env) from Let's Encrypt and renews it by itself, sends
+# plain http:// visitors to https://, and passes everything on to Nakama,
+# including the game's live connection (its websocket).
+{$DOMAIN} {
+	reverse_proxy nakama:7350
+}

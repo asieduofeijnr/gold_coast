@@ -12,3 +12,6 @@ __pycache__/
 # Reference notes in sketch/: read for ideas, not ours to publish
 sketch/Lagos_life_claude_sessions.md
 sketch/sims engine.txt
+# The online server's passwords and backups live on the droplet only (see server/production/)
+server/production/.env
+server/production/backups/

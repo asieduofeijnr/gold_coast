@@ -1,8 +1,8 @@
 extends Node
 ## Gold Coast's link to its server (Nakama: see server/README.md). It makes
-## accounts, logs players in and out, and remembers the login in the browser
-## (ACCOUNT_FILE), so they stay logged in between visits. (Cloud saves and the
-## shared town come next.)
+## accounts, logs players in and out, remembers the login in the browser
+## (ACCOUNT_FILE), so they stay logged in between visits, and joins the shared
+## town. (Cloud saves come next.)
 ##
 ## It reaches the server through a "backend": NakamaBackend for the real one,
 ## or a pretend one in tests (tests/fake_backend.gd). Nothing in the game waits
@@ -27,7 +27,8 @@ const ACCOUNT_FILE := "user://gold_coast_account.json"
 const EASY_PASSWORDS := ["12345678", "123456789", "1234567890", "password", "password1", "qwertyui",
 		"qwerty123", "11111111", "00000000", "iloveyou", "goldcoast", "abcd1234"]
 
-## Where the server is: this computer while we build it.
+## Where the server is: this computer while we build it, or the online one
+## (LiveServer) for the game on the internet (see use_server_for()).
 var host := "127.0.0.1"
 var port := 7350
 var scheme := "http"
@@ -64,14 +65,27 @@ var _world_told_at := 0
 
 
 func _ready() -> void:
+	var page_host := String(JavaScriptBridge.eval("location.hostname")) if OS.has_feature("web") else ""
+	if OS.has_feature("web"):
+		use_server_for(page_host)
 	if backend == null:
 		backend = NakamaBackend.new(host, port, scheme, server_key)
-	# Until the server is on the internet, the game on itch.io can't reach it
-	# (it's on the computer that made the game), so there it plays offline.
-	if OS.has_feature("web"):
-		var page_host := String(JavaScriptBridge.eval("location.hostname"))
-		if not can_reach(host, page_host):
-			offline = true
+	# Without an online server, the game on itch.io can't reach the one on the
+	# computer that made it, so there it plays offline.
+	if OS.has_feature("web") and not can_reach(host, page_host):
+		offline = true
+
+
+## Points the game at the online server when it's a web page on the internet
+## (like itch.io's) and there is one (LiveServer.HOST). A page served on this
+## computer keeps this computer's server.
+func use_server_for(page_host: String, live_host: String = LiveServer.HOST, live_key: String = LiveServer.SERVER_KEY) -> void:
+	if live_host == "" or page_host in ["127.0.0.1", "localhost", ""]:
+		return
+	host = live_host
+	port = 443
+	scheme = "https"
+	server_key = live_key
 
 
 func is_logged_in() -> bool:

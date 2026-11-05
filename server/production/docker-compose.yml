@@ -1,0 +1,98 @@
+# Gold Coast's game server on the internet, on a DigitalOcean droplet: Caddy
+# (HTTPS) in front, then Nakama, and the database where it keeps everyone's
+# accounts (PostgreSQL). deploy.sh copies this folder, with server/modules, to
+# /opt/gold-coast/ on the droplet, and setup.sh starts it there.
+#
+# Its passwords and keys are in /opt/gold-coast/.env, which setup.sh makes on
+# the droplet: they're never in git. (The game's key and the server's name come
+# from the game: gold-coast/scripts/live_server.gd.)
+#
+# Only Caddy is open to the internet (ports 80 and 443). Nakama and the database
+# can only be reached inside Docker, and the console only from the droplet
+# itself, through an SSH tunnel (see README.md).
+
+name: gold-coast
+
+x-logs: &logs
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" } # so logs never fill the disk
+
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nakama
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run setup.sh first}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "nakama"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    <<: *logs
+
+  nakama:
+    image: heroiclabs/nakama:3.22.0
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    # As on the Mac: first it makes (or updates) the database's tables, then it
+    # starts. Every key is the droplet's own, never Nakama's default: with the
+    # defaults, anyone could make a login of their own or open the console.
+    # (No "-x" here, unlike the Mac's: it would print the passwords in the logs.)
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - >
+        /nakama/nakama migrate up --database.address postgres:${POSTGRES_PASSWORD}@database:5432/nakama &&
+        exec /nakama/nakama --name gold-coast
+        --database.address postgres:${POSTGRES_PASSWORD}@database:5432/nakama
+        --runtime.path /nakama/data/modules
+        --runtime.http_key ${HTTP_KEY:?run setup.sh first}
+        --socket.server_key ${SERVER_KEY:?run setup.sh first}
+        --session.encryption_key ${SESSION_KEY:?run setup.sh first}
+        --session.refresh_encryption_key ${REFRESH_KEY:?run setup.sh first}
+        --session.token_expiry_sec 7200
+        --session.refresh_token_expiry_sec 2592000
+        --console.username ${CONSOLE_USERNAME:?run setup.sh first}
+        --console.password ${CONSOLE_PASSWORD:?run setup.sh first}
+        --console.signing_key ${CONSOLE_SIGNING_KEY:?run setup.sh first}
+        --logger.level INFO
+    volumes:
+      - ./modules:/nakama/data/modules:ro
+    ports:
+      - "127.0.0.1:7351:7351" # the console: only on the droplet (reach it with an SSH tunnel)
+    healthcheck:
+      test: ["CMD", "/nakama/nakama", "healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    <<: *logs
+
+  caddy:
+    # HTTPS: a free certificate for the server's name from Let's Encrypt, renewed
+    # by itself, and everything (the game's websocket too) passed on to Nakama.
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      nakama:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN:?run setup.sh first}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # its certificates
+      - caddy_config:/config
+    <<: *logs
+
+volumes:
+  database:
+  caddy_data:
+  caddy_config:

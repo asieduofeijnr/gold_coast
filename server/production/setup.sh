@@ -1,5 +1,6 @@
 #!/bin/bash
-# Sets up Gold Coast's server on a new Ubuntu 24.04 droplet, and starts it.
+# Sets up Gold Coast's server on a new Ubuntu droplet (22.04 or 24.04, plain or
+# DigitalOcean's Docker image), and starts it.
 # deploy.sh copies this folder to /opt/gold-coast/ on the droplet and runs it
 # there, as root, with the server's name and the game's key:
 #   bash /opt/gold-coast/setup.sh api.yourgame.com <the game's server key>
@@ -9,18 +10,31 @@ cd "$(dirname "$0")"
 DOMAIN="${1:?usage: setup.sh <server name> <server key>}"
 SERVER_KEY="${2:?usage: setup.sh <server name> <server key>}"
 
-echo "== Docker, the firewall, and automatic security updates"
+echo "== Updates, Docker, the firewall, and automatic security updates"
 export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a # Ubuntu 22.04 would otherwise stop an update to ask which services to restart
 # A new droplet often runs its own updates first: wait for them (up to 10 minutes).
-apt() { apt-get -o DPkg::Lock::Timeout=600 -yq "$@"; }
+# When an update changes a settings file, keep the droplet's own (confold).
+apt() { apt-get -o DPkg::Lock::Timeout=600 -o Dpkg::Options::=--force-confold -yq "$@"; }
 apt update >/dev/null
-apt install docker.io docker-compose-v2 ufw unattended-upgrades >/dev/null
+apt upgrade >/dev/null
+if ! command -v docker >/dev/null; then
+	apt install docker.io docker-compose-v2 >/dev/null # a plain Ubuntu: its own Docker
+elif ! docker compose version >/dev/null 2>&1; then
+	apt install docker-compose-plugin >/dev/null # Docker from Docker's own packages (DigitalOcean's image)
+fi
+apt install ufw unattended-upgrades >/dev/null
 systemctl enable --now docker
 # Only SSH (to manage it) and the web (80 and 443) are open. The console and the
 # database aren't published to the internet at all (see docker-compose.yml).
 ufw allow OpenSSH >/dev/null
 ufw allow 80/tcp >/dev/null
 ufw allow 443/tcp >/dev/null
+# DigitalOcean's Docker image also opens Docker's remote ports (2375, 2376), which nothing here uses.
+for port in 2375 2376; do
+	ufw delete allow "$port/tcp" >/dev/null 2>&1 || true
+	ufw delete allow "$port" >/dev/null 2>&1 || true
+done
 ufw --force enable >/dev/null
 systemctl enable --now unattended-upgrades >/dev/null 2>&1 || true
 
@@ -70,6 +84,11 @@ docker compose restart nakama >/dev/null
 echo
 echo "Gold Coast's server is up. In a minute or two (once its certificate"
 echo "arrives) it answers at https://$DOMAIN"
+if [ -f /var/run/reboot-required ]; then
+	echo
+	echo "Ubuntu's updates need a restart to finish: type  reboot  on the droplet (or"
+	echo "restart it on DigitalOcean). The server starts again by itself afterwards."
+fi
 if [ -n "$NEW" ]; then
 	echo
 	echo "Its console's password is below. Keep it in your password manager, and"

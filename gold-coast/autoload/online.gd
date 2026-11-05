@@ -23,6 +23,9 @@ signal world_clock_changed
 const TERMS_VERSION := "2026-10-30"
 const MIN_AGE := 18
 const ACCOUNT_FILE := "user://gold_coast_account.json"
+## The login kept for the online server, apart from this computer's, so trying
+## one never logs you out of the other.
+const LIVE_ACCOUNT_FILE := "user://gold_coast_account_online.json"
 ## Passwords too easy to guess, even with 8 characters.
 const EASY_PASSWORDS := ["12345678", "123456789", "1234567890", "password", "password1", "qwertyui",
 		"qwerty123", "11111111", "00000000", "iloveyou", "goldcoast", "abcd1234"]
@@ -65,9 +68,12 @@ var _world_told_at := 0
 
 
 func _ready() -> void:
-	var page_host := String(JavaScriptBridge.eval("location.hostname")) if OS.has_feature("web") else ""
+	var page_host := ""
+	var page_query := ""
 	if OS.has_feature("web"):
-		use_server_for(page_host)
+		page_host = String(JavaScriptBridge.eval("location.hostname"))
+		page_query = String(JavaScriptBridge.eval("location.search"))
+	use_server_for(page_host, wants_live_server(page_query, OS.get_cmdline_user_args()))
 	if backend == null:
 		backend = NakamaBackend.new(host, port, scheme, server_key)
 	# Without an online server, the game on itch.io can't reach the one on the
@@ -76,16 +82,31 @@ func _ready() -> void:
 		offline = true
 
 
-## Points the game at the online server when it's a web page on the internet
-## (like itch.io's) and there is one (LiveServer.HOST). A page served on this
-## computer keeps this computer's server.
-func use_server_for(page_host: String, live_host: String = LiveServer.HOST, live_key: String = LiveServer.SERVER_KEY) -> void:
-	if live_host == "" or page_host in ["127.0.0.1", "localhost", ""]:
+## Whether this copy was asked to use the online server even on this computer,
+## to try it out before the game on itch.io does: "?server=live" at the end of
+## the web page's address, or "--server=live" after Godot's own arguments
+## (godot --path . -- --server=live).
+static func wants_live_server(page_query: String, args: PackedStringArray) -> bool:
+	return "server=live" in page_query or "--server=live" in args
+
+
+## Points the game at the online server (LiveServer.HOST), if there is one,
+## when it's a web page on the internet (like itch.io's) or `live` asks for it.
+## Otherwise (the editor, the tests, a web page served on this computer) it
+## keeps this computer's server.
+func use_server_for(page_host: String, live := false, live_host: String = LiveServer.HOST,
+		live_key: String = LiveServer.SERVER_KEY) -> void:
+	if live_host == "":
+		if live:
+			push_warning("There's no online server in scripts/live_server.gd yet, so it's this computer's.")
+		return
+	if not live and page_host in ["127.0.0.1", "localhost", ""]:
 		return
 	host = live_host
 	port = 443
 	scheme = "https"
 	server_key = live_key
+	account_file = LIVE_ACCOUNT_FILE
 
 
 func is_logged_in() -> bool:

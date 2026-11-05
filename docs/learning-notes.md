@@ -502,4 +502,16 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   droplet.
 - **One place for the address.** `live_server.gd` says where the server is.
   The game reads it, and so does the deploy script, so the two can't disagree.
+- **A key for each door.** The droplet has its own SSH key
+  (`~/.ssh/gold_coast_do`), apart from the work one, and `~/.ssh/config` gives
+  it a short name, `gold-coast`, that always uses that key. If one key is ever
+  lost or stolen, only its own door needs a new lock.
+- **A name, not an address.** A DNS record (type `A`) points
+  `api.goldcoaster.ai` at the droplet's IP address. The game only knows the
+  name, so the server could move to another droplet without a new version of
+  the game.
+- **Try it before it's public.** The game on itch.io only changes when main
+  does, so `?server=live` (or `--server=live`) lets a copy on this computer use
+  the online server first, with its own saved login, leaving this computer's
+  as it is.
 

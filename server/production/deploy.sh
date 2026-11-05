@@ -1,6 +1,8 @@
 #!/bin/bash
 # Puts Gold Coast's server on a DigitalOcean droplet, or updates it there.
 # Run it on your Mac, in Terminal, from the kayayo folder:
+#   bash server/production/deploy.sh gold-coast
+# where gold-coast is the droplet's name in ~/.ssh/config (see README.md), or
 #   bash server/production/deploy.sh root@<the droplet's IP address>
 # It copies server/production and server/modules to /opt/gold-coast/ on the
 # droplet, then runs setup.sh there, which sets it up (the first time) and
@@ -8,7 +10,10 @@
 # The server's name and the game's key come from gold-coast/scripts/live_server.gd.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
-TARGET="${1:?Say which droplet: bash server/production/deploy.sh root@<IP address>}"
+TARGET="${1:?Say which droplet: bash server/production/deploy.sh gold-coast (or root@<IP address>)}"
+# One SSH connection for every step, so a key with a passphrase asks for it once.
+SSH_OPTS="-o ControlMaster=auto -o ControlPath=/tmp/gc-deploy-%C -o ControlPersist=60"
+ssh() { command ssh $SSH_OPTS "$@"; }
 LIVE=gold-coast/scripts/live_server.gd
 DOMAIN=$(sed -n 's/^const HOST := "\(.*\)"$/\1/p' "$LIVE")
 KEY=$(sed -n 's/^const SERVER_KEY := "\(.*\)"$/\1/p' "$LIVE")
@@ -22,11 +27,11 @@ if [ -z "$KEY" ] || [ "$KEY" = "defaultkey" ]; then
 fi
 
 echo "== Copying the server to $TARGET:/opt/gold-coast"
-ssh "$TARGET" 'mkdir -p /opt/gold-coast/modules'
+ssh "$TARGET" 'mkdir -p /opt/gold-coast/modules && (command -v rsync >/dev/null || (apt-get update -q && apt-get install -yq rsync) >/dev/null)'
 # The game's rules (an exact copy: anything deleted here goes there too)...
-rsync -rlt --delete server/modules/ "$TARGET:/opt/gold-coast/modules/"
+rsync -rlt --delete -e "ssh $SSH_OPTS" server/modules/ "$TARGET:/opt/gold-coast/modules/"
 # ...and the server's own files. Its .env (passwords) and backups stay as they are.
-rsync -rlt --exclude README.md server/production/ "$TARGET:/opt/gold-coast/"
+rsync -rlt --exclude README.md -e "ssh $SSH_OPTS" server/production/ "$TARGET:/opt/gold-coast/"
 
 echo "== Setting it up and starting it, on the droplet"
 ssh "$TARGET" "bash /opt/gold-coast/setup.sh '$DOMAIN' '$KEY'"

@@ -6,8 +6,9 @@
 > password-protected page, screenshots, and test on another computer are left.
 > Job 18's first parts (the account card, the server on this computer, and a
 > shared town with one clock) are built; cloud saves are next.
-> The server is ready for the internet (part 4): it goes online once there's
-> a droplet and a domain (`server/production/README.md`).
+> The server is on the internet (part 4), at `api.goldcoaster.ai` on a
+> DigitalOcean droplet, and the game on itch.io uses it
+> (`server/production/README.md`).
 > **Planned next:** phase three, Coaster Life (Jobs 19 to 41), on the design
 > board's Build plan tab (section 7). It starts with Job 19 when I say so.
 
@@ -783,8 +784,14 @@ of peeling plaster. Flat colors, simple shapes.
   `server/production/` (Caddy for HTTPS, Nakama, PostgreSQL; `setup.sh`,
   `deploy.sh`, `check.sh`, `backup.sh`, and a README with every step).
   `LiveServer` (`scripts/live_server.gd`) holds the online server's name
-  (`HOST`, empty for now) and the game's key, and `Online.use_server_for()`
-  points the web build on itch.io at it.
+  (`HOST`) and the game's key, and `Online.use_server_for()` points the web
+  build on itch.io at it.
+  - **Online on 2026-11-05:** `api.goldcoaster.ai` (the domain is from
+    Namecheap), on a droplet in London (DigitalOcean's Docker image, Ubuntu
+    22.04), which the Mac reaches as `ssh gold-coast`, with its own key.
+    `check.sh` passes. A copy on this computer can try it before main changes
+    (`?server=live` on the web page, or `--server=live` for Godot), with its
+    own saved login.
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports
@@ -949,10 +956,14 @@ changing them: `docker compose -f server/docker-compose.yml restart nakama`.
 **The server on the internet** (a DigitalOcean droplet; the steps are in
 `server/production/README.md`), from your own Terminal:
 ```bash
-bash server/production/deploy.sh root@<IP>   # put the server on the droplet, or update it
+bash server/production/deploy.sh gold-coast  # put the server on the droplet, or update it
 bash server/production/check.sh              # check HTTPS, and that the console and database are closed
-ssh -L 7351:127.0.0.1:7351 root@<IP>         # then the console is at http://127.0.0.1:7351
+ssh -L 17351:127.0.0.1:7351 gold-coast       # then its console is at http://127.0.0.1:17351
 ```
+(`gold-coast` is the droplet's name in `~/.ssh/config`, with its own key.) To
+try the online server before main changes, a copy on this computer can use it:
+http://127.0.0.1:8060/web/?server=live (from `serve_web.sh`), or
+`$GODOT --path . -- --server=live`.
 
 **Two players on this computer:** each needs their own account, and a browser
 keeps one login, so use two browsers: run `sh gold-coast/tests/serve_web.sh`,
@@ -1786,16 +1797,18 @@ my "Lagos Life" picture; everyone who signs up lives in the same town.
 5. **Tests:** automated, with a pretend server (no internet), and by hand with
    the server on this computer and two browser windows.
 
-**The server on the internet (part 4, ready on 2026-11-05):** `server/production/`
+**The server on the internet (part 4, online on 2026-11-05):** `server/production/`
 has it for a DigitalOcean droplet: Caddy in front for HTTPS (a free certificate,
 renewed by itself), every key the droplet's own (made there, in its `.env`,
 never in git), a firewall with only SSH and the web open, the console reached
 through an SSH tunnel, and nightly database backups. The game finds it through
-`gold-coast/scripts/live_server.gd`: `HOST` (empty until the droplet exists)
-and `SERVER_KEY`. The web build on itch.io uses it; the editor, the tests, and
+`gold-coast/scripts/live_server.gd`: `HOST` (`api.goldcoaster.ai`) and
+`SERVER_KEY`. The web build on itch.io uses it; the editor, the tests, and
 the web build on this computer keep this computer's server
-(`Online.use_server_for()`). The steps are in `server/production/README.md`.
-Tests: `tests/test_live_server.gd`, 11 checks (461 in all).
+(`Online.use_server_for()`), unless they're asked for the online one, to try
+it first (`?server=live` on the page, or `--server=live` for Godot), with its
+own saved login. The steps are in `server/production/README.md`.
+Tests: `tests/test_live_server.gd`, 16 checks (466 in all).
 
 **Later (before the itch.io page goes public):** confirmation and
 password-reset emails (Nakama doesn't send emails, so the server needs code

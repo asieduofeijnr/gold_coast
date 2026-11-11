@@ -201,7 +201,7 @@ var player_facing := 0.0
 var spot_loaded := false
 ## How the game begins next time the main scene loads: "" with the title
 ## screen, "new" with a new game, or "load" carrying on from the saved game.
-## (The phone's menu sets it before reloading the scene.)
+## (restart_scene() sets it, for the phone's menu.)
 var start_with := ""
 ## Whether townspeople and the trotro go about their day. Tests switch this off
 ## so nothing wanders into their way.
@@ -658,6 +658,30 @@ func reset() -> void:
 	set_time(START_DAY, START_MINUTES)
 	earned_today = 0
 	spent_today = 0
+
+
+## Loads the main scene again, fresh, to begin as `how` says (see start_with).
+## The scene that's running is freed at once, before the next frame, so nothing
+## still waiting in it (a chicken halfway through a walk, say) wakes up after
+## it's left the tree. SceneTree.reload_current_scene() takes the scene out of
+## the tree at once but frees it at the end of the frame, and in between such a
+## loop finds get_tree() empty; in the web build, waiting on nothing doesn't
+## wait, so the loop spins forever and the game freezes. (That was the freeze on
+## the phone's LOG OUT, LOAD GAME, and NEW GAME.)
+func restart_scene(how: String) -> void:
+	start_with = how
+	_restart_scene.call_deferred()
+
+
+# Deferred, so the old scene's own code has finished and it can be freed here.
+func _restart_scene() -> void:
+	var tree := get_tree()
+	var old := tree.current_scene
+	if old == null:
+		return # already restarting
+	var scene: PackedScene = load(old.scene_file_path)
+	old.free()
+	tree.change_scene_to_node(scene.instantiate())
 
 
 func _update_needs(hours: float) -> void:

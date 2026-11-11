@@ -44,8 +44,7 @@ func restart(how: String) -> void:
 	if how == "new":
 		GameState.reset()
 	if get_tree().current_scene == self:
-		GameState.start_with = how
-		get_tree().reload_current_scene()
+		GameState.restart_scene(how)
 	elif how == "load": # in a test: carry on right here
 		if GameState.load_game():
 			continue_from_save()

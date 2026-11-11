@@ -792,6 +792,16 @@ of peeling plaster. Flat colors, simple shapes.
     `check.sh` passes. A copy on this computer can try it before main changes
     (`?server=live` on the web page, or `--server=live` for Godot), with its
     own saved login.
+- **The freeze on the phone's LOG OUT (fixed on 2026-11-11).** In the web
+  build, the phone menu's LOG OUT, LOAD GAME, and NEW GAME froze the game.
+  They restart the scene, and `reload_current_scene()` takes the old town out
+  of the tree at once but frees it only at the end of the frame. In between,
+  anything still waiting a frame at a time in it (a chicken mid-walk) woke up
+  and found `get_tree()` empty, and in a release build, waiting on nothing
+  doesn't wait, so it looped forever. `GameState.restart_scene()` now frees the
+  old scene at once (deferred, outside its own code), and
+  `change_scene_to_node()` adds the fresh one. Tests: `tests/test_restart.gd`,
+  3 checks (469 in all).
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports

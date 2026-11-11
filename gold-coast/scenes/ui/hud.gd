@@ -208,6 +208,5 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("debug_new_game"):
 		GameState.delete_save()
 		GameState.reset()
-		GameState.start_with = "new" # no title screen
 		get_tree().paused = false
-		get_tree().reload_current_scene()
+		GameState.restart_scene("new") # no title screen

@@ -515,3 +515,20 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   the online server first, with its own saved login, leaving this computer's
   as it is.
 
+## Job 18: the freeze on LOG OUT
+- **The web build is a release build.** In the editor and the tests, a
+  mistake like using `get_tree()` when it's empty stops that function with an
+  error. A release build skips some of those checks and carries on: `await`
+  on nothing doesn't wait, so a loop that waits a frame at a time spins
+  forever, and the game freezes. That's why the tests never froze, and the
+  game on itch.io did.
+- **Changing scenes isn't instant.** `reload_current_scene()` takes the scene
+  out of the tree at once, but frees it at the end of the frame, and things in
+  it can still wake up in between. `GameState.restart_scene()` frees it at
+  once instead, so nothing in it wakes up.
+- **Reproduce it where it happens.** The freeze only showed in a browser, so
+  the web build was played in a headless browser (Playwright), with Playwright
+  answering for the server, and its console showed the same error thousands of
+  times. A test now checks the restart with something that waits a frame at a
+  time, like the chickens.
+

@@ -9,6 +9,7 @@ extends Node
 ## It also saves and loads the game: going to bed at home, or the phone's Save
 ## game, saves everything that matters to a file (see save_game()), including
 ## where she's standing and the load on her head, and load_game() brings it back.
+## While she's logged in, Online copies that file to her account in the cloud.
 
 ## Fires whenever your money changes, with the new amount (in pesewas).
 signal money_changed(new_amount: int)
@@ -603,6 +604,41 @@ func load_game() -> bool:
 	return true
 
 
+## The saved game's file as it is, text and all ("" if there isn't one): what a
+## cloud save copies (see Online).
+func save_text() -> String:
+	return FileAccess.get_file_as_string(save_path) if has_save() else ""
+
+
+## Whether `data` is a saved game this version of the game can load: a
+## dictionary with a layout version it knows, and the money, day, time, and
+## needs as numbers. (A save from a newer version of the game isn't.)
+static func is_save(data: Variant) -> bool:
+	if not data is Dictionary or not (data.get("version") is float or data.get("version") is int):
+		return false
+	var version := int(data.version)
+	if version < 1 or version > SAVE_VERSION:
+		return false
+	for key in ["money", "day", "minutes", "hunger", "energy"]:
+		if not (data.get(key) is float or data.get(key) is int):
+			return false
+	return true
+
+
+## Puts `data`, a saved game from the cloud, in place of the saved game on this
+## computer, without loading it. Returns false, and changes nothing, if it isn't
+## a saved game this version can load (see is_save()).
+func replace_save(data: Variant) -> bool:
+	if not is_save(data):
+		return false
+	var file := FileAccess.open(save_path, FileAccess.WRITE)
+	if file == null:
+		return false
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+	return true
+
+
 # Reads the saved game from `save_path`, checking it's really a saved game: it
 # returns an empty dictionary if there isn't one, or it's damaged or too new.
 func _read_save() -> Dictionary:
@@ -611,16 +647,7 @@ func _read_save() -> Dictionary:
 	var json := JSON.new()
 	if json.parse(FileAccess.get_file_as_string(save_path)) != OK:
 		return {} # not a saved game (or a damaged one)
-	var data: Variant = json.data
-	if not data is Dictionary or not (data.get("version") is float or data.get("version") is int):
-		return {}
-	var version := int(data.version)
-	if version < 1 or version > SAVE_VERSION:
-		return {}
-	for key in ["money", "day", "minutes", "hunger", "energy"]:
-		if not data.has(key):
-			return {}
-	return data
+	return json.data if is_save(json.data) else {}
 
 
 ## Deletes the saved game, for a new game.
@@ -773,6 +800,9 @@ func _save_data() -> Dictionary:
 		"jobs_day": _jobs_day,
 		"player": {"x": player_position.x, "y": player_position.y, "z": player_position.z, "facing": player_facing},
 		"delivery": delivery.to_save() if delivery != null else null,
+		# When it was saved (seconds since 1970, in UTC), so two saves can say
+		# which is which (see Format.date_time()).
+		"saved_at": int(Time.get_unix_time_from_system()),
 	}
 
 

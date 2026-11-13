@@ -7,9 +7,9 @@ extends Node
 ##   anywhere but her bed); otherwise the phone says why not
 ## - LOAD GAME: back to the saved game (it asks first)
 ## - NEW GAME: starts again (it asks first)
-## - LOG OUT: saves her game (if she's free), logs out, and goes back to the
-##   title screen; playing offline, it's LOG IN, back to the title screen to
-##   sign up or log in
+## - LOG OUT: saves her game (if she's free), waits for it to go up to the
+##   cloud, logs out, and goes back to the title screen; playing offline, it's
+##   LOG IN, back to the title screen to sign up or log in
 ## - HOW TO PLAY: the controls and the basics, a page at a time
 ## Choose with the phone's scroll key (or the arrow keys, or W and S), and pick
 ## with its middle key (or Enter, or E). C (or Esc, or M) goes back. A click
@@ -31,6 +31,7 @@ const HOW_TO_PLAY := [
 	["LEARN SKILLS", "AT SANKOFA", "COLLEGE."],
 	["RENT: GH₵140", "EVERY MONDAY.", "EAT WELL!"],
 	["M OR ESC:", "THIS MENU.", "SAVE ANYTIME!"],
+	["FULL CLOUD:", "SAVED ONLINE.", "EMPTY: NOT YET"],
 ]
 ## How dark the game gets behind the phone while the menu is open.
 const SHADE := 0.35
@@ -41,7 +42,8 @@ const SHADE := 0.35
 
 var _open := false
 # What the phone's page is for: "" (no page: the menu), "message", "load",
-# "new", or "help"; which help page is showing; and the item to go back to.
+# "new", "account", "waiting" (for the cloud, before logging out), or "help";
+# which help page is showing; and the item to go back to.
 var _page := ""
 var _help_page := 0
 var _item := 0
@@ -172,10 +174,15 @@ func _on_page_accepted() -> void:
 			close()
 			restart_requested.emit(how)
 		"account":
-			# Her game is saved (if she's free), then logging out (or leaving
-			# offline play) goes back to the title screen, where the account card asks.
+			# Her game is saved (if she's free) and goes up to the cloud (if
+			# she's logged in), then logging out (or leaving offline play) goes
+			# back to the title screen, where the account card asks.
 			if GameState.save_refusal() == "":
 				GameState.save_game()
+			if Online.is_syncing():
+				_page = "waiting"
+				phone.show_page(PackedStringArray(["SAVING TO", "THE CLOUD...", ""]), "", "LOG OUT")
+				await Online.wait_for_cloud()
 			close()
 			Online.log_out()
 			restart_requested.emit("")
@@ -185,6 +192,8 @@ func _on_page_accepted() -> void:
 				_show_help()
 			else:
 				_show_menu(_item)
+		"waiting":
+			pass # it logs out once her save is in the cloud
 		_:
 			_show_menu(_item)
 
@@ -197,7 +206,7 @@ func _on_page_scrolled(step: int) -> void:
 
 # C goes back: from a page to the menu, and from the menu back to the game.
 func _on_back_pressed() -> void:
-	if not _open:
+	if not _open or _page == "waiting":
 		return
 	if _page == "":
 		close()
@@ -219,5 +228,5 @@ func _show_help() -> void:
 # A click beside the phone closes the menu.
 func _on_shade_input(event: InputEvent) -> void:
 	var click := event as InputEventMouseButton
-	if click != null and click.pressed:
+	if click != null and click.pressed and _page != "waiting":
 		close()

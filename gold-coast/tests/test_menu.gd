@@ -150,12 +150,12 @@ func _check_help() -> void:
 	for page: Array in PauseMenu.HOW_TO_PLAY:
 		for line: String in page:
 			fits = fits and line.length() <= Phone.MAX_CHARACTERS and _phone.can_show(line)
-	check(fits and PauseMenu.HOW_TO_PLAY.size() == 8, "every line of How to play fits the phone's screen, in its own font")
+	check(fits and PauseMenu.HOW_TO_PLAY.size() == 9, "every line of How to play fits the phone's screen, in its own font")
 	await _choose("HOW TO PLAY")
-	check(_phone.page_title == "HELP 1/8" and _phone.page_lines[0] == "WALK: WASD OR", "HOW TO PLAY shows the first page: %s"
+	check(_phone.page_title == "HELP 1/9" and _phone.page_lines[0] == "WALK: WASD OR", "HOW TO PLAY shows the first page: %s"
 			% " / ".join(_phone.page_lines))
 	await press_action("ui_down")
-	check(_phone.page_title == "HELP 2/8", "  ...the scroll key turns the pages")
+	check(_phone.page_title == "HELP 2/9", "  ...the scroll key turns the pages")
 	for i in PauseMenu.HOW_TO_PLAY.size() - 1:
 		await press_action("ui_accept")
 	check(_phone.screen == Phone.Screen.MENU and _phone.picked_item() == "HOW TO PLAY", "  ...and after the last page, back to the menu")

@@ -4,7 +4,8 @@ extends CanvasLayer
 ## over the screen while she sleeps. Every mobile money payment arrives on the
 ## phone as a text message. While she carries a load, the phone shows where it's
 ## going and how many minutes are left. Rent, its reminder, and the bedtime
-## save (with what she earned and spent that day) come as texts too.
+## save (with what she earned and spent that day) come as texts too. While
+## she's logged in, the little cloud on the phone shows her cloud save (Online).
 ##
 ## It also holds the title screen (TitleScreen) and the game's menu, which is
 ## on the phone (PauseMenu: M, Esc, or the phone's middle key).
@@ -44,9 +45,11 @@ func _ready() -> void:
 	GameState.rent_paid.connect(_on_rent_paid)
 	GameState.game_saved.connect(_show_saved)
 	GameState.skill_learned.connect(_show_certificate)
+	Online.cloud_changed.connect(_show_cloud)
 	_show_money(GameState.money)
 	_show_time(GameState.day, GameState.minutes)
 	_show_needs(GameState.hunger, GameState.energy)
+	_show_cloud()
 
 
 func _show_money(pesewas: int) -> void:
@@ -120,6 +123,22 @@ func _on_rent_paid(_amount: int) -> void:
 func _show_saved() -> void:
 	phone.show_sms(PackedStringArray(["GAME SAVED", "DAY %d" % GameState.day,
 			_fit("IN +", Format.cedis(GameState.earned_today)), _fit("OUT -", Format.cedis(GameState.spent_today))]))
+
+
+# The little cloud on the phone: full when her save is in the cloud, empty
+# while it isn't yet, and none offline. If, while she plays, the cloud turns out
+# to have another game (from another computer), a text says what happens.
+func _show_cloud() -> void:
+	match Online.cloud:
+		CloudSave.State.UP_TO_DATE:
+			phone.cloud = Phone.Cloud.FULL
+		CloudSave.State.WAITING, CloudSave.State.DIFFERS:
+			phone.cloud = Phone.Cloud.EMPTY
+		_:
+			phone.cloud = Phone.Cloud.NONE
+	var title := get_node_or_null("TitleScreen") as TitleScreen
+	if Online.cloud == CloudSave.State.DIFFERS and title != null and not title.is_open():
+		phone.show_sms(PackedStringArray(["CLOUD SAVE", "DIFFERS. NEXT", "START, PICK", "WHICH TO KEEP"]))
 
 
 func _show_mosquitoes() -> void:

@@ -4,8 +4,10 @@
 > phase two: online (details in section 8). Phase one (Jobs 1–9 and skills),
 > Job 15, and Job 16 are done. Job 17's automatic uploads to itch.io work; its
 > password-protected page, screenshots, and test on another computer are left.
-> Job 18's first parts (the account card, the server on this computer, and a
-> shared town with one clock) are built; cloud saves are next.
+> Job 18's parts are all built: the account card, the server (on this computer
+> and online), a shared town with one clock, and cloud saves (part 5, on
+> 2026-11-13, on the `job-18` branch). Left: the by-hand test with two
+> computers (or two browsers) against the online server, then merging to main.
 > The server is on the internet (part 4), at `api.goldcoaster.ai` on a
 > DigitalOcean droplet, and the game on itch.io uses it
 > (`server/production/README.md`).
@@ -802,6 +804,50 @@ of peeling plaster. Flat colors, simple shapes.
   old scene at once (deferred, outside its own code), and
   `change_scene_to_node()` adds the fresh one. Tests: `tests/test_restart.gd`,
   3 checks (469 in all).
+- **Job 18, part 5: cloud saves (2026-11-13).** Every save still goes to the
+  browser first; then a copy goes up to her account in the background.
+  - **On the server:** Nakama's storage, one object for each account
+    (collection `saves`, key `game`), that only she can read or change
+    (permission 1, "owner only"). The game writes it itself, so the server
+    needed no change.
+  - **The rules** (`scripts/cloud_save.gd`, `CloudSave`): each browser keeps
+    notes (`user://gold_coast_cloud.json`, `Online.cloud_file`): for each
+    account, the fingerprint (SHA-256) of the save here and the cloud copy's
+    version when they were last the same, and the last account to play here.
+    `CloudSave.next_step()` compares now with then: SAME, UPLOAD, DOWNLOAD,
+    CLEAR (another account's game, safe in their cloud, makes way for hers),
+    or ASK (both changed). The very same game in both always counts as SAME
+    (an upload whose answer never came back, because the page closed).
+  - **In `Online`:** `check_cloud()`, on the title screen once she's logged
+    in (a newer cloud save comes down; two different ones fill
+    `cloud_question`, and `keep_save("here" or "cloud")` keeps one). After
+    every save (`GameState.game_saved`), an upload in the background, only
+    over the version it looked at (`write_save()` with that version, or `*`
+    for "nothing there yet"), so another computer's save is never written
+    over. While she plays, a newer cloud save never comes down: the cloud
+    DIFFERS, her phone texts her, and the next start asks. With no internet
+    it WAITS, and tries again every 30 seconds (`CLOUD_RETRY_SECONDS`).
+    `Online.cloud` (`CloudSave.State`: OFF, UP_TO_DATE, WAITING, DIFFERS) and
+    the `cloud_changed` signal say how it stands.
+  - **The backends:** `NakamaBackend.read_save()` and `write_save()` (a
+    version that's changed comes back as `"conflict": true`, from Nakama's
+    "version check failed"); `FakeBackend` has a pretend cloud (`saves`,
+    `put_save()`, `delay` for a slow internet, and `before_next_write` for
+    another computer's save getting there first).
+  - **The title screen:** "Checking your cloud save...", then, if they differ,
+    KEEP WHICH? (THIS COMPUTER or THE CLOUD) on her phone, with both saves
+    described under the sign (C doesn't skip it). The saved game's line says
+    when it was saved, and "Logged in as @..." says how her cloud save stands.
+  - **The phone:** a little cloud right of the time (`Phone.cloud`: full, an
+    empty outline, or none offline), set by the HUD, and a ninth HOW TO PLAY
+    page about it. The phone menu's LOG OUT waits (up to 8 seconds) while her
+    save goes up ("SAVING TO THE CLOUD...").
+  - **The save** gains `saved_at` (when it was saved, as a Unix time), and
+    `GameState` gains `is_save()`, `save_text()`, and `replace_save()`;
+    `Format.date_time()` shows a time in this computer's time zone.
+  - Tests: `tests/test_cloud_save.gd`, 38 checks (507 in all), and
+    `tests/cloud_check.tscn`, which checks the real server on this computer
+    (see Commands).
 - **First character is done (Job 13, done early).** A young woman in a kaba and
   slit with a duku, gold jewelry, and sandals, in a slim, flat-color style.
   - She's built by `blender/scripts/build_player_character.py`, which exports
@@ -885,11 +931,12 @@ of peeling plaster. Flat colors, simple shapes.
   the files named after `--`). `tests/test_case.gd` (`TestCase`) is the base
   class, with `check()`, `wait_physics_frames()`, `press_action()`,
   `teleport()`, `wait_until()`, `click_at()`, and `move_mouse_to()`. There are
-  450 checks so far, all passing. `tests/web_check.gd` is different: it runs
+  507 checks so far, all passing. `tests/web_check.gd` is different: it runs
   in a browser, in the "Web check" build (see Commands). The runner gives
   `Online` a pretend server (`tests/fake_backend.gd`) and plays offline,
   unless a test logs in. The runner saves to `user://test_save.json`,
-  never your real save. It also switches the townspeople off
+  never your real save, and keeps its own cloud save notes
+  (`user://test_cloud.json`). It also switches the townspeople off
   (`GameState.town_life = false`) so they don't get in the way;
   `test_town.gd` switches them back on. Tests that need exact times stop the clock with
   `GameState.time_speed = 0.0` (`GameState.reset()` starts it again). In the
@@ -962,6 +1009,12 @@ Its console is at http://127.0.0.1:7351 (admin / password). The AI's sandbox
 can't run Docker (nor can commands typed with `!` in the AI's chat); start it
 in your own Terminal. Nakama reads `server/modules/` when it starts, so after
 changing them: `docker compose -f server/docker-compose.yml restart nakama`.
+With it running, the cloud check tries cloud saves against the real server
+(from `gold-coast/`, in your own Terminal; it makes two accounts of its own,
+`cloud_check_a` and `cloud_check_b`):
+```bash
+$GODOT --headless --path . res://tests/cloud_check.tscn   # CLOUD CHECK PASS, exit code 0
+```
 
 **The server on the internet** (a DigitalOcean droplet; the steps are in
 `server/production/README.md`), from your own Terminal:
@@ -1158,6 +1211,15 @@ marker, change the scripts that look for it (`Vehicle`, `Trotro`, `Car`).
 - **One login per browser:** the login is kept in the browser's storage, so
   two windows of one browser (or two games run from the editor) are the same
   player. To test two players, use two browsers.
+- **A pretend server answers at once.** `FakeBackend` returns straight away,
+  so the cloud's answer to a save arrives before the other things listening
+  to `game_saved` have run (like the HUD's GAME SAVED text, which then covers
+  the cloud's). A real server answers a moment later. A test that cares about
+  the order sets `FakeBackend.delay`.
+- **Comparing saves:** two saves of the same game don't have the same text
+  once they've been to the server (it stores JSON its own way), but they read
+  back as equal Dictionaries (`==` compares what's in them). That's how the
+  same game in both is never asked about.
 - **Everything in `gold-coast/` is exported,** pictures included: the four
   branding pictures added 7 MB to the web build. Keep files the game doesn't
   use out of `gold-coast/`, or add them to the presets' exclude filters.
@@ -1196,12 +1258,14 @@ kayayo/                       repo root
       ui/                     hud.tscn, phone.tscn, menu_board.gd, floating labels, account_screen.gd, later more menus
       online/                 town_players.gd and remote_player.gd: the other players in the shared town
       effects/                move_marker.tscn (the ring where you click), later other effects
-    scripts/                  shared helpers not tied to one scene, e.g. shapes.gd, format.gd, food.gd, delivery.gd, course.gd
+    scripts/                  shared helpers not tied to one scene, e.g. shapes.gd, format.gd, food.gd, delivery.gd, course.gd,
+                              cloud_save.gd (the cloud save rules)
     art/
       palette/                palette.gd, the single source of colors
       models/                 .glb files exported from Blender: characters/, buildings/, vehicles/
       materials/
-    tests/                    test_runner.tscn + test_*.gd; web_check.gd/.tscn/.sh and serve_web.sh (the web version's checks)
+    tests/                    test_runner.tscn + test_*.gd; web_check.gd/.tscn/.sh and serve_web.sh (the web version's checks);
+                              cloud_check.gd/.tscn (cloud saves against the real server on this computer)
     export_presets.cfg        the Web and Web check export settings
     build/                    web builds (not in git, except build/.gdignore)
 ```
@@ -1794,11 +1858,14 @@ my "Lagos Life" picture; everyone who signs up lives in the same town.
    free") and Log in, with "Play offline" for single player in the browser.
    The five pages are first drafts (`scripts/legal.gd`) to review before
    going public.
-3. **Cloud saves, local first:** every save goes to the browser first, then a
-   copy to Nakama's storage in the background. Logging in on another computer
-   brings the save; if two saves differ, it asks which to keep. A little
-   cloud on the phone shows whether the save is up to date. With no internet,
-   it uploads later.
+3. **Cloud saves, local first** (done, part 5, 2026-11-13): every save goes
+   to the browser first, then a copy to Nakama's storage in the background.
+   Logging in on another computer brings the save; if two saves differ, it
+   asks which to keep. A little cloud on the phone shows whether the save is
+   up to date. With no internet, it uploads later. As built, "differ" means
+   both have changed since they were last the same: if only one has, that one
+   is kept without asking (see `CloudSave`). Tests: `tests/test_cloud_save.gd`,
+   38 checks (507 in all).
 4. **One shared town** (done, parts 2 and 3): everyone logged in is in the
    same Gold Coast, at the same time of day. You see other players walking
    around, in their own colors, with their usernames over their heads. Each

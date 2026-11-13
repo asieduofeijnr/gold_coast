@@ -3,8 +3,11 @@ extends Control
 ## The title screen, when the game starts: GOLD COAST painted on a sign in
 ## Ghana's colors. First, if nobody's logged in, the account card
 ## (AccountScreen) asks you to make an account, log in, or play offline; if you
-## logged in before, it logs you in again by itself. Then her phone, held up,
-## shows the start menu:
+## logged in before, it logs you in again by itself. Logged in, it checks her
+## save against her cloud save (Online.check_cloud()): a newer one from another
+## computer comes down, and if both have changed, her phone asks which to keep
+## (THIS COMPUTER or THE CLOUD), with both described under the sign. Then her
+## phone, held up, shows the start menu:
 ## - CONTINUE (only if there's a saved game): carries on from it. Under the
 ##   sign it says when it was saved, and how much money she had.
 ## - NEW GAME: a fresh start. If there's a saved game it asks first; the old
@@ -33,6 +36,7 @@ var _page := ""
 var _help_page := 0
 var _account: AccountScreen
 var _logging_in := false
+var _checking := false
 
 
 func _ready() -> void:
@@ -60,7 +64,8 @@ func open() -> void:
 		problem = await Online.restore()
 		_logging_in = false
 	if Online.is_ready_to_play():
-		_show_start()
+		if not await _check_cloud():
+			_show_start()
 	else:
 		_show_account()
 		if problem != "":
@@ -87,17 +92,40 @@ func items() -> PackedStringArray:
 	return _items
 
 
+## Whether her phone is asking which of two saves to keep (this computer's or
+## the cloud's).
+func is_asking_which() -> bool:
+	return _page == "keep"
+
+
 ## What the title screen says about the saved game ("" if there isn't one).
 func saved_game_line() -> String:
-	if _saved.is_empty():
-		return ""
-	var day := int(_saved.day)
-	return "Saved game: %s, day %d, %s  ·  %s" % [Format.weekday(day), day, Format.clock(float(_saved.minutes)),
-			Format.cedis(int(_saved.money))]
+	return "" if _saved.is_empty() else "Saved game: " + describe(_saved)
+
+
+## The two saves she can choose between, as the title screen describes them:
+## this computer's, then the cloud's (empty if it isn't asking).
+func which_lines() -> PackedStringArray:
+	if not is_asking_which() or Online.cloud_question.is_empty():
+		return PackedStringArray()
+	return PackedStringArray(["This computer:  " + describe(Online.cloud_question.here),
+			"The cloud:  " + describe(Online.cloud_question.cloud)])
+
+
+## A saved game in a few words: the day and time in the game, her money, and
+## (for saves that know it) when it was saved, like "MON, day 5, 14:20  ·
+## GH₵230.00  ·  saved 13 Nov, 16:20".
+static func describe(save: Dictionary) -> String:
+	var day := int(save.get("day", 1))
+	var line := "%s, day %d, %s  ·  %s" % [Format.weekday(day), day, Format.clock(float(save.get("minutes", 0.0))),
+			Format.cedis(int(save.get("money", 0)))]
+	if save.get("saved_at") is float or save.get("saved_at") is int:
+		line += "  ·  saved " + Format.date_time(int(save.saved_at))
+	return line
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not _open or _account.is_open() or _logging_in:
+	if not _open or _account.is_open() or _logging_in or _checking:
 		return
 	var key := Phone.key_for(event)
 	if key != "":
@@ -106,6 +134,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_item_chosen(index: int) -> void:
+	if _open and _page == "keep":
+		_page = "keeping" # one choice: the keys wait until it's kept
+		await Online.keep_save("here" if index == 0 else "cloud")
+		_saved = GameState.peek_save()
+		_show_start()
+		return
 	if not _open or _page != "":
 		return
 	match _items[index]:
@@ -145,9 +179,9 @@ func _on_page_scrolled(step: int) -> void:
 		_show_help()
 
 
-# C goes back from a page to the start menu.
+# C goes back from a page to the start menu (but she must choose which save to keep).
 func _on_back_pressed() -> void:
-	if _open and _page != "":
+	if _open and _page != "" and _page not in ["keep", "keeping"]:
 		_show_menu(_items.find("NEW GAME" if _page == "new" else "HOW TO PLAY"))
 
 
@@ -160,7 +194,30 @@ func _show_account() -> void:
 
 func _on_account_done() -> void:
 	_account.close()
-	_show_start()
+	if not await _check_cloud():
+		_show_start()
+
+
+# Logged in, her save on this computer and her cloud save are brought into step
+# first (see Online.check_cloud()). Returns true if her phone is asking which
+# of the two to keep.
+func _check_cloud() -> bool:
+	if not Online.is_logged_in():
+		return false
+	_checking = true
+	phone.visible = false
+	queue_redraw()
+	var answer: String = await Online.check_cloud()
+	_checking = false
+	_saved = GameState.peek_save()
+	if answer != "ask":
+		return false
+	_page = "keep"
+	phone.visible = true
+	phone.hold_up(true)
+	phone.show_menu("KEEP WHICH?", PackedStringArray(["THIS COMPUTER", "THE CLOUD"]), 0)
+	queue_redraw()
+	return true
 
 
 func _show_start() -> void:
@@ -207,9 +264,12 @@ func _draw() -> void:
 	_draw_sign(SIGN)
 	# What's saved, who's playing, and how to choose.
 	var below := SIGN.end.y + 44.0
-	if _logging_in:
-		draw_string(font, Vector2(SIGN.position.x, below), "Logging in...", HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 20,
-				paper)
+	if _logging_in or _checking:
+		draw_string(font, Vector2(SIGN.position.x, below), "Logging in..." if _logging_in else "Checking your cloud save...",
+				HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 20, paper)
+		return
+	if _page in ["keep", "keeping"]:
+		_draw_which(font, below)
 		return
 	var saved := saved_game_line()
 	if saved == "":
@@ -220,9 +280,38 @@ func _draw() -> void:
 		CediText.draw(self, font, Vector2(SIGN.get_center().x - width / 2.0, below), saved, 20, paper)
 	draw_string(font, Vector2(SIGN.position.x, below + 34.0), "Choose on her phone: the arrow keys and Enter, or click its keys.",
 			HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 15, Palette.color(Palette.ColorName.PLINTH_LIGHT))
-	var who := "Logged in as @%s" % Online.username if Online.is_logged_in() else "Playing offline, without an account"
+	var who := "Logged in as @%s%s" % [Online.username, _cloud_note()] if Online.is_logged_in() \
+			else "Playing offline, without an account"
 	draw_string(font, Vector2(SIGN.position.x, below + 64.0), who, HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 15,
 			Palette.color(Palette.ColorName.KENTE_GOLD))
+
+
+# What the cloud is like, after "Logged in as @...".
+func _cloud_note() -> String:
+	match Online.cloud:
+		CloudSave.State.UP_TO_DATE:
+			return "  ·  your save is in the cloud"
+		CloudSave.State.WAITING:
+			return "  ·  your save goes to the cloud when it can"
+		CloudSave.State.DIFFERS:
+			return "  ·  the cloud has another save"
+	return ""
+
+
+# Two saves that differ, and which to keep: this computer's and the cloud's.
+func _draw_which(font: Font, below: float) -> void:
+	var paper := Palette.color(Palette.ColorName.PAPER)
+	var light := Palette.color(Palette.ColorName.PLINTH_LIGHT)
+	draw_string(font, Vector2(SIGN.position.x, below), "You have two different saved games. Which one do you keep?",
+			HORIZONTAL_ALIGNMENT_CENTER, SIGN.size.x, 20, paper)
+	var lines := which_lines() if _page == "keep" else PackedStringArray()
+	for i in lines.size():
+		var width := CediText.width(font, lines[i], 16)
+		CediText.draw(self, font, Vector2(SIGN.get_center().x - width / 2.0, below + 34.0 + 26.0 * i), lines[i], 16,
+				Palette.color(Palette.ColorName.KENTE_GOLD))
+	draw_string(font, Vector2(SIGN.position.x, below + 112.0),
+			"Choose on her phone. The other one is replaced by the one you keep.", HORIZONTAL_ALIGNMENT_CENTER,
+			SIGN.size.x, 15, light)
 
 
 # The sign in `rect`: a wooden frame round Ghana's red, gold, and green, with

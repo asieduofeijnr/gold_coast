@@ -532,3 +532,25 @@ Plain-language notes on the ideas behind each job, newest at the bottom.
   times. A test now checks the restart with something that waits a frame at a
   time, like the chickens.
 
+## Job 18, part 5: cloud saves
+- **This computer first.** Every save still goes to the browser first, and
+  the game plays from that copy. Then a copy goes up to the server in the
+  background. If it can't (no internet), nothing's lost: the save waits on
+  this computer, the game tries again every 30 seconds, and the little cloud
+  on the phone stays empty until it's up.
+- **A fingerprint.** To tell whether the save has changed, the game doesn't
+  keep a second copy of it: it keeps its *fingerprint* (a SHA-256 hash), a
+  64-letter code made from the save's text. The same text always gives the
+  same code, and changing anything, even one pesewa, gives a different one.
+- **Comparing three ways.** Two saves on their own can't tell you which is
+  newer, or which came from which. Comparing each with how things stood *the
+  last time they were the same* can: if only this computer's has changed, it
+  goes up; if only the cloud's has (you played somewhere else), it comes
+  down; if both have, only you can say which to keep. Git works the same way.
+- **Versions, and "only if nobody's changed it".** Each time her save is
+  written on the server, Nakama gives it a new *version*. The game sends a
+  save up "only if the cloud's is still the version I looked at". If another
+  computer's save got there in between, the server turns this one down
+  instead of writing over it, and she chooses later. This is called
+  *optimistic concurrency*: expect nobody else to be writing, but check at
+  the last moment.

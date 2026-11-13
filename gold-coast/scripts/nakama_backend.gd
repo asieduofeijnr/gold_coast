@@ -5,9 +5,15 @@ extends RefCounted
 ## (tests/fake_backend.gd) with the same functions.
 ##
 ## The account functions return a Dictionary: {"ok": true, "token": ...,
-## "refresh_token": ..., "username": ..., "display_name": ..., "email": ...}
-## when it worked, or {"ok": false, "error": what went wrong, in plain words,
-## "unreachable": whether that was because the server couldn't be reached}.
+## "refresh_token": ..., "user_id": ..., "username": ..., "display_name": ...,
+## "email": ...} when it worked, or {"ok": false, "error": what went wrong, in
+## plain words, "unreachable": whether that was because the server couldn't be
+## reached}.
+##
+## Cloud saves (see Online and CloudSave) keep her saved game in the server's
+## storage: one object for each account, in the "saves" collection, that only
+## she can read or change. read_save() and write_save() return the login's
+## tokens too, in case the client renewed them on the way.
 ##
 ## The shared town (server/modules/town.lua) goes over a live connection (a
 ## socket): join_town(), send_move(), and leave_town(), and the signals say
@@ -30,6 +36,12 @@ const PERMISSION_DENIED := 7
 ## The town's messages: "here's where I am", and the town's time of day.
 const OP_MOVE := 1
 const OP_CLOCK := 2
+## Where her save is kept in the server's storage: the collection, and its key there.
+const SAVES := "saves"
+const SAVE_KEY := "game"
+## Storage permissions: OWNER_ONLY (1) means only the account that owns it can
+## read it (or change it); 0 would be the server alone, 2 everyone.
+const OWNER_ONLY := 1
 
 var _client: NakamaClient
 var _socket: NakamaSocket
@@ -62,6 +74,51 @@ func restore(token: String, refresh_token: String) -> Dictionary:
 
 func log_out(token: String, refresh_token: String) -> void:
 	await _client.session_logout_async(NakamaSession.new(token, false, refresh_token))
+
+
+## Her save in the cloud: {"ok": true, "save": the saved game (a Dictionary),
+## or null if there isn't one, "version": its version ("" if there isn't one),
+## "token": ..., "refresh_token": ...}, or a failure.
+func read_save(token: String, refresh_token: String) -> Dictionary:
+	var session := NakamaSession.new(token, false, refresh_token)
+	var read: NakamaAPI.ApiStorageObjects = await _client.read_storage_objects_async(session,
+			[NakamaStorageObjectId.new(SAVES, SAVE_KEY, session.user_id)])
+	if read.is_exception():
+		return failure(read.get_exception(), false)
+	var result := {"ok": true, "save": null, "version": "", "token": session.token,
+			"refresh_token": session.refresh_token}
+	for stored: NakamaAPI.ApiStorageObject in read.objects:
+		var json := JSON.new()
+		result.save = json.data if json.parse(stored.value) == OK else {} # {}: not a saved game
+		result.version = stored.version
+	return result
+
+
+## Puts `text` (the saved game's file) in the cloud as her save, if the copy
+## there is still `version` ("*": if there isn't one yet), so it never writes
+## over a save another computer put there in the meantime. Returns {"ok": true,
+## "version": the new copy's version, "token": ..., "refresh_token": ...}, or a
+## failure, with "conflict": true if the copy there had changed.
+func write_save(token: String, refresh_token: String, text: String, version: String) -> Dictionary:
+	var session := NakamaSession.new(token, false, refresh_token)
+	var wrote: NakamaAPI.ApiStorageObjectAcks = await _client.write_storage_objects_async(session,
+			[save_object(text, version)])
+	if wrote.is_exception():
+		var problem := wrote.get_exception()
+		var result := failure(problem, false)
+		# Nakama: "Storage write rejected - version check failed."
+		result["conflict"] = problem.grpc_status_code == INVALID_ARGUMENT and "version" in problem.message
+		return result
+	var new_version := ""
+	for ack: NakamaAPI.ApiStorageObjectAck in wrote.acks:
+		new_version = ack.version
+	return {"ok": true, "version": new_version, "token": session.token, "refresh_token": session.refresh_token}
+
+
+## The storage object her save goes up as: in SAVES, at SAVE_KEY, that only she
+## can read or change.
+static func save_object(text: String, version: String) -> NakamaWriteStorageObject:
+	return NakamaWriteStorageObject.new(SAVES, SAVE_KEY, OWNER_ONLY, OWNER_ONLY, text, version)
 
 
 ## Connects to the server and joins the shared town. Returns "" if it worked,
@@ -127,7 +184,7 @@ func _finish(session: NakamaSession, signing_up: bool) -> Dictionary:
 	var account: NakamaAPI.ApiAccount = await _client.get_account_async(session)
 	if account.is_exception():
 		return failure(account.get_exception(), signing_up)
-	return {"ok": true, "token": session.token, "refresh_token": session.refresh_token,
+	return {"ok": true, "token": session.token, "refresh_token": session.refresh_token, "user_id": account.user.id,
 			"username": account.user.username, "display_name": account.user.display_name, "email": account.email}
 
 

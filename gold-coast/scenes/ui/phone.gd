@@ -7,7 +7,9 @@ extends Control
 ## (₵) always shows.
 ##
 ## Where an old Nokia had its signal and battery bars, down the sides of the
-## screen, this phone has a food bar (left) and an energy bar (right).
+## screen, this phone has a food bar (left) and an energy bar (right). While
+## she's logged in, a little cloud by the time shows her cloud save: full when
+## it's up to date, empty while it isn't yet (see `cloud`).
 ##
 ## Set `screen_value` to change the big text; the backlight flashes each time.
 ## show_sms() shows a text message, like the ones mobile money sends after
@@ -88,6 +90,11 @@ const LCD_FONT := {
 const FOOD_ICON := [".#.#.", "#.#..", ".....", "#####", "#####", ".###.", "....."] # a steaming bowl
 const ENERGY_ICON := ["...##", "..##.", ".##..", "#####", "..##.", ".##..", "##..."] # a lightning bolt
 const MESSAGE_ICON := ["#######", "##...##", "#.#.#.#", "#..#..#", "#######"] # an envelope
+## The little cloud (see `cloud`): full, or just its outline (empty).
+const CLOUD_FULL_ICON := ["....###..", ".##.####.", "#########", "#########", ".#######."]
+const CLOUD_EMPTY_ICON := ["....###..", ".##.#..#.", "#..#....#", "#.......#", ".#######."]
+## Where the cloud goes on the screen, in dots: in the top bar, right of the time.
+const CLOUD_SPOT := Vector2i(59, 1)
 ## The keypad: each key's number and the letters printed beside it.
 const KEYS := [["1", ""], ["2", "abc"], ["3", "def"], ["4", "ghi"], ["5", "jkl"], ["6", "mno"],
 		["7", "pqrs"], ["8", "tuv"], ["9", "wxyz"], ["*", "+"], ["0", ""], ["#", ""]]
@@ -120,6 +127,9 @@ signal back_pressed
 
 ## What the screen shows: the usual (money, time, and needs), a menu, or a page.
 enum Screen { HOME, MENU, PAGE }
+## The little cloud by the time: none (playing offline), full (her save is in
+## the cloud), or empty (it isn't yet: it goes up when it can).
+enum Cloud { NONE, FULL, EMPTY }
 
 ## The brand printed above the screen.
 @export var brand := "CHALE":
@@ -157,6 +167,11 @@ enum Screen { HOME, MENU, PAGE }
 @export_range(0.0, 100.0) var energy := 100.0:
 	set(value):
 		energy = value
+		queue_redraw()
+## The little cloud in the top bar, by the time.
+@export var cloud := Cloud.NONE:
+	set(value):
+		cloud = value
 		queue_redraw()
 
 ## How brightly the backlight is on, from 0 (off) to 1 (fully on).
@@ -550,12 +565,14 @@ func _draw_screen() -> void:
 		# A text message takes over the screen, under the time.
 		_pattern(MESSAGE_ICON, Vector2i(0, 1), ink)
 		_text(status_time, 0, 1, ink)
+		_draw_cloud(ink)
 		for i in _sms.size():
 			_text(_sms[i], 11 + i * 9, 1, ink)
 		return
 	_need_bar(hunger, FOOD_ICON, false, ink, unlit)
 	_need_bar(energy, ENERGY_ICON, true, ink, unlit)
 	_text(status_time, 0, 1, ink)
+	_draw_cloud(ink)
 	_text(screen_day, 10, 1, ink)
 	_text(shown_title(), 19, 1, ink)
 	_text(screen_value, 29, 2, ink)
@@ -589,6 +606,12 @@ func _draw_menu(ink: Color, paper: Color, unlit: Color) -> void:
 			_dot(LCD_DOTS.x - 2, y, ink)
 			_dot(LCD_DOTS.x - 1, y, ink)
 	_text("SELECT", SOFT_KEY_ROW, 1, ink)
+
+
+# The little cloud in the top bar, if there is one (see `cloud`).
+func _draw_cloud(ink: Color) -> void:
+	if cloud != Cloud.NONE:
+		_pattern(CLOUD_FULL_ICON if cloud == Cloud.FULL else CLOUD_EMPTY_ICON, CLOUD_SPOT, ink)
 
 
 # A title along the top of the screen, with a dotted line under it.

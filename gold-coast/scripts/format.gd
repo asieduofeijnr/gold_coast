@@ -2,6 +2,7 @@ class_name Format
 ## Turns numbers into text for the player.
 
 const WEEKDAYS := ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 
 ## Money as Ghana cedis. `pesewas` is the amount in pesewas (100 = GH₵1):
@@ -31,3 +32,14 @@ static func clock(minutes: float) -> String:
 ## The day of the week for a day number. Day 1 is a Monday: 1 → "MON", 8 → "MON".
 static func weekday(day: int) -> String:
 	return WEEKDAYS[posmod(day - 1, 7)]
+
+
+## A real date and time, in this computer's time zone, from a Unix time
+## (seconds since 1970, in UTC, like a save's "saved_at"): "13 Nov, 16:20".
+## `bias` is the time zone's difference from UTC, in minutes (this computer's
+## if it's left out).
+static func date_time(unix: int, bias: Variant = null) -> String:
+	if bias == null:
+		bias = Time.get_time_zone_from_system().get("bias", 0)
+	var at := Time.get_datetime_dict_from_unix_time(unix + int(bias) * 60)
+	return "%d %s, %02d:%02d" % [at.day, MONTHS[int(at.month) - 1], at.hour, at.minute]
